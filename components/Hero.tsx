@@ -21,10 +21,11 @@ export default function Hero() {
               Built for county golf unions
             </div>
 
-            <h1 className="text-4xl md:text-5xl font-extrabold text-gray-900 leading-tight tracking-tight mb-6">
-              CountyConsent —{' '}
-              <span className="text-green-700">Junior Safeguarding for Golf</span>
+            <h1 className="text-4xl md:text-5xl font-extrabold text-gray-900 leading-tight tracking-tight mb-4">
+              One missing consent form could change everything.
             </h1>
+
+            <p className="text-xl font-semibold text-green-700 mb-4">Junior Golf Safeguarding, Done Right.</p>
 
             <p className="text-lg text-gray-600 leading-relaxed mb-8">
               CountyConsent is the only GDPR-compliant digital consent system built specifically for county golf unions — so your staff have the right information, at the right time, every time.
