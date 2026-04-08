@@ -40,10 +40,10 @@ export default function Nav() {
         </nav>
 
         <div className="hidden md:flex items-center gap-3">
-          <a href="#demo" className="inline-flex items-center px-5 py-2.5 rounded-xl text-sm font-semibold text-white transition-all hover:opacity-90 shadow-sm"
+          <Link href="/pricing" className="inline-flex items-center px-5 py-2.5 rounded-xl text-sm font-semibold text-white transition-all hover:opacity-90 shadow-sm"
             style={{background:'linear-gradient(135deg,#155230,#1a6b3e)'}}>
-            Request a demo
-          </a>
+            Get started
+          </Link>
         </div>
 
         <button className="md:hidden p-2 rounded-lg text-gray-600 hover:bg-gray-100 transition-colors"
@@ -61,11 +61,11 @@ export default function Nav() {
               onClick={() => setMenuOpen(false)}
               className="text-sm font-medium text-gray-700">{label}</a>
           ))}
-          <a href="#demo" onClick={() => setMenuOpen(false)}
+          <Link href="/pricing" onClick={() => setMenuOpen(false)}
             className="inline-flex items-center justify-center px-4 py-2.5 rounded-xl text-white text-sm font-semibold"
             style={{background:'linear-gradient(135deg,#155230,#1a6b3e)'}}>
-            Request a demo
-          </a>
+            Get started
+          </Link>
         </div>
       )}
     </header>

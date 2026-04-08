@@ -1,4 +1,4 @@
-'use client'
+import Link from 'next/link'
 
 const features = [
   'Unlimited staff users',
@@ -16,27 +16,13 @@ const features = [
 function PricingCard({ plan }: { plan: 'monthly' | 'annual' }) {
   const isAnnual = plan === 'annual'
 
-  const handleCheckout = async () => {
-    try {
-      const res = await fetch('/api/create-checkout-session', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ plan }),
-      })
-      const data = await res.json()
-      if (data.url) window.location.href = data.url
-    } catch {
-      alert('Something went wrong. Please try again.')
-    }
-  }
-
   if (isAnnual) {
     return (
       <div className="relative rounded-2xl overflow-hidden shadow-2xl" style={{background:'linear-gradient(145deg,#0a2818 0%,#155230 60%,#1a6b3e 100%)'}}>
         {/* Save badge */}
         <div className="absolute top-5 right-5">
           <span className="text-xs font-black px-3 py-1.5 rounded-full" style={{background:'#c9921c',color:'white'}}>
-            SAVE £300
+            SAVE £298
           </span>
         </div>
         {/* Decorative circle */}
@@ -45,16 +31,16 @@ function PricingCard({ plan }: { plan: 'monthly' | 'annual' }) {
         <div className="relative p-8 md:p-10">
           <div className="text-green-300 text-sm font-bold tracking-widest uppercase mb-4">Annual plan</div>
           <div className="flex items-end gap-2 mb-2">
-            <span className="text-6xl font-black text-white tracking-tight">£1,500</span>
+            <span className="text-6xl font-black text-white tracking-tight">£1,490</span>
             <span className="text-green-300 text-lg mb-3">/year</span>
           </div>
-          <p className="text-green-200 text-sm mb-8">Billed annually · equivalent to £125/month</p>
+          <p className="text-green-200 text-sm mb-8">Billed annually · equivalent to £124/month</p>
 
-          <button onClick={handleCheckout}
-            className="w-full py-4 rounded-xl font-black text-base transition-all hover:opacity-90 mb-8"
+          <Link href="/signup?plan=annual"
+            className="block w-full py-4 rounded-xl font-black text-base text-center transition-all hover:opacity-90 mb-8"
             style={{background:'#c9921c',color:'white'}}>
-            Start free 30-day trial →
-          </button>
+            Get started →
+          </Link>
 
           <ul className="space-y-3">
             {features.map((f) => (
@@ -75,16 +61,16 @@ function PricingCard({ plan }: { plan: 'monthly' | 'annual' }) {
     <div className="rounded-2xl border-2 border-gray-200 bg-white p-8 md:p-10 shadow-sm hover:border-gray-300 hover:shadow-md transition-all">
       <div className="text-gray-400 text-sm font-bold tracking-widest uppercase mb-4">Monthly plan</div>
       <div className="flex items-end gap-2 mb-2">
-        <span className="text-6xl font-black text-gray-900 tracking-tight">£150</span>
+        <span className="text-6xl font-black text-gray-900 tracking-tight">£149</span>
         <span className="text-gray-400 text-lg mb-3">/month</span>
       </div>
       <p className="text-gray-500 text-sm mb-8">Billed monthly · cancel anytime</p>
 
-      <button onClick={handleCheckout}
-        className="w-full py-4 rounded-xl font-black text-base border-2 transition-all hover:bg-gray-50 mb-8"
+      <Link href="/signup?plan=monthly"
+        className="block w-full py-4 rounded-xl font-black text-base text-center border-2 transition-all hover:bg-gray-50 mb-8"
         style={{borderColor:'#155230',color:'#155230'}}>
-        Start free 30-day trial
-      </button>
+        Get started
+      </Link>
 
       <ul className="space-y-3">
         {features.map((f) => (

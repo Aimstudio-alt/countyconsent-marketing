@@ -24,22 +24,67 @@ export async function POST(request: NextRequest) {
   const supabase = createServiceClient()
 
   switch (event.type) {
+    case 'checkout.session.completed': {
+      const session = event.data.object as Stripe.Checkout.Session
+      const supabaseUserId = session.metadata?.supabase_user_id
+      const customerId = typeof session.customer === 'string' ? session.customer : session.customer?.id
+      const subscriptionId = typeof session.subscription === 'string' ? session.subscription : session.subscription?.id
+      const plan = session.metadata?.plan || 'monthly'
+
+      if (supabaseUserId && customerId) {
+        await supabase
+          .from('counties')
+          .update({
+            stripe_customer_id: customerId,
+            stripe_subscription_id: subscriptionId || null,
+            subscription_status: session.payment_status === 'paid' ? 'active' : 'trialing',
+          })
+          .eq('supabase_user_id', supabaseUserId)
+      }
+
+      // Also update Stripe customer name from metadata
+      if (customerId && session.metadata?.secretary_name) {
+        await stripe.customers.update(customerId, {
+          name: session.metadata.secretary_name,
+          metadata: {
+            county_union_name: session.metadata.county_union_name || '',
+            governing_body: session.metadata.governing_body || '',
+          },
+        })
+      }
+      break
+    }
+
     case 'customer.subscription.created': {
       const subscription = event.data.object as Stripe.Subscription
       const customer = await stripe.customers.retrieve(subscription.customer as string) as Stripe.Customer
 
       const email = customer.email
-      const name = customer.name || ''
+      const name = customer.name || subscription.metadata?.secretary_name || ''
       const plan = subscription.items.data[0]?.price?.recurring?.interval === 'year' ? 'annual' : 'monthly'
+      const supabaseUserId = subscription.metadata?.supabase_user_id
 
-      await supabase.from('subscribers').insert({
+      // Update counties table subscription status
+      if (supabaseUserId) {
+        await supabase
+          .from('counties')
+          .update({
+            stripe_customer_id: customer.id,
+            stripe_subscription_id: subscription.id,
+            subscription_status: subscription.status,
+          })
+          .eq('supabase_user_id', supabaseUserId)
+      }
+
+      // Also maintain legacy subscribers table for backwards compat
+      await supabase.from('subscribers').upsert({
         stripe_customer_id: customer.id,
         stripe_subscription_id: subscription.id,
         email,
         name,
         plan,
         status: subscription.status,
-      })
+      }, { onConflict: 'stripe_subscription_id' })
 
       if (email) {
         await resend.emails.send({
@@ -58,7 +103,7 @@ export async function POST(request: NextRequest) {
                   ${subscription.trial_end ? `Your 30-day free trial runs until <strong>${new Date(subscription.trial_end * 1000).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })}</strong>.` : ''}
                 </p>
                 <p style="color: #4b5563; line-height: 1.6; margin: 0 0 24px;">
-                  We'll be in touch shortly with your login details and onboarding guide. In the meantime, reply to this email if you have any questions.
+                  You can log in to your dashboard at any time. Reply to this email if you have any questions.
                 </p>
                 <hr style="border: none; border-top: 1px solid #e5e7eb; margin: 24px 0;" />
                 <p style="color: #9ca3af; font-size: 13px; margin: 0;">
@@ -89,6 +134,10 @@ export async function POST(request: NextRequest) {
     case 'customer.subscription.updated': {
       const subscription = event.data.object as Stripe.Subscription
       await supabase
+        .from('counties')
+        .update({ subscription_status: subscription.status })
+        .eq('stripe_subscription_id', subscription.id)
+      await supabase
         .from('subscribers')
         .update({ status: subscription.status })
         .eq('stripe_subscription_id', subscription.id)
@@ -97,6 +146,10 @@ export async function POST(request: NextRequest) {
 
     case 'customer.subscription.deleted': {
       const subscription = event.data.object as Stripe.Subscription
+      await supabase
+        .from('counties')
+        .update({ subscription_status: 'cancelled' })
+        .eq('stripe_subscription_id', subscription.id)
       await supabase
         .from('subscribers')
         .update({ status: 'cancelled' })

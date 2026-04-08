@@ -39,9 +39,9 @@ export default function Hero() {
             </p>
 
             <div className="flex flex-col sm:flex-row gap-3 mb-12">
-              <a href="#demo" className="inline-flex items-center justify-center px-7 py-4 rounded-xl text-white font-bold text-base shadow-lg hover:opacity-90 transition-all hover:-translate-y-0.5"
+              <a href="/pricing" className="inline-flex items-center justify-center px-7 py-4 rounded-xl text-white font-bold text-base shadow-lg hover:opacity-90 transition-all hover:-translate-y-0.5"
                 style={{background:'linear-gradient(135deg,#155230,#1a6b3e)'}}>
-                Request a demo
+                Get started free
                 <svg className="ml-2 w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
                 </svg>
