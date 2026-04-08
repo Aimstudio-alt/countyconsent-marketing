@@ -1,8 +1,35 @@
 @import "tailwindcss";
 
+@theme inline {
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+
+  /* Brand colours */
+  --color-brand-950: #051409;
+  --color-brand-900: #0a2818;
+  --color-brand-800: #0f3d24;
+  --color-brand-700: #155230;
+  --color-brand-600: #1a6b3e;
+  --color-brand-500: #228450;
+  --color-brand-400: #34a866;
+  --color-brand-100: #d4ede0;
+  --color-brand-50:  #edf7f2;
+
+  --color-gold-700: #92620a;
+  --color-gold-600: #b07c12;
+  --color-gold-500: #c9921c;
+  --color-gold-400: #e0aa30;
+  --color-gold-300: #f0c050;
+  --color-gold-100: #fdf0cb;
+  --color-gold-50:  #fffaeb;
+
+  --color-cream: #fdfcf8;
+  --color-cream-dark: #f7f5ee;
+}
+
 :root {
-  --background: #ffffff;
-  --foreground: #111827;
+  --background: #fdfcf8;
+  --foreground: #0f1a10;
 }
 
 body {
@@ -12,6 +39,19 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
-html {
-  scroll-behavior: smooth;
+html { scroll-behavior: smooth; }
+
+/* Gradient text utility */
+.text-gradient {
+  background: linear-gradient(135deg, #155230 0%, #228450 50%, #c9921c 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.text-gradient-gold {
+  background: linear-gradient(135deg, #b07c12 0%, #e0aa30 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
 }
