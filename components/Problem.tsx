@@ -54,7 +54,8 @@ export default function Problem() {
             The problem
           </div>
           <h2 className="text-3xl md:text-4xl font-black tracking-tight mb-4" style={{color:'#0a2818'}}>
-            The risks county unions face<br className="hidden md:block" />
+            The risks county unions face{' '}
+            <br className="hidden md:block" />
             on every junior golf trip
           </h2>
           <p className="text-lg max-w-2xl mx-auto" style={{color:'#6b7280'}}>
