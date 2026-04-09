@@ -34,11 +34,12 @@ export async function POST(request: NextRequest) {
     })
 
     if (authError) {
-      if (authError.message?.toLowerCase().includes('already registered') || authError.message?.toLowerCase().includes('already exists')) {
+      const msg = authError.message || ''
+      console.error('Supabase auth error:', msg)
+      if (msg.toLowerCase().includes('already registered') || msg.toLowerCase().includes('already exists') || msg.toLowerCase().includes('unique')) {
         return NextResponse.json({ error: 'An account with this email already exists.' }, { status: 409 })
       }
-      console.error('Supabase auth error:', authError)
-      return NextResponse.json({ error: 'Failed to create account. Please try again.' }, { status: 500 })
+      return NextResponse.json({ error: `Auth error: ${msg}` }, { status: 500 })
     }
 
     const userId = authData.user.id
@@ -59,7 +60,7 @@ export async function POST(request: NextRequest) {
       console.error('Counties insert error:', insertError)
       // Clean up auth user if counties insert fails
       await supabase.auth.admin.deleteUser(userId)
-      return NextResponse.json({ error: 'Failed to create account. Please try again.' }, { status: 500 })
+      return NextResponse.json({ error: `Database error: ${insertError.message}` }, { status: 500 })
     }
 
     // Create Stripe Checkout session
@@ -97,7 +98,8 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ url: session.url })
   } catch (err) {
-    console.error('Signup error:', err)
-    return NextResponse.json({ error: 'Something went wrong. Please try again.' }, { status: 500 })
+    const msg = err instanceof Error ? err.message : String(err)
+    console.error('Signup error:', msg)
+    return NextResponse.json({ error: `Unexpected error: ${msg}` }, { status: 500 })
   }
 }
