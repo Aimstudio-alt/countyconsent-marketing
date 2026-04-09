@@ -1,8 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import Stripe from 'stripe'
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!)
-
 export async function POST(request: NextRequest) {
   try {
     const { plan } = await request.json()
@@ -11,10 +9,13 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Invalid plan' }, { status: 400 })
     }
 
-    const priceId =
-      plan === 'monthly'
-        ? process.env.STRIPE_MONTHLY_PRICE_ID!
-        : process.env.STRIPE_ANNUAL_PRICE_ID!
+    const isTest = process.env.STRIPE_MODE === 'test'
+    const stripeKey = isTest ? process.env.TEST_STRIPE_SECRET_KEY! : process.env.STRIPE_SECRET_KEY!
+    const stripe = new Stripe(stripeKey)
+
+    const priceId = plan === 'monthly'
+      ? (isTest ? process.env.TEST_STRIPE_MONTHLY_PRICE_ID! : process.env.STRIPE_MONTHLY_PRICE_ID!)
+      : (isTest ? process.env.TEST_STRIPE_ANNUAL_PRICE_ID! : process.env.STRIPE_ANNUAL_PRICE_ID!)
 
     const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://countyconsent.co.uk'
 
@@ -22,17 +23,15 @@ export async function POST(request: NextRequest) {
       mode: 'subscription',
       payment_method_types: ['card'],
       line_items: [{ price: priceId, quantity: 1 }],
-      subscription_data: {
-        trial_period_days: 30,
-      },
-      success_url: `${appUrl}/thank-you?session_id={CHECKOUT_SESSION_ID}`,
+      success_url: `${appUrl}/welcome?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${appUrl}/pricing`,
       allow_promotion_codes: true,
     })
 
     return NextResponse.json({ url: session.url })
   } catch (err) {
-    console.error('Stripe checkout error:', err)
+    const msg = err instanceof Error ? err.message : String(err)
+    console.error('[create-checkout-session]', msg)
     return NextResponse.json({ error: 'Failed to create checkout session' }, { status: 500 })
   }
 }

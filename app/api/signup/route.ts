@@ -2,14 +2,24 @@ import { NextRequest, NextResponse } from 'next/server'
 import Stripe from 'stripe'
 import { createServiceClient } from '@/lib/supabase'
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!)
+function getStripeClient() {
+  const isTest = process.env.STRIPE_MODE === 'test'
+  const key = isTest ? process.env.TEST_STRIPE_SECRET_KEY! : process.env.STRIPE_SECRET_KEY!
+  return { stripe: new Stripe(key), isTest }
+}
+
+function getPriceId(plan: string, isTest: boolean) {
+  if (plan === 'monthly') {
+    return isTest ? process.env.TEST_STRIPE_MONTHLY_PRICE_ID! : process.env.STRIPE_MONTHLY_PRICE_ID!
+  }
+  return isTest ? process.env.TEST_STRIPE_ANNUAL_PRICE_ID! : process.env.STRIPE_ANNUAL_PRICE_ID!
+}
 
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json()
     const { countyUnionName, governingBody, secretaryName, email, phone, password, plan } = body
 
-    // Validate required fields
     if (!countyUnionName || !governingBody || !secretaryName || !email || !phone || !password || !plan) {
       return NextResponse.json({ error: 'All fields are required.' }, { status: 400 })
     }
@@ -22,7 +32,6 @@ export async function POST(request: NextRequest) {
 
     const supabase = createServiceClient()
 
-    // Create Supabase Auth user
     const { data: authData, error: authError } = await supabase.auth.admin.createUser({
       email,
       password,
@@ -35,7 +44,7 @@ export async function POST(request: NextRequest) {
 
     if (authError) {
       const msg = authError.message || ''
-      console.error('Supabase auth error:', msg)
+      console.error('[signup] auth error:', msg)
       if (msg.toLowerCase().includes('already registered') || msg.toLowerCase().includes('already exists') || msg.toLowerCase().includes('unique')) {
         return NextResponse.json({ error: 'An account with this email already exists.' }, { status: 409 })
       }
@@ -44,7 +53,6 @@ export async function POST(request: NextRequest) {
 
     const userId = authData.user.id
 
-    // Insert into counties table with pending_payment status
     const { error: insertError } = await supabase.from('counties').insert({
       supabase_user_id: userId,
       county_union_name: countyUnionName,
@@ -57,22 +65,13 @@ export async function POST(request: NextRequest) {
     })
 
     if (insertError) {
-      console.error('Counties insert error:', insertError)
-      // Clean up auth user if counties insert fails
+      console.error('[signup] insert error:', insertError.message)
       await supabase.auth.admin.deleteUser(userId)
       return NextResponse.json({ error: `Database error: ${insertError.message}` }, { status: 500 })
     }
 
-    // Create Stripe Checkout session
-    const priceId =
-      plan === 'monthly'
-        ? process.env.STRIPE_MONTHLY_PRICE_ID!
-        : process.env.STRIPE_ANNUAL_PRICE_ID!
-
-    console.log('DEBUG plan:', plan)
-    console.log('DEBUG priceId:', priceId)
-    console.log('DEBUG key prefix:', process.env.STRIPE_SECRET_KEY?.slice(0, 12))
-
+    const { stripe, isTest } = getStripeClient()
+    const priceId = getPriceId(plan, isTest)
     const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://countyconsent.co.uk'
 
     const session = await stripe.checkout.sessions.create({
@@ -80,8 +79,11 @@ export async function POST(request: NextRequest) {
       payment_method_types: ['card'],
       customer_email: email,
       line_items: [{ price: priceId, quantity: 1 }],
+      metadata: {
+        supabase_user_id: userId,
+        plan,
+      },
       subscription_data: {
-        trial_period_days: 30,
         metadata: {
           supabase_user_id: userId,
           county_union_name: countyUnionName,
@@ -91,10 +93,6 @@ export async function POST(request: NextRequest) {
           plan,
         },
       },
-      metadata: {
-        supabase_user_id: userId,
-        plan,
-      },
       success_url: `${appUrl}/welcome?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${appUrl}/signup?plan=${plan}`,
       allow_promotion_codes: true,
@@ -103,7 +101,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ url: session.url })
   } catch (err) {
     const msg = err instanceof Error ? err.message : String(err)
-    console.error('Signup error:', msg)
+    console.error('[signup] unexpected error:', msg)
     return NextResponse.json({ error: `Unexpected error: ${msg}` }, { status: 500 })
   }
 }
