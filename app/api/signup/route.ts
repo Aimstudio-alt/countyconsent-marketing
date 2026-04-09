@@ -69,6 +69,10 @@ export async function POST(request: NextRequest) {
         ? process.env.STRIPE_MONTHLY_PRICE_ID!
         : process.env.STRIPE_ANNUAL_PRICE_ID!
 
+    console.log('DEBUG plan:', plan)
+    console.log('DEBUG priceId:', priceId)
+    console.log('DEBUG key prefix:', process.env.STRIPE_SECRET_KEY?.slice(0, 12))
+
     const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://countyconsent.co.uk'
 
     const session = await stripe.checkout.sessions.create({
