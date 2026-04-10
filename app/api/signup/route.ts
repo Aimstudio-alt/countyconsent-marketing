@@ -18,7 +18,17 @@ function getPriceId(plan: string, isTest: boolean) {
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json()
-    const { countyUnionName, governingBody, secretaryName, email, phone, password, plan } = body
+    const {
+      accountType,
+      countyUnionName,
+      governingBody,
+      secretaryName,
+      email,
+      phone,
+      parentCountyId,
+      password,
+      plan,
+    } = body
 
     if (!countyUnionName || !governingBody || !secretaryName || !email || !phone || !password || !plan) {
       return NextResponse.json({ error: 'All fields are required.' }, { status: 400 })
@@ -30,7 +40,30 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Password must be at least 8 characters.' }, { status: 400 })
     }
 
+    const resolvedAccountType: 'county_union' | 'golf_club' =
+      accountType === 'golf_club' ? 'golf_club' : 'county_union'
+
+    if (resolvedAccountType === 'golf_club' && !parentCountyId) {
+      return NextResponse.json({ error: 'Golf clubs must select a county union.' }, { status: 400 })
+    }
+
     const supabase = createServiceClient()
+
+    // Validate parentCountyId exists and is an active county union
+    if (resolvedAccountType === 'golf_club') {
+      const { data: parentCounty, error: parentError } = await supabase
+        .from('counties')
+        .select('id, account_type, subscription_status')
+        .eq('id', parentCountyId)
+        .single()
+
+      if (parentError || !parentCounty) {
+        return NextResponse.json({ error: 'Selected county union not found.' }, { status: 400 })
+      }
+      if (parentCounty.account_type !== 'county_union') {
+        return NextResponse.json({ error: 'Invalid county union selected.' }, { status: 400 })
+      }
+    }
 
     const { data: authData, error: authError } = await supabase.auth.admin.createUser({
       email,
@@ -39,13 +72,18 @@ export async function POST(request: NextRequest) {
       user_metadata: {
         county_union_name: countyUnionName,
         secretary_name: secretaryName,
+        account_type: resolvedAccountType,
       },
     })
 
     if (authError) {
       const msg = authError.message || ''
       console.error('[signup] auth error:', msg)
-      if (msg.toLowerCase().includes('already registered') || msg.toLowerCase().includes('already exists') || msg.toLowerCase().includes('unique')) {
+      if (
+        msg.toLowerCase().includes('already registered') ||
+        msg.toLowerCase().includes('already exists') ||
+        msg.toLowerCase().includes('unique')
+      ) {
         return NextResponse.json({ error: 'An account with this email already exists.' }, { status: 409 })
       }
       return NextResponse.json({ error: `Auth error: ${msg}` }, { status: 500 })
@@ -62,6 +100,8 @@ export async function POST(request: NextRequest) {
       phone,
       plan,
       subscription_status: 'pending_payment',
+      account_type: resolvedAccountType,
+      parent_county_id: resolvedAccountType === 'golf_club' ? parentCountyId : null,
     })
 
     if (insertError) {
@@ -82,6 +122,7 @@ export async function POST(request: NextRequest) {
       metadata: {
         supabase_user_id: userId,
         plan,
+        account_type: resolvedAccountType,
       },
       subscription_data: {
         metadata: {
@@ -91,6 +132,7 @@ export async function POST(request: NextRequest) {
           secretary_name: secretaryName,
           phone,
           plan,
+          account_type: resolvedAccountType,
         },
       },
       success_url: `${appUrl}/welcome?session_id={CHECKOUT_SESSION_ID}`,
