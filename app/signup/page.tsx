@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, Suspense } from 'react'
+import { useState, Suspense } from 'react'
 import { useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 
@@ -11,13 +11,11 @@ const GOVERNING_BODIES = [
   'Golf Ireland',
 ]
 
-type AccountType = 'county_union' | 'golf_club'
+const ENGLAND_GOLF_COUNTIES = [
+  'Durham County Golf Union',
+]
 
-type CountyUnion = {
-  id: string
-  county_union_name: string
-  governing_body: string
-}
+type AccountType = 'county_union' | 'golf_club'
 
 function SignupForm() {
   const searchParams = useSearchParams()
@@ -25,8 +23,6 @@ function SignupForm() {
   const plan: 'monthly' | 'annual' = planParam === 'annual' ? 'annual' : 'monthly'
 
   const [accountType, setAccountType] = useState<AccountType>('county_union')
-  const [countyUnions, setCountyUnions] = useState<CountyUnion[]>([])
-  const [countyUnionsLoading, setCountyUnionsLoading] = useState(false)
 
   const [form, setForm] = useState({
     organisationName: '',
@@ -34,23 +30,12 @@ function SignupForm() {
     contactName: '',
     email: '',
     phone: '',
-    parentCountyId: '',
+    parentCountyName: '',
     password: '',
     passwordConfirm: '',
   })
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
-
-  // Load county unions when Golf Club is selected
-  useEffect(() => {
-    if (accountType !== 'golf_club') return
-    setCountyUnionsLoading(true)
-    fetch('/api/county-unions')
-      .then(r => r.json())
-      .then(d => setCountyUnions(d.countyUnions || []))
-      .catch(() => setCountyUnions([]))
-      .finally(() => setCountyUnionsLoading(false))
-  }, [accountType])
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     setForm(prev => ({ ...prev, [e.target.name]: e.target.value }))
@@ -68,7 +53,7 @@ function SignupForm() {
       setError('Password must be at least 8 characters.')
       return
     }
-    if (accountType === 'golf_club' && !form.parentCountyId) {
+    if (accountType === 'golf_club' && !form.parentCountyName) {
       setError('Please select which county union your club belongs to.')
       return
     }
@@ -85,7 +70,7 @@ function SignupForm() {
           secretaryName: form.contactName,
           email: form.email,
           phone: form.phone,
-          parentCountyId: accountType === 'golf_club' ? form.parentCountyId : undefined,
+          parentCountyName: accountType === 'golf_club' ? form.parentCountyName : undefined,
           password: form.password,
           plan,
         }),
@@ -208,35 +193,23 @@ function SignupForm() {
             {/* County union selector (golf clubs only) */}
             {accountType === 'golf_club' && (
               <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-1.5" htmlFor="parentCountyId">
+                <label className="block text-sm font-semibold text-gray-700 mb-1.5" htmlFor="parentCountyName">
                   County union
                 </label>
-                {countyUnionsLoading ? (
-                  <div className="w-full px-4 py-3 rounded-xl border border-gray-200 text-sm text-gray-400">
-                    Loading county unions…
-                  </div>
-                ) : countyUnions.length === 0 ? (
-                  <div className="w-full px-4 py-3 rounded-xl border border-amber-200 text-sm text-amber-700 bg-amber-50">
-                    No registered county unions found. Please contact us for help.
-                  </div>
-                ) : (
-                  <select
-                    id="parentCountyId"
-                    name="parentCountyId"
-                    required
-                    value={form.parentCountyId}
-                    onChange={handleChange}
-                    className={`${inputClass} bg-white`}
-                    style={ringStyle}
-                  >
-                    <option value="">Select your county union</option>
-                    {countyUnions.map(cu => (
-                      <option key={cu.id} value={cu.id}>
-                        {cu.county_union_name} ({cu.governing_body})
-                      </option>
-                    ))}
-                  </select>
-                )}
+                <select
+                  id="parentCountyName"
+                  name="parentCountyName"
+                  required
+                  value={form.parentCountyName}
+                  onChange={handleChange}
+                  className={`${inputClass} bg-white`}
+                  style={ringStyle}
+                >
+                  <option value="">Select your county union</option>
+                  {ENGLAND_GOLF_COUNTIES.map(name => (
+                    <option key={name} value={name}>{name}</option>
+                  ))}
+                </select>
               </div>
             )}
 

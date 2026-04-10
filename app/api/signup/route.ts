@@ -25,7 +25,7 @@ export async function POST(request: NextRequest) {
       secretaryName,
       email,
       phone,
-      parentCountyId,
+      parentCountyName,
       password,
       plan,
     } = body
@@ -43,26 +43,22 @@ export async function POST(request: NextRequest) {
     const resolvedAccountType: 'county_union' | 'golf_club' =
       accountType === 'golf_club' ? 'golf_club' : 'county_union'
 
-    if (resolvedAccountType === 'golf_club' && !parentCountyId) {
+    if (resolvedAccountType === 'golf_club' && !parentCountyName) {
       return NextResponse.json({ error: 'Golf clubs must select a county union.' }, { status: 400 })
     }
 
     const supabase = createServiceClient()
 
-    // Validate parentCountyId exists and is an active county union
-    if (resolvedAccountType === 'golf_club') {
-      const { data: parentCounty, error: parentError } = await supabase
+    // Look up parent county union by name (best-effort — null if not yet registered)
+    let resolvedParentCountyId: string | null = null
+    if (resolvedAccountType === 'golf_club' && parentCountyName) {
+      const { data: parentCounty } = await supabase
         .from('counties')
-        .select('id, account_type, subscription_status')
-        .eq('id', parentCountyId)
-        .single()
-
-      if (parentError || !parentCounty) {
-        return NextResponse.json({ error: 'Selected county union not found.' }, { status: 400 })
-      }
-      if (parentCounty.account_type !== 'county_union') {
-        return NextResponse.json({ error: 'Invalid county union selected.' }, { status: 400 })
-      }
+        .select('id')
+        .eq('account_type', 'county_union')
+        .ilike('county_union_name', parentCountyName)
+        .maybeSingle()
+      resolvedParentCountyId = parentCounty?.id ?? null
     }
 
     const { data: authData, error: authError } = await supabase.auth.admin.createUser({
@@ -101,7 +97,7 @@ export async function POST(request: NextRequest) {
       plan,
       subscription_status: 'pending_payment',
       account_type: resolvedAccountType,
-      parent_county_id: resolvedAccountType === 'golf_club' ? parentCountyId : null,
+      parent_county_id: resolvedAccountType === 'golf_club' ? resolvedParentCountyId : null,
     })
 
     if (insertError) {
@@ -133,6 +129,9 @@ export async function POST(request: NextRequest) {
           phone,
           plan,
           account_type: resolvedAccountType,
+          ...(resolvedAccountType === 'golf_club' && parentCountyName
+            ? { parent_county_name: parentCountyName }
+            : {}),
         },
       },
       success_url: `${appUrl}/welcome?session_id={CHECKOUT_SESSION_ID}`,
