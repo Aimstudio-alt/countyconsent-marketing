@@ -131,7 +131,7 @@ function SignupForm() {
               Create your account
             </h1>
             <p className="text-gray-500 text-sm">
-              30-day free trial · no credit card required today
+              No setup fees · Cancel anytime
             </p>
           </div>
 
@@ -361,7 +361,6 @@ function SignupForm() {
 
             <p className="text-center text-xs text-gray-400 leading-relaxed">
               By creating an account you agree to our terms of service and privacy policy.
-              Your trial starts today — payment details collected after sign-up.
             </p>
           </form>
 
@@ -377,7 +376,7 @@ function SignupForm() {
           </p>
 
           <div className="mt-6 flex items-center justify-center gap-6">
-            {['UK GDPR compliant', 'UK data storage', '30-day free trial'].map(item => (
+            {['UK GDPR compliant', 'UK data storage', 'Cancel anytime'].map(item => (
               <div key={item} className="flex items-center gap-1.5 text-xs text-gray-400">
                 <svg
                   className="w-3.5 h-3.5 flex-shrink-0"
