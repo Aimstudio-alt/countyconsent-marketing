@@ -83,6 +83,47 @@ const features = [
     description: 'Staff see only what they need. Medical data is protected — accessible only to those who need it on the day.',
     accent: '#f5f3ff',
   },
+  {
+    icon: (
+      <svg viewBox="0 0 40 40" fill="none" className="w-8 h-8">
+        <rect width="40" height="40" rx="11" fill="#f0fdf4" />
+        <circle cx="18" cy="17" r="5" stroke="#16a34a" strokeWidth="1.5" />
+        <path d="M25 24l5 5" stroke="#16a34a" strokeWidth="2" strokeLinecap="round" />
+        <path d="M14 26h12" stroke="#16a34a" strokeWidth="1.5" strokeLinecap="round" />
+        <path d="M14 29h8" stroke="#16a34a" strokeWidth="1.5" strokeLinecap="round" />
+      </svg>
+    ),
+    title: 'Junior golfer register',
+    description: 'Every junior in one place — name, club, age, consent status, and medical flags visible at a glance across all trips.',
+    accent: '#f0fdf4',
+  },
+  {
+    icon: (
+      <svg viewBox="0 0 40 40" fill="none" className="w-8 h-8">
+        <rect width="40" height="40" rx="11" fill="#fdf4ff" />
+        <path d="M20 10v4M20 26v4M10 20h4M26 20h4" stroke="#a21caf" strokeWidth="1.5" strokeLinecap="round" />
+        <circle cx="20" cy="20" r="6" stroke="#a21caf" strokeWidth="1.5" />
+        <path d="M20 17v3l2 2" stroke="#a21caf" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+      </svg>
+    ),
+    title: 'GDPR age-18 alerts',
+    description: 'Automatic alerts when a junior turns 18, with a guided workflow to erase their data in line with UK GDPR data minimisation rules.',
+    accent: '#fdf4ff',
+  },
+  {
+    icon: (
+      <svg viewBox="0 0 40 40" fill="none" className="w-8 h-8">
+        <rect width="40" height="40" rx="11" fill="#fff7ed" />
+        <rect x="11" y="13" width="18" height="14" rx="3" stroke="#ea580c" strokeWidth="1.5" />
+        <path d="M15 18h10M15 21h7" stroke="#ea580c" strokeWidth="1.5" strokeLinecap="round" />
+        <circle cx="28" cy="13" r="5" fill="#ea580c" />
+        <path d="M28 10v3l2 1" stroke="white" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" />
+      </svg>
+    ),
+    title: 'Live dashboard',
+    description: 'The dashboard refreshes automatically as consent forms arrive — no manual refresh needed during the busy run-up to a trip.',
+    accent: '#fff7ed',
+  },
 ]
 
 export default function Features() {
@@ -95,10 +136,10 @@ export default function Features() {
             Features
           </div>
           <h2 className="text-3xl md:text-4xl font-black tracking-tight mb-4" style={{color:'#0a2818'}}>
-            Everything your union needs,<br className="hidden md:block" />nothing it doesn&apos;t
+            Everything your organisation needs,<br className="hidden md:block" />nothing it doesn&apos;t
           </h2>
           <p className="text-lg max-w-2xl mx-auto" style={{color:'#6b7280'}}>
-            Purpose-built for county golf. No generic safeguarding software shoehorned to fit — designed for exactly this use case.
+            Purpose-built for junior golf. No generic safeguarding software shoehorned to fit — designed for exactly this use case.
           </p>
         </div>
 

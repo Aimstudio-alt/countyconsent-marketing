@@ -2,7 +2,7 @@ const stats = [
   {
     value: '39',
     label: 'County unions in England',
-    sub: 'all England Golf affiliated',
+    sub: 'plus 1,900+ affiliated golf clubs',
     color: '#155230',
   },
   {

@@ -103,7 +103,11 @@ export async function POST(request: NextRequest) {
     if (insertError) {
       console.error('[signup] insert error:', insertError.message)
       await supabase.auth.admin.deleteUser(userId)
-      return NextResponse.json({ error: `Database error: ${insertError.message}` }, { status: 500 })
+      const isDuplicate = insertError.code === '23505' || insertError.message.includes('duplicate key')
+      return NextResponse.json(
+        { error: isDuplicate ? 'An account with this email already exists. Please sign in instead.' : `Something went wrong creating your account. Please try again or contact support.` },
+        { status: isDuplicate ? 409 : 500 }
+      )
     }
 
     const { stripe, isTest } = getStripeClient()

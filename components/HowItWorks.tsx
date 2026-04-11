@@ -62,7 +62,7 @@ export default function HowItWorks() {
             From roster to roadtrip<br className="hidden md:block" /> in five steps
           </h2>
           <p className="text-lg max-w-2xl mx-auto" style={{color:'#6b7280'}}>
-            A complete walkthrough of how CountyConsent works — from setting up your union to the moment you board the coach.
+            A complete walkthrough of how CountyConsent works — from setting up your organisation to the moment you board the coach.
           </p>
         </div>
       </div>
@@ -128,7 +128,7 @@ export default function HowItWorks() {
             <div className="relative">
               <h3 className="text-2xl md:text-3xl font-black text-white mb-3">Ready to see it in action?</h3>
               <p className="text-green-200 text-lg mb-7 max-w-xl mx-auto">
-                We&apos;ll walk you through the whole flow live, tailored to your county union&apos;s setup.
+                We&apos;ll walk you through the whole flow live, tailored to your organisation&apos;s setup.
               </p>
               <a href="#demo" className="inline-flex items-center px-7 py-4 rounded-xl font-bold text-base transition-all hover:opacity-90"
                 style={{background:'#c9921c',color:'white'}}>

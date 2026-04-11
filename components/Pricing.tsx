@@ -99,7 +99,7 @@ export default function Pricing() {
             One price. Everything included.
           </h2>
           <p className="text-lg max-w-xl mx-auto" style={{color:'#6b7280'}}>
-            No per-user fees, no hidden costs, no surprises — just simple, transparent pricing for your entire union.
+            No per-user fees, no hidden costs, no surprises — just simple, transparent pricing for your entire organisation.
           </p>
         </div>
 

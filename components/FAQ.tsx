@@ -20,8 +20,8 @@ const faqs = [
     a: 'Yes. Monthly subscribers can cancel at any time and your subscription will run until the end of the current billing period. Annual subscribers receive a pro-rata refund for any unused months.',
   },
   {
-    q: 'Is it really built for county golf unions?',
-    a: 'Yes. CountyConsent was built in direct partnership with Durham County Golf Union. It reflects the real workflows, safeguarding requirements, and England Golf accreditation standards that county unions face.',
+    q: 'Is it really built for golf organisations?',
+    a: 'Yes. CountyConsent was built in direct partnership with Durham County Golf Union and is designed for both county unions and individual golf clubs. It reflects the real workflows, safeguarding requirements, and England Golf accreditation standards that organisations face.',
   },
   {
     q: 'What happens after the 30-day free trial?',

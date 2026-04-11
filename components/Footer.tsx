@@ -14,7 +14,7 @@ export default function Footer() {
               <span className="font-bold text-white text-base">CountyConsent</span>
             </div>
             <p className="text-sm leading-relaxed mb-5" style={{color:'#6b9980'}}>
-              Junior Golf Safeguarding, Done Right. The only GDPR-compliant digital consent system built specifically for county golf unions.
+              Junior Golf Safeguarding, Done Right. The only GDPR-compliant digital consent system built specifically for county golf unions and clubs.
             </p>
             <a href="#demo" className="inline-flex items-center px-4 py-2.5 rounded-xl text-sm font-semibold transition-all hover:opacity-90"
               style={{background:'#c9921c',color:'white'}}>

@@ -31,7 +31,7 @@ export default function Compliance() {
           {/* Callout block */}
           <div className="max-w-2xl mx-auto rounded-2xl p-6 border-l-4 text-left" style={{background:'white',borderLeftColor:'#c9921c'}}>
             <p className="text-xl font-bold italic leading-snug mb-1" style={{color:'#0a2818'}}>
-              &ldquo;We built CountyConsent because county golf unions were doing their best with paper — and their best wasn&apos;t enough to protect them.&rdquo;
+              &ldquo;We built CountyConsent because golf organisations were doing their best with paper — and their best wasn&apos;t enough to protect them.&rdquo;
             </p>
             <p className="text-sm font-medium" style={{color:'#6b7280'}}>
               Built in partnership with Durham County Golf Union
@@ -73,7 +73,7 @@ export default function Compliance() {
             </div>
             <a href="#demo" className="inline-flex items-center justify-center px-6 py-3.5 rounded-xl font-bold text-white text-sm transition-all hover:opacity-90"
               style={{background:'linear-gradient(135deg,#155230,#1a6b3e)'}}>
-              Talk to us about your union
+              Talk to us about your organisation
               <svg className="ml-2 w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
               </svg>

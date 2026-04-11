@@ -17,7 +17,7 @@ export default function DemoForm() {
     const data = {
       firstName: (form.elements.namedItem('firstName') as HTMLInputElement).value,
       lastName: (form.elements.namedItem('lastName') as HTMLInputElement).value,
-      countyUnion: (form.elements.namedItem('countyUnion') as HTMLInputElement).value,
+      organisation: (form.elements.namedItem('organisation') as HTMLInputElement).value,
       email: (form.elements.namedItem('email') as HTMLInputElement).value,
       phone: (form.elements.namedItem('phone') as HTMLInputElement).value,
     }
@@ -53,7 +53,7 @@ export default function DemoForm() {
               See CountyConsent in action
             </h2>
             <p className="text-gray-600 text-lg leading-relaxed mb-8">
-              We&apos;ll show you exactly how CountyConsent works for your county union — and answer any questions you have about safeguarding, data compliance, or implementation.
+              We&apos;ll show you exactly how CountyConsent works for your organisation — and answer any questions you have about safeguarding, data compliance, or implementation.
             </p>
 
             <ul className="space-y-3">
@@ -107,16 +107,16 @@ export default function DemoForm() {
               </div>
 
               <div>
-                <label htmlFor="countyUnion" className="block text-sm font-medium text-gray-700 mb-1.5">
-                  County Union name
+                <label htmlFor="organisation" className="block text-sm font-medium text-gray-700 mb-1.5">
+                  Organisation name
                 </label>
                 <input
-                  id="countyUnion"
-                  name="countyUnion"
+                  id="organisation"
+                  name="organisation"
                   type="text"
                   required
                   className="w-full px-4 py-2.5 rounded-lg border border-gray-200 text-gray-900 text-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-green-600 focus:border-transparent transition"
-                  placeholder="e.g. Yorkshire County Golf Union"
+                  placeholder="e.g. Yorkshire County Golf Union or Hexham Golf Club"
                 />
               </div>
 
