@@ -37,15 +37,6 @@ const SCREENS = [
   { id: 8, label: "Medical Summary" },
 ];
 
-const SCREEN_TIPS: Record<number, string> = {
-  1: "Click the <strong>trip card</strong> to view trip details, or click <strong>New trip</strong> to see how easy it is to add one.",
-  2: "The form is pre-filled with demo data. Click <strong>Create trip</strong> to continue.",
-  4: "Try <strong>View details</strong> on James Taylor to see the medical alert, <strong>Send consent email</strong> on Sophie Davis, or <strong>Add golfer</strong> to see the form.",
-  5: "Fill in any details you like, then click <strong>Add golfer</strong> to see them appear in the trip.",
-  7: "This is the full consent record — scroll down to see emergency contacts, GP details, and signed consents.",
-  8: "This is the printable medical summary your team manager takes on the day. Click <strong>Back to trip</strong> when done.",
-};
-
 // ── Shared sub-components ─────────────────────────────────────────────────────
 
 function DonutRing({ pct }: { pct: number }) {
@@ -118,6 +109,22 @@ function Breadcrumb({ items }: { items: string[] }) {
   );
 }
 
+/** Wraps a clickable element with a pulsing ring + arrow label pointing at it. */
+function ClickHint({ children, label }: { children: React.ReactNode; label: string }) {
+  return (
+    <span className="inline-flex flex-col items-center gap-1.5">
+      <span className="relative inline-flex">
+        <span className="absolute -inset-1 rounded-xl ring-2 ring-green-400 animate-pulse opacity-75 pointer-events-none" />
+        {children}
+      </span>
+      <span className="inline-flex items-center gap-1 text-[11px] font-bold px-2.5 py-0.5 rounded-full whitespace-nowrap pointer-events-none"
+        style={{ background: "#166534", color: "white" }}>
+        ▲ {label}
+      </span>
+    </span>
+  );
+}
+
 // ── Screen 1: Dashboard ───────────────────────────────────────────────────────
 
 function Screen1({ onNewTrip, onOpenTrip, golfers, consentedCount, medicalCount }: {
@@ -135,12 +142,14 @@ function Screen1({ onNewTrip, onOpenTrip, golfers, consentedCount, medicalCount 
           <h1 className="text-2xl font-bold text-slate-900 tracking-tight">Trips & Consent Tracker</h1>
           <p className="text-slate-500 mt-1 text-sm">Monitor parental consent progress across all junior golf trips</p>
         </div>
-        <button onClick={onNewTrip}
-          className="inline-flex items-center gap-2 text-white text-sm font-semibold px-4 py-2.5 rounded-xl shadow-sm transition-all duration-200"
-          style={{ background: "linear-gradient(135deg, #166534, #15803d)" }}>
-          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 4v16m8-8H4" /></svg>
-          New trip
-        </button>
+        <ClickHint label="Create a trip">
+          <button onClick={onNewTrip}
+            className="inline-flex items-center gap-2 text-white text-sm font-semibold px-4 py-2.5 rounded-xl shadow-sm transition-all duration-200"
+            style={{ background: "linear-gradient(135deg, #166534, #15803d)" }}>
+            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 4v16m8-8H4" /></svg>
+            New trip
+          </button>
+        </ClickHint>
       </div>
 
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
@@ -163,6 +172,9 @@ function Screen1({ onNewTrip, onOpenTrip, golfers, consentedCount, medicalCount 
           <h2 className="text-base font-bold text-slate-800 tracking-tight">Upcoming Trips</h2>
           <span className="text-xs bg-slate-100 text-slate-600 font-semibold px-2 py-0.5 rounded-full">1</span>
         </div>
+        <div className="flex flex-col items-center gap-1.5">
+        <div className="relative w-full">
+          <span className="absolute -inset-1 rounded-2xl ring-2 ring-green-400 animate-pulse opacity-75 pointer-events-none" />
         <button onClick={onOpenTrip} className="w-full text-left group flex items-center gap-4 bg-white rounded-2xl border border-slate-200 border-l-4 border-l-amber-400 shadow-sm hover:shadow-md hover:border-slate-300 transition-all duration-200 p-5">
           <DonutRing pct={pct} />
           <div className="flex-1 min-w-0">
@@ -193,6 +205,12 @@ function Screen1({ onNewTrip, onOpenTrip, golfers, consentedCount, medicalCount 
           </div>
           <svg className="w-4 h-4 text-slate-300 group-hover:text-slate-500 group-hover:translate-x-0.5 transition-all duration-200 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg>
         </button>
+        </div>
+          <span className="inline-flex items-center gap-1 text-[11px] font-bold px-2.5 py-0.5 rounded-full whitespace-nowrap pointer-events-none"
+            style={{ background: "#166534", color: "white" }}>
+            ▲ View this trip
+          </span>
+        </div>
       </section>
 
     </div>
@@ -239,12 +257,14 @@ function Screen2({ onSubmit, onBack }: { onSubmit: () => void; onBack: () => voi
             className="w-full px-4 py-2.5 rounded-xl border border-slate-300 text-slate-900 text-sm bg-slate-50 focus:outline-none" />
         </div>
         <div className="flex items-center gap-3 pt-2">
-          <button onClick={onSubmit}
-            className="inline-flex items-center gap-2 text-white text-sm font-semibold px-5 py-2.5 rounded-xl shadow-sm transition-all"
-            style={{ background: "linear-gradient(135deg, #166534, #15803d)" }}>
-            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" /></svg>
-            Create trip
-          </button>
+          <ClickHint label="Create the trip">
+            <button onClick={onSubmit}
+              className="inline-flex items-center gap-2 text-white text-sm font-semibold px-5 py-2.5 rounded-xl shadow-sm transition-all"
+              style={{ background: "linear-gradient(135deg, #166534, #15803d)" }}>
+              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" /></svg>
+              Create trip
+            </button>
+          </ClickHint>
           <button onClick={onBack} className="text-sm font-semibold text-slate-500 hover:text-slate-700 px-4 py-2.5 rounded-xl border border-slate-200 hover:bg-slate-50 transition-colors">
             Cancel
           </button>
@@ -308,12 +328,14 @@ function Screen4({ golfers, onAddGolfer, onSendEmail, onViewGolfer, onPrintMedic
             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" /></svg>
             Medical summary
           </button>
-          <button onClick={onAddGolfer}
-            className="inline-flex items-center gap-2 text-white text-sm font-semibold px-4 py-2.5 rounded-xl shadow-sm transition-all"
-            style={{ background: "linear-gradient(135deg, #166534, #15803d)" }}>
-            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 4v16m8-8H4" /></svg>
-            Add golfer
-          </button>
+          <ClickHint label="Add a golfer">
+            <button onClick={onAddGolfer}
+              className="inline-flex items-center gap-2 text-white text-sm font-semibold px-4 py-2.5 rounded-xl shadow-sm transition-all"
+              style={{ background: "linear-gradient(135deg, #166534, #15803d)" }}>
+              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 4v16m8-8H4" /></svg>
+              Add golfer
+            </button>
+          </ClickHint>
         </div>
       </div>
 
@@ -384,10 +406,19 @@ function Screen4({ golfers, onAddGolfer, onSendEmail, onViewGolfer, onPrintMedic
                 <td className="px-5 py-3.5"><ConsentBadge consented={g.consented} /></td>
                 <td className="px-5 py-3.5 text-right">
                   {g.id === 1 ? (
-                    <button onClick={onViewGolfer}
-                      className="text-xs font-semibold text-green-700 hover:text-green-800 px-3 py-1.5 rounded-lg border border-green-200 bg-green-50 hover:bg-green-100 transition-colors">
-                      View details
-                    </button>
+                    <ClickHint label="See medical alert">
+                      <button onClick={onViewGolfer}
+                        className="text-xs font-semibold text-green-700 hover:text-green-800 px-3 py-1.5 rounded-lg border border-green-200 bg-green-50 hover:bg-green-100 transition-colors">
+                        View details
+                      </button>
+                    </ClickHint>
+                  ) : g.id === 2 && !g.consented ? (
+                    <ClickHint label="Send email">
+                      <button onClick={() => onSendEmail(g.parent_email)}
+                        className="text-xs font-semibold text-slate-600 hover:text-slate-800 px-3 py-1.5 rounded-lg border border-slate-200 hover:bg-slate-50 transition-colors">
+                        Send consent email
+                      </button>
+                    </ClickHint>
                   ) : !g.consented ? (
                     <button onClick={() => onSendEmail(g.parent_email)}
                       className="text-xs font-semibold text-slate-600 hover:text-slate-800 px-3 py-1.5 rounded-lg border border-slate-200 hover:bg-slate-50 transition-colors">
@@ -463,12 +494,14 @@ function Screen5({ golfers, onAdd, onBack }: {
           <p className="text-xs text-slate-400 mt-1.5">A consent link will be emailed automatically.</p>
         </div>
         <div className="flex items-center gap-3 pt-2">
-          <button onClick={handleSubmit}
-            className="inline-flex items-center gap-2 text-white text-sm font-semibold px-5 py-2.5 rounded-xl shadow-sm transition-all"
-            style={{ background: "linear-gradient(135deg, #166534, #15803d)" }}>
-            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 4v16m8-8H4" /></svg>
-            Add golfer
-          </button>
+          <ClickHint label="Add to trip">
+            <button onClick={handleSubmit}
+              className="inline-flex items-center gap-2 text-white text-sm font-semibold px-5 py-2.5 rounded-xl shadow-sm transition-all"
+              style={{ background: "linear-gradient(135deg, #166534, #15803d)" }}>
+              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 4v16m8-8H4" /></svg>
+              Add golfer
+            </button>
+          </ClickHint>
           <button onClick={onBack} className="text-sm font-semibold text-slate-500 hover:text-slate-700 px-4 py-2.5 rounded-xl border border-slate-200 hover:bg-slate-50 transition-colors">
             Cancel
           </button>
@@ -715,7 +748,7 @@ export default function DemoPage() {
       </div>
 
       {/* Demo controls */}
-      <div className="sticky top-0 z-40 bg-white border-b border-slate-200 shadow-sm px-4 py-3 space-y-2">
+      <div className="sticky top-0 z-40 bg-white border-b border-slate-200 shadow-sm px-4 py-3">
         <div className="max-w-6xl mx-auto flex items-center justify-between gap-4">
           <div className="flex items-center gap-3 flex-1 min-w-0">
             <span className="text-xs font-semibold text-slate-500 whitespace-nowrap hidden sm:block">
@@ -741,16 +774,6 @@ export default function DemoPage() {
             </Link>
           </div>
         </div>
-        {/* Per-screen tip */}
-        {SCREEN_TIPS[screen] && (
-          <div className="max-w-6xl mx-auto flex items-center gap-2 px-3 py-2 rounded-lg" style={{ background: "#eff6ff", border: "1px solid #bfdbfe" }}>
-            <svg className="w-3.5 h-3.5 flex-shrink-0" style={{ color: "#3b82f6" }} fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
-            <p className="text-xs font-medium" style={{ color: "#1e40af" }}
-              dangerouslySetInnerHTML={{ __html: SCREEN_TIPS[screen] }} />
-          </div>
-        )}
       </div>
 
       {/* Fake app nav */}
