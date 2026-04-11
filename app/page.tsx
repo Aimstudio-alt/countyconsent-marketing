@@ -8,7 +8,7 @@ import Features from '@/components/Features'
 import Compliance from '@/components/Compliance'
 import Pricing from '@/components/Pricing'
 import FAQ from '@/components/FAQ'
-import DemoForm from '@/components/DemoForm'
+import BookDemo from '@/components/BookDemo'
 import Footer from '@/components/Footer'
 
 export default function Home() {
@@ -25,7 +25,7 @@ export default function Home() {
         <Compliance />
         <Pricing />
         <FAQ />
-        <DemoForm />
+        <BookDemo />
       </main>
       <Footer />
     </>
