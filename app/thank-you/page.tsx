@@ -11,19 +11,19 @@ export default function ThankYou() {
         </div>
 
         <h1 className="text-3xl font-bold text-gray-900 mb-4">
-          Thanks — we&apos;ll be in touch soon
+          Your demo is booked
         </h1>
         <p className="text-gray-600 text-lg leading-relaxed mb-8">
-          We&apos;ve received your demo request and sent a confirmation to your email. A member of the team will be in touch within one working day to arrange a time that suits you.
+          We&apos;ve confirmed your booking and sent a calendar invite to your email. We look forward to speaking with you.
         </p>
 
         <div className="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm text-left mb-8">
           <h2 className="font-semibold text-gray-900 mb-3">What happens next</h2>
           <ul className="space-y-2.5">
             {[
-              'We\'ll email you to confirm your demo',
-              'We\'ll arrange a 30-minute call at a time that suits you',
-              'You\'ll see the platform live, tailored to county golf workflows',
+              'You\'ll receive a video call link before your session',
+              'We\'ll walk you through the platform live, tailored to county golf',
+              'Bring any questions about safeguarding, compliance, or getting started',
               'No obligation — just a genuinely helpful conversation',
             ].map((item) => (
               <li key={item} className="flex items-start gap-2.5 text-sm text-gray-600">
