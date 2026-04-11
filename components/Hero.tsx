@@ -21,7 +21,7 @@ export default function Hero() {
             <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-semibold tracking-wide uppercase mb-8 border"
               style={{background:'#edf7f2',borderColor:'#a7d9bc',color:'#155230'}}>
               <span className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse inline-block" />
-              Built for county golf unions
+              Built for golf clubs & county unions
             </div>
 
             <h1 className="text-5xl md:text-6xl font-black tracking-tight leading-none mb-5" style={{color:'#0a2818'}}>
