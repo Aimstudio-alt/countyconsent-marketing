@@ -37,6 +37,15 @@ const SCREENS = [
   { id: 8, label: "Medical Summary" },
 ];
 
+const SCREEN_TIPS: Record<number, string> = {
+  1: "Click the <strong>trip card</strong> to view trip details, or click <strong>New trip</strong> to see how easy it is to add one.",
+  2: "The form is pre-filled with demo data. Click <strong>Create trip</strong> to continue.",
+  4: "Try <strong>View details</strong> on James Taylor to see the medical alert, <strong>Send consent email</strong> on Sophie Davis, or <strong>Add golfer</strong> to see the form.",
+  5: "Fill in any details you like, then click <strong>Add golfer</strong> to see them appear in the trip.",
+  7: "This is the full consent record — scroll down to see emergency contacts, GP details, and signed consents.",
+  8: "This is the printable medical summary your team manager takes on the day. Click <strong>Back to trip</strong> when done.",
+};
+
 // ── Shared sub-components ─────────────────────────────────────────────────────
 
 function DonutRing({ pct }: { pct: number }) {
@@ -186,12 +195,6 @@ function Screen1({ onNewTrip, onOpenTrip, golfers, consentedCount, medicalCount 
         </button>
       </section>
 
-      <div className="bg-blue-50 border border-blue-200 rounded-2xl p-4 flex items-start gap-3">
-        <svg className="w-5 h-5 text-blue-500 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-        <p className="text-blue-800 text-sm font-medium">
-          <strong>Demo tip:</strong> Click the trip card to view trip details, or click <strong>New trip</strong> to see how easy it is to add one.
-        </p>
-      </div>
     </div>
   );
 }
@@ -400,12 +403,6 @@ function Screen4({ golfers, onAddGolfer, onSendEmail, onViewGolfer, onPrintMedic
         </table>
       </div>
 
-      <div className="bg-blue-50 border border-blue-200 rounded-2xl p-4 flex items-start gap-3">
-        <svg className="w-5 h-5 text-blue-500 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-        <p className="text-blue-800 text-sm font-medium">
-          <strong>Demo tip:</strong> Try <strong>View details</strong> on James Taylor to see the medical alert, <strong>Send consent email</strong> on Sophie Davis, or <strong>Add golfer</strong> to see the form.
-        </p>
-      </div>
     </div>
   );
 }
@@ -718,7 +715,7 @@ export default function DemoPage() {
       </div>
 
       {/* Demo controls */}
-      <div className="sticky top-0 z-40 bg-white border-b border-slate-200 shadow-sm px-4 py-3">
+      <div className="sticky top-0 z-40 bg-white border-b border-slate-200 shadow-sm px-4 py-3 space-y-2">
         <div className="max-w-6xl mx-auto flex items-center justify-between gap-4">
           <div className="flex items-center gap-3 flex-1 min-w-0">
             <span className="text-xs font-semibold text-slate-500 whitespace-nowrap hidden sm:block">
@@ -744,6 +741,16 @@ export default function DemoPage() {
             </Link>
           </div>
         </div>
+        {/* Per-screen tip */}
+        {SCREEN_TIPS[screen] && (
+          <div className="max-w-6xl mx-auto flex items-center gap-2 px-3 py-2 rounded-lg" style={{ background: "#eff6ff", border: "1px solid #bfdbfe" }}>
+            <svg className="w-3.5 h-3.5 flex-shrink-0" style={{ color: "#3b82f6" }} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            <p className="text-xs font-medium" style={{ color: "#1e40af" }}
+              dangerouslySetInnerHTML={{ __html: SCREEN_TIPS[screen] }} />
+          </div>
+        )}
       </div>
 
       {/* Fake app nav */}
