@@ -109,7 +109,7 @@ export default function Pricing() {
         </div>
 
         <p className="text-center text-sm" style={{color:'#9ca3af'}}>
-          30-day free trial on both plans. No credit card required to start.
+          Questions? <a href="/#demo" className="underline hover:text-gray-600 transition-colors">Request a demo</a> and we&apos;ll walk you through the platform before you commit.
         </p>
       </div>
     </section>

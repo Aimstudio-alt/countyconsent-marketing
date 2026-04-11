@@ -35,13 +35,13 @@ export default function Hero() {
             </p>
 
             <p className="text-lg leading-relaxed mb-10" style={{color:'#374151'}}>
-              CountyConsent is the only GDPR-compliant digital consent system built specifically for county golf unions — so your staff have the right information, at the right time, every time.
+              CountyConsent is the only GDPR-compliant digital consent system built specifically for golf clubs and county unions — so your staff have the right information, at the right time, every time.
             </p>
 
             <div className="flex flex-col sm:flex-row gap-3 mb-12">
               <a href="/pricing" className="inline-flex items-center justify-center px-7 py-4 rounded-xl text-white font-bold text-base shadow-lg hover:opacity-90 transition-all hover:-translate-y-0.5"
                 style={{background:'linear-gradient(135deg,#155230,#1a6b3e)'}}>
-                Get started free
+                See pricing
                 <svg className="ml-2 w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
                 </svg>
@@ -62,8 +62,8 @@ export default function Hero() {
 
             <div className="flex flex-wrap items-center gap-5 pt-6 border-t border-gray-200">
               {[
-                { icon: '✓', label: '30-day free trial' },
-                { icon: '✓', label: 'No credit card required' },
+                { icon: '✓', label: 'No setup fee' },
+                { icon: '✓', label: 'Cancel anytime' },
                 { icon: '✓', label: 'UK data storage' },
               ].map(({ icon, label }) => (
                 <div key={label} className="flex items-center gap-2 text-sm font-medium" style={{color:'#4b5563'}}>

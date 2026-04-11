@@ -24,8 +24,8 @@ const faqs = [
     a: 'Yes. CountyConsent was built in direct partnership with Durham County Golf Union and is designed for both county unions and individual golf clubs. It reflects the real workflows, safeguarding requirements, and England Golf accreditation standards that organisations face.',
   },
   {
-    q: 'What happens after the 30-day free trial?',
-    a: 'At the end of your trial you can choose to subscribe. We\'ll remind you before the trial ends. No card is required to start, and we won\'t charge anything without your explicit action.',
+    q: 'Can I see the platform before signing up?',
+    a: 'Yes. You can try the interactive demo on our website, or request a guided walkthrough with our team. We\'ll show you the full platform and answer any questions before you commit to anything.',
   },
 ]
 
