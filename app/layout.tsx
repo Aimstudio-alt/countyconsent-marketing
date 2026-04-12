@@ -5,6 +5,9 @@ import './globals.css'
 const geist = Geist({ subsets: ['latin'], variable: '--font-geist-sans' })
 
 export const metadata: Metadata = {
+  verification: {
+    google: 'GnGzv21K2KFnhdKmbUFyQ4l83BeN8GCn-Erd_zRtiFU',
+  },
   title: 'CountyConsent — Junior Safeguarding for Golf',
   description:
     'CountyConsent is the only GDPR-compliant digital consent system built specifically for county golf unions — so your staff have the right information, at the right time, every time.',
