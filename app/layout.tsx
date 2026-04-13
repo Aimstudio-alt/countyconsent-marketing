@@ -6,7 +6,7 @@ const geist = Geist({ subsets: ['latin'], variable: '--font-geist-sans' })
 
 export const metadata: Metadata = {
   verification: {
-    google: 'GnGzv21K2KFnhdKmbUFyQ4l83BeN8GCn-Erd_zRtiFU',
+    google: 'elOGT0nfkQPMg0fqY127indq6a6ZBmKYcnG_cemDgdM',
   },
   title: 'CountyConsent — Junior Safeguarding for Golf',
   description:
