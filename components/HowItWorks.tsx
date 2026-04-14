@@ -1,3 +1,4 @@
+import InviteStaffMockup from './mockups/InviteStaffMockup'
 import AddJuniorsMockup from './mockups/AddJuniorsMockup'
 import TripSetupMockup from './mockups/TripSetupMockup'
 import EmailMockup from './mockups/EmailMockup'
@@ -7,43 +8,51 @@ import StaffViewMockup from './mockups/StaffViewMockup'
 const steps = [
   {
     number: '01',
-    label: 'Plan',
-    title: 'Create a trip',
-    description: 'Set up your away trip or tournament in seconds — add the venue, dates and team manager.',
-    mockup: <TripSetupMockup />,
+    label: 'Team',
+    title: 'Invite your team managers',
+    description: 'Add the staff who will run your trips. Each manager receives an invite link by email and sets up their own password — no shared logins.',
+    mockup: <InviteStaffMockup />,
     bg: 'white',
   },
   {
     number: '02',
-    label: 'Roster',
-    title: 'Add your junior members',
-    description: 'Add junior golfers to the trip individually or import them in bulk via CSV upload.',
+    label: 'Register',
+    title: 'Build your junior golfer register',
+    description: 'Add junior golfers to your county register once. Import in bulk via CSV or add individually — they\'re then available for any trip.',
     mockup: <AddJuniorsMockup />,
     bg: '#f7f5ee',
   },
   {
     number: '03',
-    label: 'Notify',
-    title: 'Parents receive a secure link by email',
-    description: "Each parent automatically receives a unique secure link to complete their child's consent form.",
-    mockup: <EmailMockup />,
+    label: 'Plan',
+    title: 'Create a trip and assign managers',
+    description: 'Set up your away trip or tournament in seconds — add the venue, dates and assign the team managers who will be travelling.',
+    mockup: <TripSetupMockup />,
     bg: 'white',
   },
   {
     number: '04',
-    label: 'Consent',
-    title: 'Parents complete the form digitally',
-    description: 'Parents fill in medical information, emergency contacts and give consent from any device — no printing, no chasing.',
-    mockup: <ConsentFormMockup />,
+    label: 'Notify',
+    title: 'Add golfers and send consent requests',
+    description: 'Select golfers from your register and add them to the trip. Each parent automatically receives a unique secure link to complete their child\'s consent form.',
+    mockup: <EmailMockup />,
     bg: '#f7f5ee',
   },
   {
     number: '05',
+    label: 'Consent',
+    title: 'Parents complete the form digitally',
+    description: 'Parents fill in medical information, emergency contacts and give consent from any device — no printing, no chasing, no missing paperwork.',
+    mockup: <ConsentFormMockup />,
+    bg: 'white',
+  },
+  {
+    number: '06',
     label: 'Go',
     title: 'Staff have everything on the day',
     description: 'On the day, staff have instant access to medical summaries, emergency contacts and full consent records — online or offline.',
     mockup: <StaffViewMockup />,
-    bg: 'white',
+    bg: '#f7f5ee',
   },
 ]
 
@@ -59,7 +68,7 @@ export default function HowItWorks() {
             How it works
           </div>
           <h2 className="text-3xl md:text-4xl font-black tracking-tight mb-4" style={{color:'#0a2818'}}>
-            From roster to roadtrip<br className="hidden md:block" /> in five steps
+            From register to roadtrip<br className="hidden md:block" /> in six steps
           </h2>
           <p className="text-lg max-w-2xl mx-auto" style={{color:'#6b7280'}}>
             A complete walkthrough of how CountyConsent works — from setting up your organisation to the moment you board the coach.
