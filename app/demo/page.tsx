@@ -44,7 +44,7 @@ const REGISTER_GOLFERS = [
 
 const SCREEN_HINTS: Record<number, string> = {
   1: 'Step 1 of 7 — Click "Invite your first team manager" to begin the walkthrough.',
-  2: 'Step 2 of 7 — Try inviting a manager using the form, then click "Next: create a trip" to continue.',
+  2: 'Step 2 of 7 — Click "Invite manager", fill in the details, and send the invite. The next step will unlock once sent.',
   3: 'Step 3 of 7 — Fill in the trip details, then click "Create trip" to set it up.',
   4: 'Step 4 of 7 — Trip created! Taking you to the trip view\u2026',
   5: 'Step 5 of 7 — Click "Add golfer" to add someone from your register. Once added, click "Medical summary" to continue.',
@@ -898,14 +898,23 @@ function Screen9({ onBack, onNext }: { onBack: () => void; onNext: () => void })
         <button onClick={onBack} className="text-sm font-semibold text-slate-500 hover:text-slate-700 transition-colors">
           ← Back to dashboard
         </button>
-        <ClickHint label="Next: create a trip">
+        {sent ? (
+          <ClickHint label="Next: create a trip">
+            <button onClick={onNext}
+              className="inline-flex items-center gap-2 text-white text-sm font-semibold px-5 py-2.5 rounded-xl shadow-sm transition-all"
+              style={{ background: "linear-gradient(135deg, #166534, #15803d)" }}>
+              Next: create a trip
+              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" /></svg>
+            </button>
+          </ClickHint>
+        ) : (
           <button onClick={onNext}
-            className="inline-flex items-center gap-2 text-white text-sm font-semibold px-5 py-2.5 rounded-xl shadow-sm transition-all"
-            style={{ background: "linear-gradient(135deg, #166534, #15803d)" }}>
+            className="inline-flex items-center gap-2 text-slate-400 text-sm font-semibold px-5 py-2.5 rounded-xl border border-slate-200 cursor-default"
+            tabIndex={-1}>
             Next: create a trip
             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" /></svg>
           </button>
-        </ClickHint>
+        )}
       </div>
     </div>
   );
