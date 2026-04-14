@@ -45,7 +45,7 @@ const REGISTER_GOLFERS = [
 ];
 
 const SCREEN_HINTS: Record<number, string> = {
-  1: 'Click the highlighted "Manage team" button to invite your staff — that\'s step one of the flow.',
+  1: 'Click "Invite your first team manager" below to begin. Each step will guide you through the full setup.',
   2: 'This is where you manage your team. Click "Next: create a trip" at the bottom when you\'re ready to continue.',
   3: 'Fill in the trip details below, then click "Create trip" to set it up.',
   4: 'Trip created! Taking you to the trip view\u2026',
@@ -153,16 +153,9 @@ function ClickHint({ children, label }: { children: React.ReactNode; label: stri
   );
 }
 
-// ── Screen 1: Dashboard ───────────────────────────────────────────────────────
+// ── Screen 1: Dashboard (empty new-user state) ────────────────────────────────
 
-function Screen1({ onNewTrip, onOpenTrip, golfers, consentedCount, medicalCount }: {
-  onNewTrip: () => void;
-  onOpenTrip: () => void;
-  golfers: Golfer[];
-  consentedCount: number;
-  medicalCount: number;
-}) {
-  const pct = Math.round((consentedCount / golfers.length) * 100);
+function Screen1({ onNewTrip }: { onNewTrip: () => void }) {
   return (
     <div className="space-y-8">
 
@@ -173,88 +166,65 @@ function Screen1({ onNewTrip, onOpenTrip, golfers, consentedCount, medicalCount 
         <div>
           <p className="font-bold text-green-900 text-sm">Welcome to the interactive demo</p>
           <p className="text-green-800 text-xs mt-0.5 leading-relaxed">
-            Click the <span className="font-bold" style={{ color: "#c9921c" }}>amber highlighted buttons</span> to walk through the complete workflow — from inviting staff all the way to the day of travel.
-            No sign-up needed, all data is fictional.
+            Click the <span className="font-bold" style={{ color: "#c9921c" }}>amber highlighted buttons</span> to step through the complete workflow.
+            No sign-up needed — all data is fictional.
           </p>
         </div>
       </div>
 
-      <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
-        <div>
-          <h1 className="text-2xl font-bold text-slate-900 tracking-tight">Trips & Consent Tracker</h1>
-          <p className="text-slate-500 mt-1 text-sm">Monitor parental consent progress across all junior golf trips</p>
+      <div>
+        <h1 className="text-2xl font-bold text-slate-900 tracking-tight">Dashboard</h1>
+        <p className="text-slate-500 mt-1 text-sm">Welcome to CountyConsent. Let&apos;s get your organisation set up.</p>
+      </div>
+
+      {/* Empty stats */}
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+        {[
+          { label: "Upcoming Trips",    value: 0, color: "green"   },
+          { label: "Total Golfers",     value: 0, color: "blue"    },
+          { label: "Consents Received", value: 0, color: "emerald" },
+          { label: "Medical Alerts",    value: 0, color: "red"     },
+        ].map(({ label, value, color }) => {
+          const styles: Record<string, { icon: string; value: string }> = {
+            green:   { icon: "bg-green-100 text-green-700",     value: "text-green-700" },
+            blue:    { icon: "bg-blue-100 text-blue-700",       value: "text-blue-700" },
+            emerald: { icon: "bg-emerald-100 text-emerald-700", value: "text-emerald-700" },
+            red:     { icon: "bg-red-100 text-red-700",         value: "text-red-700" },
+          };
+          const s = styles[color];
+          return (
+            <div key={label} className="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm">
+              <div className={`text-3xl font-black tracking-tight ${s.value}`}>{value}</div>
+              <div className="text-slate-500 text-xs font-semibold mt-1 uppercase tracking-wide">{label}</div>
+            </div>
+          );
+        })}
+      </div>
+
+      {/* Single empty-state CTA */}
+      <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-10 flex flex-col items-center text-center gap-5">
+        <div className="w-16 h-16 rounded-full flex items-center justify-center" style={{ background: "#f0fdf4" }}>
+          <svg className="w-8 h-8 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" />
+          </svg>
         </div>
-        <ClickHint label="Start here — invite your team">
+        <div>
+          <h2 className="text-lg font-bold text-slate-900 mb-1">Start by setting up your team</h2>
+          <p className="text-slate-500 text-sm max-w-sm">
+            Invite your team managers first. Once they&apos;re set up, you can create trips and start collecting consent.
+          </p>
+        </div>
+        <ClickHint label="Click here to begin">
           <button onClick={onNewTrip}
-            className="inline-flex items-center gap-2 text-white text-sm font-semibold px-4 py-2.5 rounded-xl shadow-sm transition-all duration-200"
+            className="inline-flex items-center gap-2 text-white font-semibold px-6 py-3 rounded-xl shadow-sm transition-all duration-200"
             style={{ background: "linear-gradient(135deg, #166534, #15803d)" }}>
-            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
-            Manage team
+            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" />
+            </svg>
+            Invite your first team manager
           </button>
         </ClickHint>
       </div>
-
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-        <StatCard label="Upcoming Trips" value={1} color="green" icon={
-          <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
-        } />
-        <StatCard label="Total Golfers" value={golfers.length} color="blue" icon={
-          <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
-        } />
-        <StatCard label="Consents Received" value={consentedCount} color="emerald" icon={
-          <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-        } />
-        <StatCard label="Medical Alerts" value={medicalCount} color="red" icon={
-          <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z" /></svg>
-        } />
-      </div>
-
-      <section>
-        <div className="flex items-center gap-2 mb-4">
-          <h2 className="text-base font-bold text-slate-800 tracking-tight">Upcoming Trips</h2>
-          <span className="text-xs bg-slate-100 text-slate-600 font-semibold px-2 py-0.5 rounded-full">1</span>
-        </div>
-        <div className="flex flex-col items-center gap-1.5">
-        <div className="relative w-full">
-          <span className="absolute -inset-1 rounded-2xl pointer-events-none animate-pulse"
-            style={{ boxShadow: '0 0 0 3px #f59e0b, 0 0 0 6px rgba(245,158,11,0.2)' }} />
-        <button onClick={onOpenTrip} className="w-full text-left group flex items-center gap-4 bg-white rounded-2xl border border-slate-200 border-l-4 border-l-amber-400 shadow-sm hover:shadow-md hover:border-slate-300 transition-all duration-200 p-5">
-          <DonutRing pct={pct} />
-          <div className="flex-1 min-w-0">
-            <div className="flex items-center gap-2 flex-wrap">
-              <h3 className="font-bold text-slate-900 text-base group-hover:text-green-800 transition-colors">Northumberland Junior Open</h3>
-              {medicalCount > 0 && (
-                <span className="inline-flex items-center gap-1 bg-red-100 text-red-700 text-xs font-semibold px-2 py-0.5 rounded-full">
-                  <span className="w-1.5 h-1.5 bg-red-500 rounded-full" />
-                  {medicalCount} medical alert
-                </span>
-              )}
-            </div>
-            <p className="text-slate-500 text-sm mt-0.5">Slaley Hall Golf Club · 15 Jul 2026</p>
-          </div>
-          <div className="hidden sm:flex items-center gap-2 flex-shrink-0">
-            <div className="flex flex-col items-center border border-slate-200 rounded-xl px-3 py-1.5 text-slate-600 bg-slate-100">
-              <span className="text-sm font-bold leading-tight">{golfers.length}</span>
-              <span className="text-[10px] font-semibold uppercase tracking-wide opacity-70 leading-tight">Total</span>
-            </div>
-            <div className="flex flex-col items-center border border-green-200 rounded-xl px-3 py-1.5 text-green-700 bg-green-50">
-              <span className="text-sm font-bold leading-tight">{consentedCount}</span>
-              <span className="text-[10px] font-semibold uppercase tracking-wide opacity-70 leading-tight">Received</span>
-            </div>
-            <div className="flex flex-col items-center border border-amber-200 rounded-xl px-3 py-1.5 text-amber-700 bg-amber-50">
-              <span className="text-sm font-bold leading-tight">{golfers.length - consentedCount}</span>
-              <span className="text-[10px] font-semibold uppercase tracking-wide opacity-70 leading-tight">Pending</span>
-            </div>
-          </div>
-          <svg className="w-4 h-4 text-slate-300 group-hover:text-slate-500 group-hover:translate-x-0.5 transition-all duration-200 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg>
-        </button>
-        </div>
-          <span className="inline-flex items-center gap-1 text-[11px] font-bold px-2.5 py-0.5 rounded-full whitespace-nowrap pointer-events-none animate-bounce"
-            style={{ background: "#c9921c", color: "white" }}>
-            👆 Or click here to skip to the trip
-          </span>
-        </div>
-      </section>
 
     </div>
   );
@@ -753,16 +723,28 @@ function Screen8({ onBack }: { onBack: () => void }) {
 
 // ── Screen 9: Team Managers ───────────────────────────────────────────────────
 
+type Manager = { initials: string; name: string; role: string; confirmed: boolean; lastSeen: string | null };
+
 function Screen9({ onBack, onNext }: { onBack: () => void; onNext: () => void }) {
-  const managers = [
-    { initials: "SM", name: "Sarah Mitchell", role: "Admin", confirmed: true, lastSeen: "Today, 09:42" },
-    { initials: "PR", name: "Paul Robson",    role: "Team Manager", confirmed: true, lastSeen: "Yesterday" },
-    { initials: "AK", name: "Amy Kendall",    role: "Team Manager", confirmed: false, lastSeen: null },
-  ];
+  const [managers, setManagers] = useState<Manager[]>([
+    { initials: "SM", name: "Sarah Mitchell", role: "Admin",        confirmed: true,  lastSeen: "Today, 09:42" },
+  ]);
+  const [showForm, setShowForm] = useState(false);
+  const [sent, setSent] = useState(false);
+  const [form, setForm] = useState({ name: "", email: "" });
+
+  const handleSend = () => {
+    const name = form.name.trim() || "New Manager";
+    const initials = name.split(" ").map(w => w[0]).join("").toUpperCase().slice(0, 2);
+    setManagers(prev => [...prev, { initials, name, role: "Team Manager", confirmed: false, lastSeen: null }]);
+    setShowForm(false);
+    setSent(true);
+    setForm({ name: "", email: "" });
+  };
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center gap-3 mb-2">
+      <div className="flex items-center gap-3">
         <button onClick={onBack} className="inline-flex items-center gap-1.5 text-sm font-semibold text-slate-500 hover:text-slate-700 transition-colors">
           <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" /></svg>
           Dashboard
@@ -774,23 +756,79 @@ function Screen9({ onBack, onNext }: { onBack: () => void; onNext: () => void })
           <h1 className="text-2xl font-bold text-slate-900">Team Managers</h1>
           <p className="text-slate-500 mt-1 text-sm">Invite staff and manage their access. Invite links are sent automatically by email.</p>
         </div>
-        <ClickHint label="Invite a manager">
-          <button className="inline-flex items-center gap-2 text-white text-sm font-semibold px-4 py-2.5 rounded-xl shadow-sm"
+        {!showForm && !sent && (
+          <ClickHint label="Click to invite a manager">
+            <button onClick={() => setShowForm(true)}
+              className="inline-flex items-center gap-2 text-white text-sm font-semibold px-4 py-2.5 rounded-xl shadow-sm transition-all"
+              style={{ background: "linear-gradient(135deg, #166534, #15803d)" }}>
+              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 4v16m8-8H4" /></svg>
+              Invite manager
+            </button>
+          </ClickHint>
+        )}
+        {(showForm || sent) && (
+          <button onClick={() => setShowForm(true)}
+            className="inline-flex items-center gap-2 text-white text-sm font-semibold px-4 py-2.5 rounded-xl opacity-50 cursor-default"
             style={{ background: "linear-gradient(135deg, #166534, #15803d)" }}>
             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 4v16m8-8H4" /></svg>
             Invite manager
           </button>
-        </ClickHint>
+        )}
       </div>
 
+      {/* Inline invite form */}
+      {showForm && (
+        <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 space-y-4">
+          <h2 className="font-bold text-slate-900 text-sm">Invite a team manager</h2>
+          <div className="grid sm:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-xs font-semibold text-slate-600 mb-1.5">Full name</label>
+              <input placeholder="e.g. Paul Robson" value={form.name} onChange={e => setForm(f => ({ ...f, name: e.target.value }))}
+                className="w-full px-3 py-2 rounded-xl border border-slate-300 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-green-500" />
+            </div>
+            <div>
+              <label className="block text-xs font-semibold text-slate-600 mb-1.5">Email address</label>
+              <input type="email" placeholder="e.g. paul@example.com" value={form.email} onChange={e => setForm(f => ({ ...f, email: e.target.value }))}
+                className="w-full px-3 py-2 rounded-xl border border-slate-300 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-green-500" />
+            </div>
+          </div>
+          <div className="flex items-center gap-3">
+            <ClickHint label="Send the invite">
+              <button onClick={handleSend}
+                className="inline-flex items-center gap-2 text-white text-sm font-semibold px-5 py-2.5 rounded-xl shadow-sm transition-all"
+                style={{ background: "linear-gradient(135deg, #166534, #15803d)" }}>
+                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>
+                Send invite email
+              </button>
+            </ClickHint>
+            <button onClick={() => setShowForm(false)} className="text-sm text-slate-500 hover:text-slate-700 font-semibold px-4 py-2.5 rounded-xl border border-slate-200 hover:bg-slate-50 transition-colors">
+              Cancel
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Success banner */}
+      {sent && (
+        <div className="rounded-2xl border p-4 flex items-center gap-3" style={{ background: "#f0fdf4", borderColor: "#bbf7d0" }}>
+          <svg className="w-5 h-5 text-green-600 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
+          </svg>
+          <p className="text-sm font-semibold text-green-900">Invite sent! They&apos;ll receive an email with a link to set their password.</p>
+        </div>
+      )}
+
+      {/* Staff list */}
       <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
         <div className="px-5 py-3.5 border-b border-slate-100 bg-slate-50 flex items-center justify-between">
           <p className="text-sm font-bold text-slate-700">Staff ({managers.length})</p>
-          <span className="text-xs text-slate-400">1 invite pending</span>
+          {managers.some(m => !m.confirmed) && (
+            <span className="text-xs text-amber-700 font-semibold">{managers.filter(m => !m.confirmed).length} invite pending</span>
+          )}
         </div>
         <div className="divide-y divide-slate-100">
           {managers.map((m) => (
-            <div key={m.name} className={`flex items-center gap-4 px-5 py-4 ${!m.confirmed ? "bg-amber-50/50" : ""}`}>
+            <div key={m.name} className={`flex items-center gap-4 px-5 py-4 ${!m.confirmed ? "bg-amber-50/40" : ""}`}>
               <div className="w-9 h-9 rounded-full flex items-center justify-center text-sm font-bold text-white flex-shrink-0"
                 style={{ background: "#155230" }}>
                 {m.initials}
@@ -806,25 +844,12 @@ function Screen9({ onBack, onNext }: { onBack: () => void; onNext: () => void })
                     {m.lastSeen && <span className="text-xs text-slate-400 hidden sm:block">Last seen: {m.lastSeen}</span>}
                   </>
                 ) : (
-                  <>
-                    <span className="text-xs font-semibold text-amber-700 bg-amber-50 border border-amber-200 px-2.5 py-1 rounded-full">Invite pending</span>
-                    <button className="text-xs font-semibold text-slate-500 px-3 py-1 rounded-lg border border-slate-200 hover:bg-slate-50 transition-colors">
-                      Resend
-                    </button>
-                  </>
+                  <span className="text-xs font-semibold text-amber-700 bg-amber-50 border border-amber-200 px-2.5 py-1 rounded-full">Invite pending</span>
                 )}
               </div>
             </div>
           ))}
         </div>
-      </div>
-
-      <div className="bg-slate-50 rounded-2xl border border-slate-200 p-5">
-        <p className="text-sm font-semibold text-slate-700 mb-1">How invites work</p>
-        <p className="text-sm text-slate-500">
-          When you invite a manager, they receive an email with a secure link to set their password.
-          Once confirmed, they can access all trips assigned to them.
-        </p>
       </div>
 
       <div className="flex items-center justify-between pt-2">
@@ -983,8 +1008,7 @@ export default function DemoPage() {
         style={{ opacity: fading ? 0 : 1, transition: "opacity 0.18s ease" }}>
 
         {screen === 1 && (
-          <Screen1 onNewTrip={() => navigate(2)} onOpenTrip={() => navigate(5)}
-            golfers={golfers} consentedCount={consentedCount} medicalCount={medicalCount} />
+          <Screen1 onNewTrip={() => navigate(2)} />
         )}
         {screen === 2 && (
           <Screen9 onBack={() => navigate(1)} onNext={() => navigate(3)} />
