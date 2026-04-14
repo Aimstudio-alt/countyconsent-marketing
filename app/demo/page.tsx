@@ -28,14 +28,14 @@ const BASE_GOLFERS: Golfer[] = [
 
 const SCREENS = [
   { id: 1, label: "Dashboard" },
-  { id: 2, label: "Create Trip" },
-  { id: 3, label: "Trip Created" },
-  { id: 4, label: "Trip Detail" },
-  { id: 5, label: "Select from Register" },
-  { id: 6, label: "Email Sent" },
-  { id: 7, label: "Golfer Detail" },
-  { id: 8, label: "Medical Summary" },
-  { id: 9, label: "Team Managers" },
+  { id: 2, label: "Team Managers" },
+  { id: 3, label: "Create Trip" },
+  { id: 4, label: "Trip Created" },
+  { id: 5, label: "Trip Detail" },
+  { id: 6, label: "Select from Register" },
+  { id: 7, label: "Email Sent" },
+  { id: 8, label: "Golfer Detail" },
+  { id: 9, label: "Medical Summary" },
 ];
 
 const REGISTER_GOLFERS = [
@@ -148,16 +148,13 @@ function Screen1({ onNewTrip, onOpenTrip, golfers, consentedCount, medicalCount 
         <div>
           <h1 className="text-2xl font-bold text-slate-900 tracking-tight">Trips & Consent Tracker</h1>
           <p className="text-slate-500 mt-1 text-sm">Monitor parental consent progress across all junior golf trips</p>
-          <p className="text-xs font-semibold mt-2" style={{ color: "#155230" }}>
-            ↑ Click <strong>Staff</strong> in the nav to invite team managers — or create a trip below.
-          </p>
         </div>
-        <ClickHint label="Create a trip">
+        <ClickHint label="Start here — invite your team">
           <button onClick={onNewTrip}
             className="inline-flex items-center gap-2 text-white text-sm font-semibold px-4 py-2.5 rounded-xl shadow-sm transition-all duration-200"
             style={{ background: "linear-gradient(135deg, #166534, #15803d)" }}>
-            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 4v16m8-8H4" /></svg>
-            New trip
+            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
+            Manage team
           </button>
         </ClickHint>
       </div>
@@ -720,7 +717,7 @@ function Screen8({ onBack }: { onBack: () => void }) {
 
 // ── Screen 9: Team Managers ───────────────────────────────────────────────────
 
-function Screen9({ onBack }: { onBack: () => void }) {
+function Screen9({ onBack, onNext }: { onBack: () => void; onNext: () => void }) {
   const managers = [
     { initials: "SM", name: "Sarah Mitchell", role: "Admin", confirmed: true, lastSeen: "Today, 09:42" },
     { initials: "PR", name: "Paul Robson",    role: "Team Manager", confirmed: true, lastSeen: "Yesterday" },
@@ -793,6 +790,20 @@ function Screen9({ onBack }: { onBack: () => void }) {
           Once confirmed, they can access all trips assigned to them.
         </p>
       </div>
+
+      <div className="flex items-center justify-between pt-2">
+        <button onClick={onBack} className="text-sm font-semibold text-slate-500 hover:text-slate-700 transition-colors">
+          ← Back to dashboard
+        </button>
+        <ClickHint label="Next: create a trip">
+          <button onClick={onNext}
+            className="inline-flex items-center gap-2 text-white text-sm font-semibold px-5 py-2.5 rounded-xl shadow-sm transition-all"
+            style={{ background: "linear-gradient(135deg, #166534, #15803d)" }}>
+            Next: create a trip
+            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" /></svg>
+          </button>
+        </ClickHint>
+      </div>
     </div>
   );
 }
@@ -822,8 +833,8 @@ export default function DemoPage() {
 
   // Auto-advance from trip-created confirmation to trip detail
   useEffect(() => {
-    if (screen !== 3) return;
-    const t = setTimeout(() => navigate(4), 1500);
+    if (screen !== 4) return;
+    const t = setTimeout(() => navigate(5), 1500);
     return () => clearTimeout(t);
   }, [screen]);
 
@@ -881,12 +892,12 @@ export default function DemoPage() {
             </div>
             <div className="hidden sm:flex items-center gap-1">
               {[
-                { label: "Dashboard", active: screen !== 9 },
-                { label: "Staff", active: screen === 9 },
+                { label: "Dashboard", active: screen !== 2 },
+                { label: "Staff", active: screen === 2 },
                 { label: "Archived", active: false },
               ].map(({ label, active }) => (
                 <button key={label}
-                  onClick={() => label === "Staff" ? navigate(9) : label === "Dashboard" ? navigate(1) : undefined}
+                  onClick={() => label === "Staff" ? navigate(2) : label === "Dashboard" ? navigate(1) : undefined}
                   className={`text-xs font-semibold px-3 py-1.5 rounded-lg transition-colors ${active ? "text-white bg-white/10" : "text-green-300/70 hover:text-white hover:bg-white/5"}`}>
                   {label}
                 </button>
@@ -911,31 +922,33 @@ export default function DemoPage() {
         style={{ opacity: fading ? 0 : 1, transition: "opacity 0.18s ease" }}>
 
         {screen === 1 && (
-          <Screen1 onNewTrip={() => navigate(2)} onOpenTrip={() => navigate(4)}
+          <Screen1 onNewTrip={() => navigate(2)} onOpenTrip={() => navigate(5)}
             golfers={golfers} consentedCount={consentedCount} medicalCount={medicalCount} />
         )}
         {screen === 2 && (
-          <Screen2 onSubmit={() => navigate(3)} onBack={() => navigate(1)} />
+          <Screen9 onBack={() => navigate(1)} onNext={() => navigate(3)} />
         )}
-        {screen === 3 && <Screen3 />}
-        {screen === 4 && (
-          <Screen4 golfers={golfers} onAddGolfer={() => navigate(5)}
-            onSendEmail={(email) => { setEmailSentTo(email); navigate(6); }}
-            onViewGolfer={() => navigate(7)} onPrintMedical={() => navigate(8)}
+        {screen === 3 && (
+          <Screen2 onSubmit={() => navigate(4)} onBack={() => navigate(2)} />
+        )}
+        {screen === 4 && <Screen3 />}
+        {screen === 5 && (
+          <Screen4 golfers={golfers} onAddGolfer={() => navigate(6)}
+            onSendEmail={(email) => { setEmailSentTo(email); navigate(7); }}
+            onViewGolfer={() => navigate(8)} onPrintMedical={() => navigate(9)}
             onBack={() => navigate(1)} />
         )}
-        {screen === 5 && (
+        {screen === 6 && (
           <Screen5
             onAdd={(g) => {
               setGolfers(prev => [...prev, { ...g, id: prev.length + 1, consented: false, medical: null }]);
-              navigate(4);
+              navigate(5);
             }}
-            onBack={() => navigate(4)} />
+            onBack={() => navigate(5)} />
         )}
-        {screen === 6 && <Screen6 emailSentTo={emailSentTo} onBack={() => navigate(4)} />}
-        {screen === 7 && <Screen7 onBack={() => navigate(4)} />}
-        {screen === 8 && <Screen8 onBack={() => navigate(4)} />}
-        {screen === 9 && <Screen9 onBack={() => navigate(1)} />}
+        {screen === 7 && <Screen6 emailSentTo={emailSentTo} onBack={() => navigate(5)} />}
+        {screen === 8 && <Screen7 onBack={() => navigate(5)} />}
+        {screen === 9 && <Screen8 onBack={() => navigate(5)} />}
 
       </main>
     </div>
