@@ -47,7 +47,7 @@ const SCREEN_HINTS: Record<number, string> = {
   2: 'Step 2 of 7 — Try inviting a manager using the form, then click "Next: create a trip" to continue.',
   3: 'Step 3 of 7 — Fill in the trip details, then click "Create trip" to set it up.',
   4: 'Step 4 of 7 — Trip created! Taking you to the trip view\u2026',
-  5: 'Step 5 of 7 — You\'re in the trip. You can send emails and view golfer records here. Click "Add golfer" to continue the walkthrough.',
+  5: 'Step 5 of 7 — Click "Add golfer" to add someone from your register. Once added, click "Medical summary" to continue.',
   6: 'Step 6 of 7 — Select a junior from your county register and click "Add to trip" to add them.',
   7: 'Step 7 of 7 — The medical summary is ready to print for the day of travel. That\'s the full walkthrough!',
 };
@@ -310,8 +310,9 @@ function Screen3() {
 
 // ── Screen 4: Trip Detail ─────────────────────────────────────────────────────
 
-function Screen4({ golfers, onAddGolfer, onPrintMedical, onBack }: {
+function Screen4({ golfers, golferAdded, onAddGolfer, onPrintMedical, onBack }: {
   golfers: Golfer[];
+  golferAdded: boolean;
   onAddGolfer: () => void;
   onPrintMedical: () => void;
   onBack: () => void;
@@ -333,19 +334,39 @@ function Screen4({ golfers, onAddGolfer, onPrintMedical, onBack }: {
           <p className="text-slate-500 text-sm mt-0.5">Slaley Hall Golf Club · 15 Jul 2026</p>
         </div>
         <div className="flex items-center gap-2 flex-wrap">
-          <button onClick={onPrintMedical}
-            className="inline-flex items-center gap-2 text-sm font-semibold px-4 py-2.5 rounded-xl border border-slate-200 text-slate-600 hover:bg-slate-50 transition-colors">
-            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" /></svg>
-            Medical summary
-          </button>
-          <ClickHint label="Next step — add a golfer">
+          {golferAdded ? (
+            <ClickHint label="Next step — view medical summary">
+              <button onClick={onPrintMedical}
+                className="inline-flex items-center gap-2 text-sm font-semibold px-4 py-2.5 rounded-xl border border-slate-200 text-slate-600 hover:bg-slate-50 transition-colors">
+                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" /></svg>
+                Medical summary
+              </button>
+            </ClickHint>
+          ) : (
+            <button onClick={onPrintMedical}
+              className="inline-flex items-center gap-2 text-sm font-semibold px-4 py-2.5 rounded-xl border border-slate-200 text-slate-600 hover:bg-slate-50 transition-colors">
+              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" /></svg>
+              Medical summary
+            </button>
+          )}
+          {!golferAdded && (
+            <ClickHint label="Next step — add a golfer">
+              <button onClick={onAddGolfer}
+                className="inline-flex items-center gap-2 text-white text-sm font-semibold px-4 py-2.5 rounded-xl shadow-sm transition-all"
+                style={{ background: "linear-gradient(135deg, #166534, #15803d)" }}>
+                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 4v16m8-8H4" /></svg>
+                Add golfer
+              </button>
+            </ClickHint>
+          )}
+          {golferAdded && (
             <button onClick={onAddGolfer}
-              className="inline-flex items-center gap-2 text-white text-sm font-semibold px-4 py-2.5 rounded-xl shadow-sm transition-all"
+              className="inline-flex items-center gap-2 text-white text-sm font-semibold px-4 py-2.5 rounded-xl shadow-sm opacity-50"
               style={{ background: "linear-gradient(135deg, #166534, #15803d)" }}>
               <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 4v16m8-8H4" /></svg>
               Add golfer
             </button>
-          </ClickHint>
+          )}
         </div>
       </div>
 
@@ -441,11 +462,13 @@ function Screen4({ golfers, onAddGolfer, onPrintMedical, onBack }: {
 
 // ── Screen 5: Select from Register ───────────────────────────────────────────
 
-function Screen5({ onAdd, onBack }: {
+function Screen5({ addedIds, onAdd, onBack }: {
+  addedIds: number[];
   onAdd: (g: Omit<Golfer, "id" | "consented" | "medical">) => void;
   onBack: () => void;
 }) {
   const [selected, setSelected] = useState<number | null>(null);
+  const available = REGISTER_GOLFERS.filter(g => !addedIds.includes(g.id));
 
   const handleAdd = () => {
     const g = REGISTER_GOLFERS.find(r => r.id === selected);
@@ -464,32 +487,38 @@ function Screen5({ onAdd, onBack }: {
       <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
         <div className="px-5 py-3.5 border-b border-slate-100 bg-slate-50 flex items-center justify-between">
           <p className="text-sm font-bold text-slate-700">County register</p>
-          <span className="text-xs text-slate-400">{REGISTER_GOLFERS.length} available</span>
+          <span className="text-xs text-slate-400">{available.length} available</span>
         </div>
-        <div className="divide-y divide-slate-100">
-          {REGISTER_GOLFERS.map((g) => (
-            <label key={g.id}
-              className={`flex items-center gap-4 px-5 py-4 cursor-pointer transition-colors ${selected === g.id ? "bg-green-50" : "hover:bg-slate-50"}`}>
-              <input type="radio" name="register-golfer" checked={selected === g.id}
-                onChange={() => setSelected(g.id)}
-                className="w-4 h-4 accent-green-700 flex-shrink-0" />
-              <div className="w-9 h-9 rounded-full bg-green-100 flex items-center justify-center text-sm font-bold text-green-700 flex-shrink-0">
-                {g.first_name.charAt(0)}
-              </div>
-              <div className="flex-1 min-w-0">
-                <p className="text-sm font-semibold text-slate-900">{g.first_name} {g.last_name}</p>
-                <p className="text-xs text-slate-400">DOB: {g.dob}</p>
-              </div>
-              {selected === g.id && (
-                <span className="text-xs font-bold text-green-700 bg-green-50 border border-green-200 px-2.5 py-1 rounded-full">Selected</span>
-              )}
-            </label>
-          ))}
-        </div>
+        {available.length === 0 ? (
+          <div className="px-5 py-8 text-center text-slate-400 text-sm">
+            All register golfers have been added to this trip.
+          </div>
+        ) : (
+          <div className="divide-y divide-slate-100">
+            {available.map((g) => (
+              <label key={g.id}
+                className={`flex items-center gap-4 px-5 py-4 cursor-pointer transition-colors ${selected === g.id ? "bg-green-50" : "hover:bg-slate-50"}`}>
+                <input type="radio" name="register-golfer" checked={selected === g.id}
+                  onChange={() => setSelected(g.id)}
+                  className="w-4 h-4 accent-green-700 flex-shrink-0" />
+                <div className="w-9 h-9 rounded-full bg-green-100 flex items-center justify-center text-sm font-bold text-green-700 flex-shrink-0">
+                  {g.first_name.charAt(0)}
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-semibold text-slate-900">{g.first_name} {g.last_name}</p>
+                  <p className="text-xs text-slate-400">DOB: {g.dob}</p>
+                </div>
+                {selected === g.id && (
+                  <span className="text-xs font-bold text-green-700 bg-green-50 border border-green-200 px-2.5 py-1 rounded-full">Selected</span>
+                )}
+              </label>
+            ))}
+          </div>
+        )}
       </div>
 
       <div className="flex items-center gap-3">
-        {selected !== null ? (
+        {selected !== null && available.length > 0 ? (
           <ClickHint label="Add to trip">
             <button onClick={handleAdd}
               className="inline-flex items-center gap-2 text-white text-sm font-semibold px-5 py-2.5 rounded-xl shadow-sm transition-all"
@@ -744,7 +773,7 @@ function Screen9({ onBack, onNext }: { onBack: () => void; onNext: () => void })
   ]);
   const [showForm, setShowForm] = useState(false);
   const [sent, setSent] = useState(false);
-  const [form, setForm] = useState({ name: "", email: "" });
+  const [form, setForm] = useState({ name: "Paul Robson", email: "paul.robson@example.com" });
 
   const handleSend = () => {
     const name = form.name.trim() || "New Manager";
@@ -1031,11 +1060,13 @@ export default function DemoPage() {
         )}
         {screen === 4 && <Screen3 />}
         {screen === 5 && (
-          <Screen4 golfers={golfers} onAddGolfer={() => navigate(6)}
+          <Screen4 golfers={golfers} golferAdded={golfers.length > BASE_GOLFERS.length}
+            onAddGolfer={() => navigate(6)}
             onPrintMedical={() => navigate(7)} onBack={() => navigate(1)} />
         )}
         {screen === 6 && (
           <Screen5
+            addedIds={golfers.filter(g => g.id >= 10).map(g => g.id)}
             onAdd={(g) => {
               setGolfers(prev => [...prev, { ...g, id: prev.length + 1, consented: false, medical: null }]);
               navigate(5);
