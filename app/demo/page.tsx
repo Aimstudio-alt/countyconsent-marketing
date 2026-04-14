@@ -657,7 +657,11 @@ function Detail({ label, value }: { label: string; value: string }) {
 
 // ── Screen 8: Medical Summary ─────────────────────────────────────────────────
 
-function Screen8({ onBack }: { onBack: () => void }) {
+function Screen8({ golfers, onBack }: { golfers: Golfer[]; onBack: () => void }) {
+  const medicalGolfers = golfers.filter(g => g.medical);
+  const clearGolfers = golfers.filter(g => !g.medical);
+  const consentedCount = golfers.filter(g => g.consented).length;
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -667,11 +671,12 @@ function Screen8({ onBack }: { onBack: () => void }) {
         </button>
       </div>
 
-      <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 space-y-4">
-        <div className="flex items-start justify-between border-b border-slate-100 pb-5">
+      {/* Trip header */}
+      <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-6">
+        <div className="flex items-start justify-between gap-4 border-b border-slate-100 pb-5 mb-5">
           <div>
-            <h1 className="text-xl font-bold text-slate-900">Medical Summary</h1>
-            <p className="text-slate-500 text-sm mt-0.5">Northumberland Junior Open · Slaley Hall Golf Club · 15 Jul 2026</p>
+            <h1 className="text-xl font-bold text-slate-900">Northumberland Junior Open</h1>
+            <p className="text-slate-500 text-sm mt-0.5">Slaley Hall Golf Club · 15 Jul 2026</p>
           </div>
           <div className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0" style={{ background: "#f0fdf4" }}>
             <svg className="w-5 h-5 text-green-700" fill="currentColor" viewBox="0 0 20 20">
@@ -679,61 +684,77 @@ function Screen8({ onBack }: { onBack: () => void }) {
             </svg>
           </div>
         </div>
-
-        <div className="flex items-center gap-2 py-2">
-          <span className="text-xs font-bold text-red-700 bg-red-100 border border-red-200 px-2.5 py-1 rounded-full">1 medical alert</span>
-          <span className="text-xs text-slate-500">of {6} golfers requires attention from the team manager</span>
-        </div>
-
-        <div className="bg-red-50 border-2 border-red-300 rounded-2xl p-5 space-y-4">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-red-100 flex items-center justify-center flex-shrink-0">
-              <svg className="w-5 h-5 text-red-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z" /></svg>
-            </div>
-            <div>
-              <p className="font-bold text-red-900">James Taylor</p>
-              <p className="text-red-700 text-xs">DOB: 12 Mar 2011</p>
-            </div>
-            <span className="ml-auto text-xs font-bold text-red-700 bg-red-100 border border-red-200 px-2.5 py-1 rounded-full">ASTHMA</span>
+        <div className="grid grid-cols-3 gap-4 text-center">
+          <div>
+            <p className="text-2xl font-black text-slate-900">{golfers.length}</p>
+            <p className="text-xs font-semibold text-slate-500 uppercase tracking-wide mt-0.5">Golfers</p>
           </div>
-
-          <div className="space-y-2 text-sm text-red-800 leading-relaxed">
-            <p><strong>Condition:</strong> Asthma</p>
-            <p><strong>Medication:</strong> Salbutamol (Ventolin) 100mcg inhaler — self-administers</p>
-            <p><strong>Action:</strong> Ensure inhaler is accessible at all times. Use 15 minutes before exercise in cold or windy conditions.</p>
-            <p><strong>Spare inhaler:</strong> Kept in golf bag at all times.</p>
+          <div>
+            <p className="text-2xl font-black text-green-700">{consentedCount}</p>
+            <p className="text-xs font-semibold text-slate-500 uppercase tracking-wide mt-0.5">Consented</p>
           </div>
-
-          <div className="border-t border-red-200 pt-4 grid grid-cols-2 gap-3 text-sm">
-            <div>
-              <p className="text-xs font-semibold text-red-700 uppercase tracking-wide mb-1">Parent contact</p>
-              <p className="text-red-900 font-semibold">Robert Taylor</p>
-              <p className="text-red-800">07712 345678</p>
-            </div>
-            <div>
-              <p className="text-xs font-semibold text-red-700 uppercase tracking-wide mb-1">Emergency contact</p>
-              <p className="text-red-900 font-semibold">Sarah Taylor (Mother)</p>
-              <p className="text-red-800">07798 456789</p>
-            </div>
+          <div>
+            <p className="text-2xl font-black text-red-600">{medicalGolfers.length}</p>
+            <p className="text-xs font-semibold text-slate-500 uppercase tracking-wide mt-0.5">Medical alerts</p>
           </div>
         </div>
-
-        <div className="border border-slate-200 rounded-2xl p-5">
-          <h3 className="font-bold text-slate-700 text-sm mb-3">All golfers — no medical needs</h3>
-          <div className="space-y-2">
-            {["Sophie Davis", "Liam Parker", "Olivia Brown", "Noah Wilson", "Emma Collins"].map(name => (
-              <div key={name} className="flex items-center gap-2 text-sm text-slate-600">
-                <svg className="w-4 h-4 text-green-500 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" /></svg>
-                {name} — No medical conditions reported
-              </div>
-            ))}
-          </div>
-        </div>
-
-        <p className="text-xs text-slate-400 text-center pt-2">
-          Generated by CountyConsent · {new Date().toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" })} · Northumberland County Golf Union
-        </p>
       </div>
+
+      {/* Medical alerts */}
+      {medicalGolfers.length > 0 && (
+        <div className="space-y-3">
+          <h2 className="text-sm font-bold text-slate-700 uppercase tracking-wide">Medical Alerts</h2>
+          {medicalGolfers.map(g => (
+            <div key={g.id} className="bg-red-50 border-2 border-red-300 rounded-2xl p-5 space-y-4">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl bg-red-100 flex items-center justify-center flex-shrink-0">
+                  <svg className="w-5 h-5 text-red-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z" /></svg>
+                </div>
+                <div>
+                  <p className="font-bold text-red-900">{g.first_name} {g.last_name}</p>
+                  <p className="text-red-700 text-xs">DOB: {g.dob}</p>
+                </div>
+                <span className="ml-auto text-xs font-bold text-red-700 bg-red-100 border border-red-200 px-2.5 py-1 rounded-full">MEDICAL</span>
+              </div>
+              <p className="text-sm text-red-800 leading-relaxed">{g.medical}</p>
+              <div className="border-t border-red-200 pt-3 text-sm">
+                <p className="text-xs font-semibold text-red-700 uppercase tracking-wide mb-1">Emergency contact</p>
+                <p className="text-red-900 font-semibold">Sarah Taylor · 07798 456789</p>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {/* Full golfer roster */}
+      <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+        <div className="px-5 py-3.5 border-b border-slate-100 bg-slate-50">
+          <h2 className="text-sm font-bold text-slate-700">Full Golfer Roster ({golfers.length})</h2>
+        </div>
+        <div className="divide-y divide-slate-100">
+          {golfers.map(g => (
+            <div key={g.id} className="flex items-center gap-3 px-5 py-3">
+              <div className="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center text-xs font-bold text-green-700 flex-shrink-0">
+                {g.first_name.charAt(0)}
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-semibold text-slate-900">{g.first_name} {g.last_name}</p>
+                <p className="text-xs text-slate-400">{g.dob}</p>
+              </div>
+              <div className="flex items-center gap-2 flex-shrink-0">
+                {g.medical && (
+                  <span className="text-xs font-bold text-red-700 bg-red-50 border border-red-200 px-2 py-0.5 rounded-full">MED</span>
+                )}
+                <ConsentBadge consented={g.consented} />
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <p className="text-xs text-slate-400 text-center">
+        Generated by CountyConsent · {new Date().toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" })} · Northumberland County Golf Union
+      </p>
 
       {/* Walkthrough complete */}
       <div className="rounded-2xl border-2 border-green-300 p-6 text-center space-y-4" style={{ background: "#f0fdf4" }}>
@@ -1082,7 +1103,7 @@ export default function DemoPage() {
             }}
             onBack={() => navigate(5)} />
         )}
-        {screen === 7 && <Screen8 onBack={() => navigate(5)} />}
+        {screen === 7 && <Screen8 golfers={golfers} onBack={() => navigate(5)} />}
 
       </main>
     </div>
