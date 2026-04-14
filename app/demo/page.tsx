@@ -846,7 +846,7 @@ export default function DemoPage() {
 
       {/* Demo banner */}
       <div className="text-center py-2 px-4 text-xs font-semibold" style={{ background: "#155230", color: "#bbf7d0" }}>
-        This is a demo — no real data is stored · Fictional data only
+        This is a demo — no real data is stored · Fictional data only · Screen layouts are for illustration purposes only
       </div>
 
       {/* Demo controls */}

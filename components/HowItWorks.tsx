@@ -127,6 +127,15 @@ export default function HowItWorks() {
         )
       })}
 
+      {/* Illustration disclaimer */}
+      <div className="bg-white">
+        <div className="max-w-6xl mx-auto px-6 pt-6 pb-2 text-center">
+          <p className="text-xs text-gray-400">
+            Screen mockups shown are for illustration purposes only and may not reflect the exact appearance of the live platform.
+          </p>
+        </div>
+      </div>
+
       {/* CTA block */}
       <div className="bg-white">
         <div className="max-w-6xl mx-auto px-6 pb-24">
