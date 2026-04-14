@@ -113,11 +113,17 @@ function StatCard({ label, value, color, icon }: { label: string; value: number;
 
 function Breadcrumb({ items }: { items: string[] }) {
   return (
-    <div className="flex items-center gap-1.5 text-sm text-slate-500 mb-6">
+    <div className="flex items-center gap-1 text-sm text-slate-500 mb-6 min-w-0 overflow-hidden">
       {items.map((item, i) => (
-        <span key={item} className="flex items-center gap-1.5">
-          {i > 0 && <svg className="w-3.5 h-3.5 text-slate-300" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg>}
-          <span className={i === items.length - 1 ? "font-semibold text-slate-900" : ""}>{item}</span>
+        <span key={item} className="flex items-center gap-1 min-w-0 flex-shrink">
+          {i > 0 && <svg className="w-3 h-3 text-slate-300 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg>}
+          {/* Hide middle segments on mobile when there are 3+ items */}
+          <span className={`truncate ${i === items.length - 1 ? "font-semibold text-slate-900" : ""} ${i > 0 && i < items.length - 1 && items.length > 2 ? "hidden sm:block" : ""}`}>
+            {item}
+          </span>
+          {i > 0 && i < items.length - 1 && items.length > 2 && (
+            <span className="sm:hidden text-slate-400 flex-shrink-0">…</span>
+          )}
         </span>
       ))}
     </div>
@@ -129,8 +135,8 @@ function ClickHint({ children, label }: { children: React.ReactNode; label: stri
   return (
     <span className="inline-flex flex-col items-center" style={{ gap: 0 }}>
       {/* Bouncing label above */}
-      <span className="inline-flex items-center gap-1.5 text-xs font-bold px-3 py-1.5 rounded-lg shadow-md pointer-events-none whitespace-nowrap animate-bounce"
-        style={{ background: "#c9921c", color: "white", marginBottom: 4 }}>
+      <span className="inline-flex items-center gap-1.5 text-xs font-bold px-3 py-1.5 rounded-lg shadow-md pointer-events-none text-center animate-bounce"
+        style={{ background: "#c9921c", color: "white", marginBottom: 4, maxWidth: 180 }}>
         <svg className="w-3 h-3 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
           <path d="M10 12a2 2 0 100-4 2 2 0 000 4z" />
           <path fillRule="evenodd" d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clipRule="evenodd" />
@@ -328,7 +334,7 @@ function Screen4({ golfers, golferAdded, onAddGolfer, onPrintMedical, onBack }: 
     <div className="space-y-6">
       <Breadcrumb items={["Dashboard", "Northumberland Junior Open"]} />
 
-      <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
+      <div className="flex flex-col gap-3">
         <div>
           <h1 className="text-2xl font-bold text-slate-900">Northumberland Junior Open</h1>
           <p className="text-slate-500 text-sm mt-0.5">Slaley Hall Golf Club · 15 Jul 2026</p>
@@ -433,7 +439,8 @@ function Screen4({ golfers, golferAdded, onAddGolfer, onPrintMedical, onBack }: 
                   {!g.consented && !emailSentIds.has(g.id) && (
                     <button onClick={() => setEmailSentIds(prev => new Set([...prev, g.id]))}
                       className="text-xs font-semibold text-slate-600 hover:text-slate-800 px-3 py-1.5 rounded-lg border border-slate-200 hover:bg-slate-50 transition-colors">
-                      Send consent email
+                      <span className="hidden sm:inline">Send consent email</span>
+                      <span className="sm:hidden">Send email</span>
                     </button>
                   )}
                   {emailSentIds.has(g.id) && (
@@ -664,9 +671,9 @@ function Screen8({ golfers, onBack }: { golfers: Golfer[]; onBack: () => void })
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-2">
         <Breadcrumb items={["Dashboard", "Northumberland Junior Open", "Medical Summary"]} />
-        <button onClick={onBack} className="text-sm font-semibold text-slate-500 hover:text-slate-700 px-4 py-2 rounded-xl border border-slate-200 hover:bg-slate-50 transition-colors">
+        <button onClick={onBack} className="text-sm font-semibold text-slate-500 hover:text-slate-700 px-4 py-2 rounded-xl border border-slate-200 hover:bg-slate-50 transition-colors self-start flex-shrink-0">
           ← Back to trip
         </button>
       </div>
@@ -915,7 +922,7 @@ function Screen9({ onBack, onNext }: { onBack: () => void; onNext: () => void })
         </div>
       </div>
 
-      <div className="flex items-center justify-between pt-2">
+      <div className="flex items-center justify-between gap-3 pt-2 flex-wrap">
         <button onClick={onBack} className="text-sm font-semibold text-slate-500 hover:text-slate-700 transition-colors">
           ← Back to dashboard
         </button>
@@ -978,8 +985,9 @@ export default function DemoPage() {
     <div className="min-h-screen" style={{ fontFamily: "var(--font-geist-sans, system-ui, sans-serif)", background: "#f8fafc" }}>
 
       {/* Demo banner */}
-      <div className="text-center py-2 px-4 text-xs font-semibold" style={{ background: "#155230", color: "#bbf7d0" }}>
-        This is a demo — no real data is stored · Fictional data only · Screen layouts are for illustration purposes only
+      <div className="text-center py-2 px-4 text-xs font-semibold leading-relaxed" style={{ background: "#155230", color: "#bbf7d0" }}>
+        <span className="hidden sm:inline">This is a demo — no real data is stored · Fictional data only · Screen layouts are for illustration purposes only</span>
+        <span className="sm:hidden">Demo only — no real data stored</span>
       </div>
 
       {/* Demo controls */}
@@ -993,7 +1001,7 @@ export default function DemoPage() {
               <div className="h-2 rounded-full transition-all duration-500"
                 style={{ width: `${(screen / SCREENS.length) * 100}%`, background: "linear-gradient(90deg, #155230, #22c55e)" }} />
             </div>
-            <span className="text-xs font-bold text-slate-700 whitespace-nowrap">
+            <span className="text-xs font-bold text-slate-700 whitespace-nowrap hidden sm:block">
               {SCREENS.find(s => s.id === screen)?.label}
             </span>
           </div>
