@@ -44,6 +44,18 @@ const REGISTER_GOLFERS = [
   { id: 12, first_name: "Rhys",   last_name: "Owen",     dob: "17 Mar 2013", parent_email: "s.owen@email.com" },
 ];
 
+const SCREEN_HINTS: Record<number, string> = {
+  1: 'Click the highlighted "Manage team" button to invite your staff — that\'s step one of the flow.',
+  2: 'This is where you manage your team. Click "Next: create a trip" at the bottom when you\'re ready to continue.',
+  3: 'Fill in the trip details below, then click "Create trip" to set it up.',
+  4: 'Trip created! Taking you to the trip view\u2026',
+  5: 'Explore the trip. Click "Add golfer" to pull someone from your register, or send a consent email to a pending golfer.',
+  6: 'Select a junior from your county register and click "Add to trip" to add them.',
+  7: 'The consent email is on its way. The parent gets a unique secure link to complete the form online.',
+  8: "This is the golfer's full record — medical details, emergency contacts, and consent status at a glance.",
+  9: 'The medical summary is printable for the day of travel — all alerts and contacts in one place.',
+};
+
 // ── Shared sub-components ─────────────────────────────────────────────────────
 
 function DonutRing({ pct }: { pct: number }) {
@@ -116,17 +128,26 @@ function Breadcrumb({ items }: { items: string[] }) {
   );
 }
 
-/** Wraps a clickable element with a pulsing ring + arrow label pointing at it. */
+/** Wraps a clickable element with a prominent bouncing callout + animated ring. */
 function ClickHint({ children, label }: { children: React.ReactNode; label: string }) {
   return (
-    <span className="inline-flex flex-col items-center gap-1.5">
-      <span className="relative inline-flex">
-        <span className="absolute -inset-1 rounded-xl ring-2 ring-green-400 animate-pulse opacity-75 pointer-events-none" />
-        {children}
+    <span className="inline-flex flex-col items-center" style={{ gap: 0 }}>
+      {/* Bouncing label above */}
+      <span className="inline-flex items-center gap-1.5 text-xs font-bold px-3 py-1.5 rounded-lg shadow-md pointer-events-none whitespace-nowrap animate-bounce"
+        style={{ background: "#c9921c", color: "white", marginBottom: 4 }}>
+        <svg className="w-3 h-3 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+          <path d="M10 12a2 2 0 100-4 2 2 0 000 4z" />
+          <path fillRule="evenodd" d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clipRule="evenodd" />
+        </svg>
+        {label}
       </span>
-      <span className="inline-flex items-center gap-1 text-[11px] font-bold px-2.5 py-0.5 rounded-full whitespace-nowrap pointer-events-none"
-        style={{ background: "#166534", color: "white" }}>
-        ▲ {label}
+      {/* Triangle pointer */}
+      <span className="pointer-events-none" style={{ width: 0, height: 0, borderLeft: '6px solid transparent', borderRight: '6px solid transparent', borderTop: '6px solid #c9921c', marginBottom: 3 }} />
+      {/* Wrapped element with double ring */}
+      <span className="relative inline-flex">
+        <span className="absolute -inset-2 rounded-xl pointer-events-none animate-pulse"
+          style={{ boxShadow: '0 0 0 3px #f59e0b, 0 0 0 6px rgba(245,158,11,0.25)' }} />
+        {children}
       </span>
     </span>
   );
@@ -144,6 +165,20 @@ function Screen1({ onNewTrip, onOpenTrip, golfers, consentedCount, medicalCount 
   const pct = Math.round((consentedCount / golfers.length) * 100);
   return (
     <div className="space-y-8">
+
+      {/* Welcome callout */}
+      <div className="rounded-2xl border p-4 flex items-start gap-3"
+        style={{ background: "#f0fdf4", borderColor: "#bbf7d0" }}>
+        <span className="text-xl flex-shrink-0">👋</span>
+        <div>
+          <p className="font-bold text-green-900 text-sm">Welcome to the interactive demo</p>
+          <p className="text-green-800 text-xs mt-0.5 leading-relaxed">
+            Click the <span className="font-bold" style={{ color: "#c9921c" }}>amber highlighted buttons</span> to walk through the complete workflow — from inviting staff all the way to the day of travel.
+            No sign-up needed, all data is fictional.
+          </p>
+        </div>
+      </div>
+
       <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
         <div>
           <h1 className="text-2xl font-bold text-slate-900 tracking-tight">Trips & Consent Tracker</h1>
@@ -181,7 +216,8 @@ function Screen1({ onNewTrip, onOpenTrip, golfers, consentedCount, medicalCount 
         </div>
         <div className="flex flex-col items-center gap-1.5">
         <div className="relative w-full">
-          <span className="absolute -inset-1 rounded-2xl ring-2 ring-green-400 animate-pulse opacity-75 pointer-events-none" />
+          <span className="absolute -inset-1 rounded-2xl pointer-events-none animate-pulse"
+            style={{ boxShadow: '0 0 0 3px #f59e0b, 0 0 0 6px rgba(245,158,11,0.2)' }} />
         <button onClick={onOpenTrip} className="w-full text-left group flex items-center gap-4 bg-white rounded-2xl border border-slate-200 border-l-4 border-l-amber-400 shadow-sm hover:shadow-md hover:border-slate-300 transition-all duration-200 p-5">
           <DonutRing pct={pct} />
           <div className="flex-1 min-w-0">
@@ -213,9 +249,9 @@ function Screen1({ onNewTrip, onOpenTrip, golfers, consentedCount, medicalCount 
           <svg className="w-4 h-4 text-slate-300 group-hover:text-slate-500 group-hover:translate-x-0.5 transition-all duration-200 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg>
         </button>
         </div>
-          <span className="inline-flex items-center gap-1 text-[11px] font-bold px-2.5 py-0.5 rounded-full whitespace-nowrap pointer-events-none"
-            style={{ background: "#166534", color: "white" }}>
-            ▲ View this trip
+          <span className="inline-flex items-center gap-1 text-[11px] font-bold px-2.5 py-0.5 rounded-full whitespace-nowrap pointer-events-none animate-bounce"
+            style={{ background: "#c9921c", color: "white" }}>
+            👆 Or click here to skip to the trip
           </span>
         </div>
       </section>
@@ -877,6 +913,31 @@ export default function DemoPage() {
           </div>
         </div>
       </div>
+
+      {/* Per-screen guidance strip */}
+      {SCREEN_HINTS[screen] && screen !== 4 && (
+        <div style={{ background: "#fffbeb", borderBottom: "1px solid #fde68a" }} className="px-4 py-2.5">
+          <div className="max-w-6xl mx-auto flex items-center gap-2.5">
+            <span className="flex-shrink-0 w-6 h-6 rounded-full flex items-center justify-center text-xs font-black text-white"
+              style={{ background: "#c9921c" }}>
+              {screen}
+            </span>
+            <p className="text-sm font-medium" style={{ color: "#78350f" }}>
+              {SCREEN_HINTS[screen]}
+            </p>
+          </div>
+        </div>
+      )}
+      {screen === 4 && (
+        <div style={{ background: "#f0fdf4", borderBottom: "1px solid #bbf7d0" }} className="px-4 py-2.5">
+          <div className="max-w-6xl mx-auto flex items-center gap-2.5">
+            <svg className="w-4 h-4 flex-shrink-0 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
+            </svg>
+            <p className="text-sm font-medium text-green-800">{SCREEN_HINTS[4]}</p>
+          </div>
+        </div>
+      )}
 
       {/* Fake app nav */}
       <nav style={{ background: "#052e16" }} className="border-b border-white/10">
