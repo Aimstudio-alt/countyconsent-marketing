@@ -1013,13 +1013,12 @@ export default function DemoPage() {
 
       {/* Per-screen guidance strip */}
       {SCREEN_HINTS[screen] && screen !== 4 && (
-        <div style={{ background: "#fffbeb", borderBottom: "1px solid #fde68a" }} className="px-4 py-2.5">
-          <div className="max-w-6xl mx-auto flex items-center gap-2.5">
-            <span className="flex-shrink-0 w-6 h-6 rounded-full flex items-center justify-center text-xs font-black text-white"
-              style={{ background: "#c9921c" }}>
-              {screen}
-            </span>
-            <p className="text-sm font-medium" style={{ color: "#78350f" }}>
+        <div style={{ background: "#b45309", borderBottom: "2px solid #92400e" }} className="px-4 py-3">
+          <div className="max-w-6xl mx-auto flex items-center gap-3">
+            <svg className="w-5 h-5 flex-shrink-0 text-amber-200" fill="currentColor" viewBox="0 0 20 20">
+              <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
+            </svg>
+            <p className="text-sm font-semibold text-white leading-snug">
               {SCREEN_HINTS[screen]}
             </p>
           </div>
