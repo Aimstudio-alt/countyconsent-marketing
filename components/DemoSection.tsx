@@ -93,7 +93,7 @@ export default function DemoSection() {
                 </div>
               </div>
               <div className="mt-3 text-center">
-                <span className="text-xs text-slate-400 italic">Click through 8 screens of the real workflow →</span>
+                <span className="text-xs text-slate-400 italic">Click through 9 screens of the real workflow →</span>
               </div>
             </div>
           </div>
@@ -103,7 +103,7 @@ export default function DemoSection() {
             style={{ background: "linear-gradient(to bottom, transparent 40%, rgba(5,46,22,0.85) 100%)" }}>
             <div className="absolute bottom-8 left-0 right-0 flex flex-col items-center gap-4">
               <p className="text-white font-semibold text-sm opacity-90">
-                Interactive · 8 screens · No sign-up required
+                Interactive · 9 screens · No sign-up required
               </p>
               <a href="/demo"
                 className="inline-flex items-center gap-2.5 px-8 py-4 rounded-xl font-bold text-base shadow-xl hover:opacity-95 transition-all hover:-translate-y-0.5"
@@ -121,10 +121,10 @@ export default function DemoSection() {
         {/* Feature bullets below */}
         <div className="flex flex-wrap justify-center gap-6 mt-12">
           {[
-            "Clickable dashboard walkthrough",
-            "Medical alert view",
-            "Consent email flow",
-            "Add golfer form",
+            "Invite team managers",
+            "Golfer register & trip setup",
+            "Add from register flow",
+            "Consent email & medical alerts",
             "Medical summary print view",
           ].map((f) => (
             <div key={f} className="flex items-center gap-2 text-sm font-medium" style={{ color: "#374151" }}>

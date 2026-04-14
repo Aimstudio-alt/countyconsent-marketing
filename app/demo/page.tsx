@@ -31,10 +31,17 @@ const SCREENS = [
   { id: 2, label: "Create Trip" },
   { id: 3, label: "Trip Created" },
   { id: 4, label: "Trip Detail" },
-  { id: 5, label: "Add Golfer" },
+  { id: 5, label: "Select from Register" },
   { id: 6, label: "Email Sent" },
   { id: 7, label: "Golfer Detail" },
   { id: 8, label: "Medical Summary" },
+  { id: 9, label: "Team Managers" },
+];
+
+const REGISTER_GOLFERS = [
+  { id: 10, first_name: "Callum", last_name: "Fraser",   dob: "22 May 2012", parent_email: "d.fraser@email.com" },
+  { id: 11, first_name: "Isla",   last_name: "McKenzie", dob: "09 Oct 2011", parent_email: "f.mckenzie@email.com" },
+  { id: 12, first_name: "Rhys",   last_name: "Owen",     dob: "17 Mar 2013", parent_email: "s.owen@email.com" },
 ];
 
 // ── Shared sub-components ─────────────────────────────────────────────────────
@@ -141,6 +148,9 @@ function Screen1({ onNewTrip, onOpenTrip, golfers, consentedCount, medicalCount 
         <div>
           <h1 className="text-2xl font-bold text-slate-900 tracking-tight">Trips & Consent Tracker</h1>
           <p className="text-slate-500 mt-1 text-sm">Monitor parental consent progress across all junior golf trips</p>
+          <p className="text-xs font-semibold mt-2" style={{ color: "#155230" }}>
+            ↑ Click <strong>Staff</strong> in the nav to invite team managers — or create a trip below.
+          </p>
         </div>
         <ClickHint label="Create a trip">
           <button onClick={onNewTrip}
@@ -438,74 +448,76 @@ function Screen4({ golfers, onAddGolfer, onSendEmail, onViewGolfer, onPrintMedic
   );
 }
 
-// ── Screen 5: Add Golfer ──────────────────────────────────────────────────────
+// ── Screen 5: Select from Register ───────────────────────────────────────────
 
-function Screen5({ golfers, onAdd, onBack }: {
-  golfers: Golfer[];
+function Screen5({ onAdd, onBack }: {
   onAdd: (g: Omit<Golfer, "id" | "consented" | "medical">) => void;
   onBack: () => void;
 }) {
-  const [form, setForm] = useState({
-    first_name: "",
-    last_name: "",
-    dob: "",
-    parent_email: "",
-  });
+  const [selected, setSelected] = useState<number | null>(null);
 
-  const handleSubmit = () => {
-    onAdd({
-      first_name: form.first_name || "Alex",
-      last_name: form.last_name || "Thompson",
-      dob: form.dob ? new Date(form.dob).toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" }) : "10 Feb 2012",
-      parent_email: form.parent_email || "k.thompson@email.com",
-    });
+  const handleAdd = () => {
+    const g = REGISTER_GOLFERS.find(r => r.id === selected);
+    if (!g) return;
+    onAdd({ first_name: g.first_name, last_name: g.last_name, dob: g.dob, parent_email: g.parent_email });
   };
 
   return (
     <div className="max-w-2xl space-y-6">
-      <Breadcrumb items={["Dashboard", "Northumberland Junior Open", "Add Golfer"]} />
+      <Breadcrumb items={["Dashboard", "Northumberland Junior Open", "Add from Register"]} />
       <div>
-        <h1 className="text-2xl font-bold text-slate-900">Add golfer</h1>
-        <p className="text-slate-500 mt-1 text-sm">Add a junior to this trip. A consent email will be sent automatically if a parent email is provided.</p>
+        <h1 className="text-2xl font-bold text-slate-900">Add golfer from register</h1>
+        <p className="text-slate-500 mt-1 text-sm">Select a junior already in your county register to add to this trip.</p>
       </div>
 
-      <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 space-y-5">
-        <div className="grid grid-cols-2 gap-4">
-          <div>
-            <label className="block text-sm font-semibold text-slate-700 mb-1.5">First name <span className="text-red-500">*</span></label>
-            <input placeholder="e.g. Alex" value={form.first_name} onChange={e => setForm(f => ({ ...f, first_name: e.target.value }))}
-              className="w-full px-4 py-2.5 rounded-xl border border-slate-300 text-slate-900 text-sm focus:outline-none focus:ring-2 focus:ring-green-500" />
-          </div>
-          <div>
-            <label className="block text-sm font-semibold text-slate-700 mb-1.5">Last name <span className="text-red-500">*</span></label>
-            <input placeholder="e.g. Thompson" value={form.last_name} onChange={e => setForm(f => ({ ...f, last_name: e.target.value }))}
-              className="w-full px-4 py-2.5 rounded-xl border border-slate-300 text-slate-900 text-sm focus:outline-none focus:ring-2 focus:ring-green-500" />
-          </div>
+      <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+        <div className="px-5 py-3.5 border-b border-slate-100 bg-slate-50 flex items-center justify-between">
+          <p className="text-sm font-bold text-slate-700">County register</p>
+          <span className="text-xs text-slate-400">{REGISTER_GOLFERS.length} available</span>
         </div>
-        <div>
-          <label className="block text-sm font-semibold text-slate-700 mb-1.5">Date of birth <span className="text-red-500">*</span></label>
-          <input type="date" value={form.dob} onChange={e => setForm(f => ({ ...f, dob: e.target.value }))}
-            className="w-full px-4 py-2.5 rounded-xl border border-slate-300 text-slate-900 text-sm focus:outline-none focus:ring-2 focus:ring-green-500" />
+        <div className="divide-y divide-slate-100">
+          {REGISTER_GOLFERS.map((g) => (
+            <label key={g.id}
+              className={`flex items-center gap-4 px-5 py-4 cursor-pointer transition-colors ${selected === g.id ? "bg-green-50" : "hover:bg-slate-50"}`}>
+              <input type="radio" name="register-golfer" checked={selected === g.id}
+                onChange={() => setSelected(g.id)}
+                className="w-4 h-4 accent-green-700 flex-shrink-0" />
+              <div className="w-9 h-9 rounded-full bg-green-100 flex items-center justify-center text-sm font-bold text-green-700 flex-shrink-0">
+                {g.first_name.charAt(0)}
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-semibold text-slate-900">{g.first_name} {g.last_name}</p>
+                <p className="text-xs text-slate-400">DOB: {g.dob}</p>
+              </div>
+              {selected === g.id && (
+                <span className="text-xs font-bold text-green-700 bg-green-50 border border-green-200 px-2.5 py-1 rounded-full">Selected</span>
+              )}
+            </label>
+          ))}
         </div>
-        <div>
-          <label className="block text-sm font-semibold text-slate-700 mb-1.5">Parent / guardian email</label>
-          <input type="email" placeholder="parent@email.com" value={form.parent_email} onChange={e => setForm(f => ({ ...f, parent_email: e.target.value }))}
-            className="w-full px-4 py-2.5 rounded-xl border border-slate-300 text-slate-900 text-sm focus:outline-none focus:ring-2 focus:ring-green-500" />
-          <p className="text-xs text-slate-400 mt-1.5">A consent link will be emailed automatically.</p>
-        </div>
-        <div className="flex items-center gap-3 pt-2">
+      </div>
+
+      <div className="flex items-center gap-3">
+        {selected !== null ? (
           <ClickHint label="Add to trip">
-            <button onClick={handleSubmit}
+            <button onClick={handleAdd}
               className="inline-flex items-center gap-2 text-white text-sm font-semibold px-5 py-2.5 rounded-xl shadow-sm transition-all"
               style={{ background: "linear-gradient(135deg, #166534, #15803d)" }}>
               <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 4v16m8-8H4" /></svg>
-              Add golfer
+              Add to trip
             </button>
           </ClickHint>
-          <button onClick={onBack} className="text-sm font-semibold text-slate-500 hover:text-slate-700 px-4 py-2.5 rounded-xl border border-slate-200 hover:bg-slate-50 transition-colors">
-            Cancel
+        ) : (
+          <button disabled
+            className="inline-flex items-center gap-2 text-white text-sm font-semibold px-5 py-2.5 rounded-xl opacity-40 cursor-not-allowed"
+            style={{ background: "linear-gradient(135deg, #166534, #15803d)" }}>
+            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 4v16m8-8H4" /></svg>
+            Add to trip
           </button>
-        </div>
+        )}
+        <button onClick={onBack} className="text-sm font-semibold text-slate-500 hover:text-slate-700 px-4 py-2.5 rounded-xl border border-slate-200 hover:bg-slate-50 transition-colors">
+          Cancel
+        </button>
       </div>
     </div>
   );
@@ -706,6 +718,85 @@ function Screen8({ onBack }: { onBack: () => void }) {
   );
 }
 
+// ── Screen 9: Team Managers ───────────────────────────────────────────────────
+
+function Screen9({ onBack }: { onBack: () => void }) {
+  const managers = [
+    { initials: "SM", name: "Sarah Mitchell", role: "Admin", confirmed: true, lastSeen: "Today, 09:42" },
+    { initials: "PR", name: "Paul Robson",    role: "Team Manager", confirmed: true, lastSeen: "Yesterday" },
+    { initials: "AK", name: "Amy Kendall",    role: "Team Manager", confirmed: false, lastSeen: null },
+  ];
+
+  return (
+    <div className="space-y-6">
+      <div className="flex items-center gap-3 mb-2">
+        <button onClick={onBack} className="inline-flex items-center gap-1.5 text-sm font-semibold text-slate-500 hover:text-slate-700 transition-colors">
+          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" /></svg>
+          Dashboard
+        </button>
+      </div>
+
+      <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
+        <div>
+          <h1 className="text-2xl font-bold text-slate-900">Team Managers</h1>
+          <p className="text-slate-500 mt-1 text-sm">Invite staff and manage their access. Invite links are sent automatically by email.</p>
+        </div>
+        <ClickHint label="Invite a manager">
+          <button className="inline-flex items-center gap-2 text-white text-sm font-semibold px-4 py-2.5 rounded-xl shadow-sm"
+            style={{ background: "linear-gradient(135deg, #166534, #15803d)" }}>
+            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 4v16m8-8H4" /></svg>
+            Invite manager
+          </button>
+        </ClickHint>
+      </div>
+
+      <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+        <div className="px-5 py-3.5 border-b border-slate-100 bg-slate-50 flex items-center justify-between">
+          <p className="text-sm font-bold text-slate-700">Staff ({managers.length})</p>
+          <span className="text-xs text-slate-400">1 invite pending</span>
+        </div>
+        <div className="divide-y divide-slate-100">
+          {managers.map((m) => (
+            <div key={m.name} className={`flex items-center gap-4 px-5 py-4 ${!m.confirmed ? "bg-amber-50/50" : ""}`}>
+              <div className="w-9 h-9 rounded-full flex items-center justify-center text-sm font-bold text-white flex-shrink-0"
+                style={{ background: "#155230" }}>
+                {m.initials}
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-semibold text-slate-900">{m.name}</p>
+                <p className="text-xs text-slate-400">{m.role}</p>
+              </div>
+              <div className="flex items-center gap-2 flex-shrink-0">
+                {m.confirmed ? (
+                  <>
+                    <span className="text-xs font-semibold text-green-700 bg-green-50 border border-green-200 px-2.5 py-1 rounded-full">Active</span>
+                    {m.lastSeen && <span className="text-xs text-slate-400 hidden sm:block">Last seen: {m.lastSeen}</span>}
+                  </>
+                ) : (
+                  <>
+                    <span className="text-xs font-semibold text-amber-700 bg-amber-50 border border-amber-200 px-2.5 py-1 rounded-full">Invite pending</span>
+                    <button className="text-xs font-semibold text-slate-500 px-3 py-1 rounded-lg border border-slate-200 hover:bg-slate-50 transition-colors">
+                      Resend
+                    </button>
+                  </>
+                )}
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <div className="bg-slate-50 rounded-2xl border border-slate-200 p-5">
+        <p className="text-sm font-semibold text-slate-700 mb-1">How invites work</p>
+        <p className="text-sm text-slate-500">
+          When you invite a manager, they receive an email with a secure link to set their password.
+          Once confirmed, they can access all trips assigned to them.
+        </p>
+      </div>
+    </div>
+  );
+}
+
 // ── Main demo page ────────────────────────────────────────────────────────────
 
 export default function DemoPage() {
@@ -789,11 +880,16 @@ export default function DemoPage() {
               <span className="font-bold text-white text-sm">CountyConsent</span>
             </div>
             <div className="hidden sm:flex items-center gap-1">
-              {["Dashboard", "Staff", "Archived"].map((item, i) => (
-                <span key={item}
-                  className={`text-xs font-semibold px-3 py-1.5 rounded-lg transition-colors ${i === 0 ? "text-white bg-white/10" : "text-green-300/70 hover:text-white hover:bg-white/5"}`}>
-                  {item}
-                </span>
+              {[
+                { label: "Dashboard", active: screen !== 9 },
+                { label: "Staff", active: screen === 9 },
+                { label: "Archived", active: false },
+              ].map(({ label, active }) => (
+                <button key={label}
+                  onClick={() => label === "Staff" ? navigate(9) : label === "Dashboard" ? navigate(1) : undefined}
+                  className={`text-xs font-semibold px-3 py-1.5 rounded-lg transition-colors ${active ? "text-white bg-white/10" : "text-green-300/70 hover:text-white hover:bg-white/5"}`}>
+                  {label}
+                </button>
               ))}
             </div>
           </div>
@@ -829,7 +925,7 @@ export default function DemoPage() {
             onBack={() => navigate(1)} />
         )}
         {screen === 5 && (
-          <Screen5 golfers={golfers}
+          <Screen5
             onAdd={(g) => {
               setGolfers(prev => [...prev, { ...g, id: prev.length + 1, consented: false, medical: null }]);
               navigate(4);
@@ -839,6 +935,7 @@ export default function DemoPage() {
         {screen === 6 && <Screen6 emailSentTo={emailSentTo} onBack={() => navigate(4)} />}
         {screen === 7 && <Screen7 onBack={() => navigate(4)} />}
         {screen === 8 && <Screen8 onBack={() => navigate(4)} />}
+        {screen === 9 && <Screen9 onBack={() => navigate(1)} />}
 
       </main>
     </div>
