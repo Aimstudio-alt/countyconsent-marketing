@@ -32,10 +32,8 @@ const SCREENS = [
   { id: 3, label: "Create Trip" },
   { id: 4, label: "Trip Created" },
   { id: 5, label: "Trip Detail" },
-  { id: 6, label: "Select from Register" },
-  { id: 7, label: "Email Sent" },
-  { id: 8, label: "Golfer Detail" },
-  { id: 9, label: "Medical Summary" },
+  { id: 6, label: "Add from Register" },
+  { id: 7, label: "Medical Summary" },
 ];
 
 const REGISTER_GOLFERS = [
@@ -45,15 +43,13 @@ const REGISTER_GOLFERS = [
 ];
 
 const SCREEN_HINTS: Record<number, string> = {
-  1: 'Click "Invite your first team manager" below to begin. Each step will guide you through the full setup.',
-  2: 'This is where you manage your team. Click "Next: create a trip" at the bottom when you\'re ready to continue.',
-  3: 'Fill in the trip details below, then click "Create trip" to set it up.',
-  4: 'Trip created! Taking you to the trip view\u2026',
-  5: 'Explore the trip. Click "Add golfer" to pull someone from your register, or send a consent email to a pending golfer.',
-  6: 'Select a junior from your county register and click "Add to trip" to add them.',
-  7: 'The consent email is on its way. The parent gets a unique secure link to complete the form online.',
-  8: "This is the golfer's full record — medical details, emergency contacts, and consent status at a glance.",
-  9: 'The medical summary is printable for the day of travel — all alerts and contacts in one place.',
+  1: 'Step 1 of 7 — Click "Invite your first team manager" to begin the walkthrough.',
+  2: 'Step 2 of 7 — Try inviting a manager using the form, then click "Next: create a trip" to continue.',
+  3: 'Step 3 of 7 — Fill in the trip details, then click "Create trip" to set it up.',
+  4: 'Step 4 of 7 — Trip created! Taking you to the trip view\u2026',
+  5: 'Step 5 of 7 — You\'re in the trip. You can send emails and view golfer records here. Click "Add golfer" to continue the walkthrough.',
+  6: 'Step 6 of 7 — Select a junior from your county register and click "Add to trip" to add them.',
+  7: 'Step 7 of 7 — The medical summary is ready to print for the day of travel. That\'s the full walkthrough!',
 };
 
 // ── Shared sub-components ─────────────────────────────────────────────────────
@@ -314,14 +310,15 @@ function Screen3() {
 
 // ── Screen 4: Trip Detail ─────────────────────────────────────────────────────
 
-function Screen4({ golfers, onAddGolfer, onSendEmail, onViewGolfer, onPrintMedical, onBack }: {
+function Screen4({ golfers, onAddGolfer, onPrintMedical, onBack }: {
   golfers: Golfer[];
   onAddGolfer: () => void;
-  onSendEmail: (email: string) => void;
-  onViewGolfer: () => void;
   onPrintMedical: () => void;
   onBack: () => void;
 }) {
+  const [emailSentIds, setEmailSentIds] = useState<Set<number>>(new Set());
+  const [expandedId, setExpandedId] = useState<number | null>(null);
+
   const consented = golfers.filter(g => g.consented).length;
   const medical = golfers.filter(g => g.medical);
   const pct = Math.round((consented / golfers.length) * 100);
@@ -341,7 +338,7 @@ function Screen4({ golfers, onAddGolfer, onSendEmail, onViewGolfer, onPrintMedic
             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" /></svg>
             Medical summary
           </button>
-          <ClickHint label="Add a golfer">
+          <ClickHint label="Next step — add a golfer">
             <button onClick={onAddGolfer}
               className="inline-flex items-center gap-2 text-white text-sm font-semibold px-4 py-2.5 rounded-xl shadow-sm transition-all"
               style={{ background: "linear-gradient(135deg, #166534, #15803d)" }}>
@@ -377,14 +374,12 @@ function Screen4({ golfers, onAddGolfer, onSendEmail, onViewGolfer, onPrintMedic
             </div>
             <div>
               <p className="text-red-800 font-semibold text-sm">Medical alert — {medical.length} golfer requires attention</p>
-              <p className="text-red-700 text-sm mt-0.5">
-                <strong>James Taylor</strong> — Asthma. Ensure inhaler is accessible at all times.
-              </p>
+              <p className="text-red-700 text-sm mt-0.5"><strong>James Taylor</strong> — Asthma. Ensure inhaler is accessible at all times.</p>
             </div>
           </div>
-          <button onClick={onViewGolfer}
+          <button onClick={() => setExpandedId(expandedId === 1 ? null : 1)}
             className="text-xs font-bold text-red-700 px-3 py-1.5 rounded-lg border border-red-200 bg-white hover:bg-red-50 transition-colors flex-shrink-0">
-            View details
+            {expandedId === 1 ? "Hide" : "View details"}
           </button>
         </div>
       )}
@@ -392,59 +387,52 @@ function Screen4({ golfers, onAddGolfer, onSendEmail, onViewGolfer, onPrintMedic
       {/* Golfer table */}
       <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
         <div className="px-5 py-3.5 border-b border-slate-100 bg-slate-50 flex items-center justify-between">
-          <h2 className="text-sm font-bold text-slate-700">Golfers</h2>
-          <span className="text-xs text-slate-400">{pct}% consent rate</span>
+          <h2 className="text-sm font-bold text-slate-700">Golfers on this trip</h2>
+          <span className="text-xs text-slate-400">{pct}% consent received</span>
         </div>
-        <table className="w-full text-sm">
-          <thead>
-            <tr className="text-left text-xs font-semibold text-slate-500 uppercase tracking-wide border-b border-slate-100">
-              <th className="px-5 py-3">Name</th>
-              <th className="px-5 py-3 hidden sm:table-cell">Date of Birth</th>
-              <th className="px-5 py-3">Status</th>
-              <th className="px-5 py-3 text-right">Actions</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-slate-100">
-            {golfers.map((g) => (
-              <tr key={g.id} className="hover:bg-slate-50 transition-colors">
-                <td className="px-5 py-3.5">
+        <div className="divide-y divide-slate-100">
+          {golfers.map((g) => (
+            <>
+              <div key={g.id} className="flex items-center gap-3 px-5 py-3.5 hover:bg-slate-50 transition-colors">
+                <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2">
-                    <span className="font-semibold text-slate-900">{g.first_name} {g.last_name}</span>
-                    {g.medical && (
-                      <span className="text-xs font-bold text-red-700 bg-red-50 border border-red-200 px-2 py-0.5 rounded-full">MED</span>
-                    )}
+                    <span className="font-semibold text-slate-900 text-sm">{g.first_name} {g.last_name}</span>
+                    {g.medical && <span className="text-xs font-bold text-red-700 bg-red-50 border border-red-200 px-2 py-0.5 rounded-full">MED</span>}
                   </div>
-                </td>
-                <td className="px-5 py-3.5 text-slate-500 hidden sm:table-cell">{g.dob}</td>
-                <td className="px-5 py-3.5"><ConsentBadge consented={g.consented} /></td>
-                <td className="px-5 py-3.5 text-right">
-                  {g.id === 1 ? (
-                    <ClickHint label="See medical alert">
-                      <button onClick={onViewGolfer}
-                        className="text-xs font-semibold text-green-700 hover:text-green-800 px-3 py-1.5 rounded-lg border border-green-200 bg-green-50 hover:bg-green-100 transition-colors">
-                        View details
-                      </button>
-                    </ClickHint>
-                  ) : g.id === 2 && !g.consented ? (
-                    <ClickHint label="Send email">
-                      <button onClick={() => onSendEmail(g.parent_email)}
-                        className="text-xs font-semibold text-slate-600 hover:text-slate-800 px-3 py-1.5 rounded-lg border border-slate-200 hover:bg-slate-50 transition-colors">
-                        Send consent email
-                      </button>
-                    </ClickHint>
-                  ) : !g.consented ? (
-                    <button onClick={() => onSendEmail(g.parent_email)}
+                  <p className="text-xs text-slate-400 mt-0.5 hidden sm:block">{g.dob}</p>
+                </div>
+                <ConsentBadge consented={g.consented || emailSentIds.has(g.id)} />
+                <div className="flex items-center gap-2 flex-shrink-0 ml-2">
+                  {g.medical && (
+                    <button onClick={() => setExpandedId(expandedId === g.id ? null : g.id)}
+                      className="text-xs font-semibold text-green-700 hover:text-green-800 px-3 py-1.5 rounded-lg border border-green-200 bg-green-50 hover:bg-green-100 transition-colors">
+                      {expandedId === g.id ? "Hide" : "View details"}
+                    </button>
+                  )}
+                  {!g.consented && !emailSentIds.has(g.id) && (
+                    <button onClick={() => setEmailSentIds(prev => new Set([...prev, g.id]))}
                       className="text-xs font-semibold text-slate-600 hover:text-slate-800 px-3 py-1.5 rounded-lg border border-slate-200 hover:bg-slate-50 transition-colors">
                       Send consent email
                     </button>
-                  ) : (
-                    <span className="text-xs text-slate-400">—</span>
                   )}
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+                  {emailSentIds.has(g.id) && (
+                    <span className="text-xs text-green-700 font-semibold flex items-center gap-1">
+                      <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" /></svg>
+                      Email sent
+                    </span>
+                  )}
+                </div>
+              </div>
+              {expandedId === g.id && (
+                <div key={`${g.id}-detail`} className="px-5 py-4 bg-amber-50 border-b border-amber-100">
+                  <p className="text-xs font-bold text-amber-900 uppercase tracking-wide mb-2">Medical record — {g.first_name} {g.last_name}</p>
+                  <p className="text-sm text-amber-800">{g.medical}</p>
+                  <p className="text-xs text-amber-600 mt-2">Emergency contact: Sarah Taylor · 07700 900001</p>
+                </div>
+              )}
+            </>
+          ))}
+        </div>
       </div>
 
     </div>
@@ -716,6 +704,31 @@ function Screen8({ onBack }: { onBack: () => void }) {
         <p className="text-xs text-slate-400 text-center pt-2">
           Generated by CountyConsent · {new Date().toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" })} · Northumberland County Golf Union
         </p>
+      </div>
+
+      {/* Walkthrough complete */}
+      <div className="rounded-2xl border-2 border-green-300 p-6 text-center space-y-4" style={{ background: "#f0fdf4" }}>
+        <div className="w-14 h-14 rounded-full flex items-center justify-center mx-auto" style={{ background: "#dcfce7" }}>
+          <svg className="w-7 h-7 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
+          </svg>
+        </div>
+        <div>
+          <p className="font-bold text-green-900 text-lg">You&apos;ve completed the walkthrough!</p>
+          <p className="text-green-800 text-sm mt-1 max-w-sm mx-auto">
+            That&apos;s the full CountyConsent workflow — from inviting your team to having everything ready on the day of travel.
+          </p>
+        </div>
+        <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-2">
+          <button onClick={onBack} className="text-sm font-semibold text-green-800 hover:text-green-900 px-4 py-2.5 rounded-xl border border-green-300 bg-white hover:bg-green-50 transition-colors">
+            ← Explore the trip again
+          </button>
+          <a href="/pricing" className="inline-flex items-center gap-2 text-white text-sm font-bold px-6 py-2.5 rounded-xl shadow-sm transition-all hover:opacity-90"
+            style={{ background: "linear-gradient(135deg, #166534, #15803d)" }}>
+            Get started for free
+            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" /></svg>
+          </a>
+        </div>
       </div>
     </div>
   );
@@ -1019,9 +1032,7 @@ export default function DemoPage() {
         {screen === 4 && <Screen3 />}
         {screen === 5 && (
           <Screen4 golfers={golfers} onAddGolfer={() => navigate(6)}
-            onSendEmail={(email) => { setEmailSentTo(email); navigate(7); }}
-            onViewGolfer={() => navigate(8)} onPrintMedical={() => navigate(9)}
-            onBack={() => navigate(1)} />
+            onPrintMedical={() => navigate(7)} onBack={() => navigate(1)} />
         )}
         {screen === 6 && (
           <Screen5
@@ -1031,9 +1042,7 @@ export default function DemoPage() {
             }}
             onBack={() => navigate(5)} />
         )}
-        {screen === 7 && <Screen6 emailSentTo={emailSentTo} onBack={() => navigate(5)} />}
-        {screen === 8 && <Screen7 onBack={() => navigate(5)} />}
-        {screen === 9 && <Screen8 onBack={() => navigate(5)} />}
+        {screen === 7 && <Screen8 onBack={() => navigate(5)} />}
 
       </main>
     </div>
