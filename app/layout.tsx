@@ -13,9 +13,9 @@ export const metadata: Metadata = {
     'CountyConsent is the only GDPR-compliant digital consent system built specifically for county golf unions — so your staff have the right information, at the right time, every time.',
   metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || 'https://countyconsent.co.uk'),
   openGraph: {
-    title: 'CountyConsent — Junior Safeguarding for Golf',
+    title: 'CountyConsent — Junior Golf Consent & Safeguarding',
     description:
-      'Replace paper consent forms with a secure, auditable digital system built for SafeGolf compliance.',
+      'GDPR-compliant parental consent and safeguarding for junior golf. Built for clubs, county unions, and tour organisers across the UK and Ireland.',
     type: 'website',
     url: 'https://countyconsent.co.uk',
     siteName: 'CountyConsent',
