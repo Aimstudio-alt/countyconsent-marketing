@@ -17,6 +17,24 @@ export const metadata: Metadata = {
     description:
       'Replace paper consent forms with a secure, auditable digital system built for SafeGolf compliance.',
     type: 'website',
+    url: 'https://countyconsent.co.uk',
+    siteName: 'CountyConsent',
+    locale: 'en_GB',
+    images: [
+      {
+        url: '/og-image.png',
+        width: 1200,
+        height: 630,
+        alt: 'CountyConsent — Junior Golf Consent & Safeguarding',
+      },
+    ],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'CountyConsent — Junior Golf Consent & Safeguarding',
+    description:
+      'GDPR-compliant parental consent and safeguarding for junior golf. Built for clubs, county unions, and tour organisers across the UK and Ireland.',
+    images: ['/og-image.png'],
   },
 }
 
