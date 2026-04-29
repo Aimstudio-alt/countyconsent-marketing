@@ -14,6 +14,16 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
+  // Super admins don't have a county row — redirect them to the admin dashboard
+  const { data: staffProfile } = await supabase
+    .from('staff_profiles')
+    .select('role')
+    .eq('user_id', user.id)
+    .single()
+  if (staffProfile?.role === 'super_admin') {
+    return NextResponse.json({ isSuperAdmin: true })
+  }
+
   const { data: county, error } = await supabase
     .from('counties')
     .select('id, county_union_name, governing_body, secretary_name, email, phone, plan, subscription_status, account_type, parent_county_id, created_at')

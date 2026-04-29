@@ -449,6 +449,10 @@ export default function DashboardPage() {
     const res = await fetch('/api/dashboard/me', { headers: { Authorization: `Bearer ${t}` } })
     if (!res.ok) return false
     const data = await res.json()
+    if (data.isSuperAdmin) {
+      window.location.href = '/admin'
+      return false
+    }
     setCounty(data.county)
     return true
   }, [])
