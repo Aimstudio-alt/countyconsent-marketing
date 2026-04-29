@@ -20,9 +20,19 @@ type County = {
   phone: string
   plan: string
   subscription_status: string
+  is_complimentary: boolean
   created_at: string
   last_login: string | null
   stripe_customer_id: string | null
+}
+
+type FreeAccountResult = {
+  orgName: string
+  adminName: string
+  email: string
+  accountType: string
+  governingBody: string
+  resetEmailSent: boolean
 }
 
 type AuthState = 'loading' | 'unauthenticated' | 'unauthorized' | 'authorized'
@@ -62,6 +72,15 @@ export default function AdminPage() {
   })
   const [creating, setCreating] = useState(false)
   const [createError, setCreateError] = useState('')
+
+  // Free account modal
+  const [showFreeAccount, setShowFreeAccount] = useState(false)
+  const [freeForm, setFreeForm] = useState({
+    orgName: '', adminName: '', email: '', accountType: 'county_union', governingBody: '',
+  })
+  const [creatingFree, setCreatingFree] = useState(false)
+  const [freeError, setFreeError] = useState('')
+  const [freeSuccess, setFreeSuccess] = useState<FreeAccountResult | null>(null)
 
   // Delete confirmation
   const [deleteTarget, setDeleteTarget] = useState<County | null>(null)
@@ -148,6 +167,29 @@ export default function AdminPage() {
     setShowCreate(false)
     setCreateForm({ countyUnionName: '', governingBody: '', secretaryName: '', email: '', phone: '', plan: 'pilot', password: '' })
     if (token) fetchCounties(token)
+  }
+
+  const handleCreateFree = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setFreeError('')
+    setCreatingFree(true)
+    const res = await fetch('/api/admin/create-free-account', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+      body: JSON.stringify(freeForm),
+    })
+    const data = await res.json()
+    setCreatingFree(false)
+    if (!res.ok) { setFreeError(data.error || 'Failed to create account.'); return }
+    setFreeSuccess(data.account)
+    if (token) fetchCounties(token)
+  }
+
+  const closeFreeModal = () => {
+    setShowFreeAccount(false)
+    setFreeSuccess(null)
+    setFreeError('')
+    setFreeForm({ orgName: '', adminName: '', email: '', accountType: 'county_union', governingBody: '' })
   }
 
   const filtered = counties.filter(c =>
@@ -278,6 +320,14 @@ export default function AdminPage() {
             onChange={e => setSearch(e.target.value)}
             className="flex-1 px-4 py-2.5 rounded-xl border border-gray-200 bg-white text-sm focus:outline-none focus:ring-2 focus:ring-green-700"
           />
+          <button onClick={() => setShowFreeAccount(true)}
+            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-bold transition-all hover:opacity-90 border"
+            style={{borderColor:'#a7d9bc',color:'#155230',background:'#edf7f2'}}>
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+            </svg>
+            Create free account
+          </button>
           <button onClick={() => setShowCreate(true)}
             className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-bold text-white transition-all hover:opacity-90"
             style={{background:'linear-gradient(135deg,#155230,#1a6b3e)'}}>
@@ -316,7 +366,15 @@ export default function AdminPage() {
                       <td className="px-5 py-4 text-gray-600 whitespace-nowrap">{county.secretary_name}</td>
                       <td className="px-5 py-4 text-gray-600">{county.email}</td>
                       <td className="px-5 py-4">
-                        <span className="capitalize text-gray-700 font-medium">{county.plan}</span>
+                        <div className="flex items-center gap-2">
+                          <span className="capitalize text-gray-700 font-medium">{county.plan}</span>
+                          {county.is_complimentary && (
+                            <span className="text-xs font-semibold px-2 py-0.5 rounded-full border"
+                              style={{background:'#f0fdf4',borderColor:'#86efac',color:'#166534'}}>
+                              Free
+                            </span>
+                          )}
+                        </div>
                       </td>
                       <td className="px-5 py-4">
                         <span className={`text-xs font-semibold px-2.5 py-1 rounded-full border capitalize ${STATUS_STYLES[county.subscription_status] || 'bg-gray-100 text-gray-600 border-gray-200'}`}>
@@ -348,6 +406,121 @@ export default function AdminPage() {
           )}
         </div>
       </div>
+
+      {/* Create free account modal */}
+      {showFreeAccount && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-6"
+          style={{background:'rgba(0,0,0,0.5)'}}>
+          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto">
+            <div className="p-6 border-b border-gray-100 flex items-center justify-between">
+              <div>
+                <h2 className="font-black text-gray-900 text-lg">Create free account</h2>
+                <p className="text-xs text-gray-500 mt-0.5">Complimentary access — no payment required</p>
+              </div>
+              <button onClick={closeFreeModal} className="text-gray-400 hover:text-gray-600">
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+
+            {freeSuccess ? (
+              <div className="p-6 space-y-5">
+                <div className="flex items-center gap-3 p-4 rounded-xl" style={{background:'#edf7f2'}}>
+                  <div className="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0"
+                    style={{background:'linear-gradient(135deg,#155230,#1a6b3e)'}}>
+                    <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
+                    </svg>
+                  </div>
+                  <div>
+                    <p className="font-bold text-green-900 text-sm">Account created successfully</p>
+                    <p className="text-xs text-green-700 mt-0.5">
+                      {freeSuccess.resetEmailSent
+                        ? 'A password setup email has been sent to the user.'
+                        : 'Account created — password reset email could not be sent automatically.'}
+                    </p>
+                  </div>
+                </div>
+                <div className="rounded-xl border border-gray-100 divide-y divide-gray-50 text-sm">
+                  {[
+                    { label: 'Organisation', value: freeSuccess.orgName },
+                    { label: 'Admin name', value: freeSuccess.adminName },
+                    { label: 'Email', value: freeSuccess.email },
+                    { label: 'Account type', value: freeSuccess.accountType === 'county_union' ? 'County Union' : 'Golf Club' },
+                    { label: 'Governing body', value: freeSuccess.governingBody },
+                    { label: 'Plan', value: 'Complimentary (free)' },
+                  ].map(({ label, value }) => (
+                    <div key={label} className="flex justify-between px-4 py-3 gap-4">
+                      <span className="text-gray-500 font-medium flex-shrink-0">{label}</span>
+                      <span className="text-gray-900 font-semibold text-right">{value}</span>
+                    </div>
+                  ))}
+                </div>
+                <button onClick={closeFreeModal}
+                  className="w-full py-3 rounded-xl text-sm font-bold text-white transition-all hover:opacity-90"
+                  style={{background:'linear-gradient(135deg,#155230,#1a6b3e)'}}>
+                  Done
+                </button>
+              </div>
+            ) : (
+              <form onSubmit={handleCreateFree} className="p-6 space-y-4">
+                {freeError && <div className="rounded-xl p-3 text-sm text-red-700 bg-red-50">{freeError}</div>}
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 mb-1.5">Organisation name</label>
+                  <input type="text" required placeholder="e.g. Durham County Golf Union"
+                    value={freeForm.orgName}
+                    onChange={e => setFreeForm(prev => ({ ...prev, orgName: e.target.value }))}
+                    className="w-full px-4 py-3 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-green-700" />
+                </div>
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 mb-1.5">Admin name</label>
+                  <input type="text" required placeholder="e.g. Jane Smith"
+                    value={freeForm.adminName}
+                    onChange={e => setFreeForm(prev => ({ ...prev, adminName: e.target.value }))}
+                    className="w-full px-4 py-3 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-green-700" />
+                </div>
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 mb-1.5">Email address</label>
+                  <input type="email" required placeholder="jane@example.com"
+                    value={freeForm.email}
+                    onChange={e => setFreeForm(prev => ({ ...prev, email: e.target.value }))}
+                    className="w-full px-4 py-3 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-green-700" />
+                </div>
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 mb-1.5">Account type</label>
+                  <select required value={freeForm.accountType}
+                    onChange={e => setFreeForm(prev => ({ ...prev, accountType: e.target.value }))}
+                    className="w-full px-4 py-3 rounded-xl border border-gray-200 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-green-700">
+                    <option value="county_union">County Union</option>
+                    <option value="golf_club">Golf Club</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 mb-1.5">Governing body</label>
+                  <select required value={freeForm.governingBody}
+                    onChange={e => setFreeForm(prev => ({ ...prev, governingBody: e.target.value }))}
+                    className="w-full px-4 py-3 rounded-xl border border-gray-200 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-green-700">
+                    <option value="">Select governing body</option>
+                    {GOVERNING_BODIES.map(gb => <option key={gb} value={gb}>{gb}</option>)}
+                  </select>
+                </div>
+                <div className="flex gap-3 pt-2">
+                  <button type="button" onClick={closeFreeModal}
+                    className="flex-1 py-3 rounded-xl text-sm font-semibold border border-gray-200 text-gray-700 hover:bg-gray-50 transition-colors">
+                    Cancel
+                  </button>
+                  <button type="submit" disabled={creatingFree}
+                    className="flex-1 py-3 rounded-xl text-sm font-bold text-white transition-all hover:opacity-90 disabled:opacity-60"
+                    style={{background:'linear-gradient(135deg,#155230,#1a6b3e)'}}>
+                    {creatingFree ? 'Creating…' : 'Create free account'}
+                  </button>
+                </div>
+              </form>
+            )}
+          </div>
+        </div>
+      )}
 
       {/* Create county modal */}
       {showCreate && (
