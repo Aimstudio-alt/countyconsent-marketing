@@ -40,6 +40,45 @@ export async function POST(request: NextRequest) {
             subscription_status: session.payment_status === 'paid' ? 'active' : 'trialing',
           })
           .eq('supabase_user_id', supabaseUserId)
+
+        // Provision the county admin: create a staff_profiles row so the new
+        // customer can access the dashboard immediately after payment.
+        // Idempotent — ignoreDuplicates maps to ON CONFLICT (id) DO NOTHING,
+        // so safe on Stripe webhook retries.
+        const { data: county } = await supabase
+          .from('counties')
+          .select('id, secretary_name')
+          .eq('supabase_user_id', supabaseUserId)
+          .maybeSingle()
+
+        if (county) {
+          const { error: spError } = await supabase
+            .from('staff_profiles')
+            .upsert(
+              {
+                id: supabaseUserId,
+                full_name: county.secretary_name || '',
+                role: 'admin',
+                county_id: county.id,
+                archived: false,
+              },
+              { onConflict: 'id', ignoreDuplicates: true }
+            )
+
+          if (spError) {
+            console.error('[webhook] staff_profiles provision failed:', spError.message, { supabaseUserId, countyId: county.id })
+            await supabase.from('audit_log').insert({
+              user_id: supabaseUserId,
+              action: 'county_created',
+              metadata: {
+                error: spError.message,
+                context: 'staff_profiles_provision_failed',
+                county_id: county.id,
+              },
+              created_at: new Date().toISOString(),
+            })
+          }
+        }
       }
 
       // Also update Stripe customer name from metadata
