@@ -125,6 +125,8 @@ export async function POST(request: NextRequest) {
         status: subscription.status,
       }, { onConflict: 'stripe_subscription_id' })
 
+      const appLoginUrl = `${process.env.NEXT_PUBLIC_APP_LOGIN_URL || 'https://app.countyconsent.co.uk'}/login`
+
       if (email) {
         await resend.emails.send({
           from: FROM_EMAIL,
@@ -142,7 +144,15 @@ export async function POST(request: NextRequest) {
                   ${subscription.trial_end ? `Your 30-day free trial runs until <strong>${new Date(subscription.trial_end * 1000).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })}</strong>.` : ''}
                 </p>
                 <p style="color: #4b5563; line-height: 1.6; margin: 0 0 24px;">
-                  You can log in to your dashboard at any time. Reply to this email if you have any questions.
+                  Use the email address and password you chose during signup to log in to your dashboard.
+                </p>
+                <a href="${appLoginUrl}"
+                  style="display: inline-block; background: linear-gradient(135deg, #155230, #1a6b3e); color: white; text-decoration: none; font-weight: 600; font-size: 15px; padding: 14px 28px; border-radius: 10px; margin-bottom: 24px;">
+                  Log in to your dashboard →
+                </a>
+                <p style="color: #6b7280; font-size: 13px; line-height: 1.5; margin: 0 0 24px;">
+                  If the button above doesn't work, copy and paste this link into your browser:<br />
+                  <a href="${appLoginUrl}" style="color: #166534;">${appLoginUrl}</a>
                 </p>
                 <hr style="border: none; border-top: 1px solid #e5e7eb; margin: 24px 0;" />
                 <p style="color: #9ca3af; font-size: 13px; margin: 0;">
