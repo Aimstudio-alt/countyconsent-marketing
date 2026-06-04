@@ -1,6 +1,7 @@
 import Nav from '@/components/Nav'
 import Hero from '@/components/Hero'
 import Stats from '@/components/Stats'
+import TestimonialPullQuote from '@/components/TestimonialPullQuote'
 import Problem from '@/components/Problem'
 import HowItWorks from '@/components/HowItWorks'
 import DemoSection from '@/components/DemoSection'
@@ -19,6 +20,7 @@ export default function Home() {
       <main>
         <Hero />
         <Stats />
+        <TestimonialPullQuote />
         <Problem />
         <HowItWorks />
         <DemoSection />

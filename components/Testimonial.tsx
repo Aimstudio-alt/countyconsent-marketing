@@ -1,5 +1,3 @@
-import Image from 'next/image'
-
 export default function Testimonial() {
   return (
     <section className="py-24 relative overflow-hidden" style={{ background: '#f7f5ee' }}>
@@ -38,12 +36,11 @@ export default function Testimonial() {
             <div className="flex items-center gap-5 pt-8 border-t border-white/15">
               <div className="p-[3px] rounded-full flex-shrink-0" style={{ background: 'linear-gradient(135deg,#a7d9bc,#c9921c)' }}>
                 <div className="w-16 h-16 rounded-full overflow-hidden">
-                  <Image
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
                     src="/paultinkler.jpg"
                     alt="Paul Tinkler"
-                    width={64}
-                    height={64}
-                    className="w-full h-full object-cover object-top"
+                    className="w-full h-full object-cover object-center"
                   />
                 </div>
               </div>
