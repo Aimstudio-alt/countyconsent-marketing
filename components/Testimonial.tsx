@@ -36,9 +36,8 @@ export default function Testimonial() {
 
             {/* Attribution */}
             <div className="flex items-center gap-5 pt-8 border-t border-white/15">
-              <div className="relative flex-shrink-0">
-                <div className="absolute inset-0 rounded-full" style={{ background: 'linear-gradient(135deg,#a7d9bc,#c9921c)', padding: '3px', borderRadius: '9999px' }} />
-                <div className="w-16 h-16 rounded-full overflow-hidden ring-2 ring-white/20 relative z-10">
+              <div className="p-[3px] rounded-full flex-shrink-0" style={{ background: 'linear-gradient(135deg,#a7d9bc,#c9921c)' }}>
+                <div className="w-16 h-16 rounded-full overflow-hidden">
                   <Image
                     src="/paultinkler.jpg"
                     alt="Paul Tinkler"
