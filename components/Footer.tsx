@@ -54,6 +54,11 @@ export default function Footer() {
           <p className="text-xs" style={{color:'#4d7a62'}}>
             &copy; {new Date().getFullYear()} CountyConsent. All rights reserved. Built in partnership with Durham County Golf Union.
           </p>
+          <nav className="flex items-center gap-4 text-xs">
+            {[['Privacy','/legal/privacy'],['Cookies','/legal/cookies'],['Terms','/legal/terms']].map(([label, href]) => (
+              <a key={label} href={href} className="transition-colors hover:text-white" style={{color:'#a0bfb0'}}>{label}</a>
+            ))}
+          </nav>
           <p className="text-xs" style={{color:'#4d7a62'}}>
             UK GDPR · ICO registered · Data stored in the United Kingdom
           </p>
