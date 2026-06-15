@@ -1,7 +1,7 @@
 import Link from 'next/link'
 
 export default function WelcomePage() {
-  const appLoginUrl = process.env.NEXT_PUBLIC_APP_LOGIN_URL || 'https://app.countyconsent.co.uk'
+  const appLoginUrl = process.env.NEXT_PUBLIC_APP_LOGIN_URL || 'https://countyconsent.uk'
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center px-6" style={{background:'#f7f5ee'}}>

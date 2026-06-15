@@ -125,7 +125,7 @@ export async function POST(request: NextRequest) {
         status: subscription.status,
       }, { onConflict: 'stripe_subscription_id' })
 
-      const appLoginUrl = `${process.env.NEXT_PUBLIC_APP_LOGIN_URL || 'https://app.countyconsent.co.uk'}/login`
+      const appLoginUrl = `${process.env.NEXT_PUBLIC_APP_LOGIN_URL || 'https://countyconsent.uk'}/login`
 
       if (email) {
         await resend.emails.send({

@@ -40,7 +40,7 @@ export default function Nav() {
         </nav>
 
         <div className="hidden md:flex items-center gap-3">
-          <a href="https://app.countyconsent.co.uk/login"
+          <a href="https://countyconsent.uk/login"
             className="text-sm font-medium text-gray-600 hover:text-gray-900 transition-colors">
             Log in
           </a>
@@ -65,7 +65,7 @@ export default function Nav() {
               onClick={() => setMenuOpen(false)}
               className="text-sm font-medium text-gray-700">{label}</a>
           ))}
-          <a href="https://app.countyconsent.co.uk/login"
+          <a href="https://countyconsent.uk/login"
             onClick={() => setMenuOpen(false)}
             className="text-sm font-medium text-gray-700">
             Log in

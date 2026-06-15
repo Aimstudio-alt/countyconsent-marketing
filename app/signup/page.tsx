@@ -367,7 +367,7 @@ function SignupForm() {
           <p className="text-center text-sm text-gray-500 mt-6">
             Already have an account?{' '}
             <a
-              href={process.env.NEXT_PUBLIC_APP_URL || 'https://app.countyconsent.co.uk'}
+              href={process.env.NEXT_PUBLIC_APP_URL || 'https://countyconsent.uk'}
               className="font-semibold"
               style={{ color: '#155230' }}
             >
