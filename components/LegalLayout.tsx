@@ -258,7 +258,7 @@ export default function LegalLayout({ title, content }: { title: string; content
           <p className="text-xs font-bold uppercase tracking-widest mb-3 px-1" style={{ color: '#9ca3af' }}>
             Legal
           </p>
-          <ul className="flex gap-2 overflow-x-auto md:flex-col md:gap-1 md:overflow-visible md:sticky md:top-8">
+          <ul className="flex flex-col gap-1 md:sticky md:top-8">
             {NAV.map((item) => {
               const active = pathname === item.href
               return (
