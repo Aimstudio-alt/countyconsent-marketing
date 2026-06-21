@@ -1,7 +1,6 @@
 'use client'
 
 import { useState, Suspense } from 'react'
-import { useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 
 const GOVERNING_BODIES = [
@@ -18,9 +17,9 @@ const ENGLAND_GOLF_COUNTIES = [
 type AccountType = 'county_union' | 'golf_club'
 
 function SignupForm() {
-  const searchParams = useSearchParams()
-  const planParam = searchParams.get('plan')
-  const plan: 'monthly' | 'annual' = planParam === 'annual' ? 'annual' : 'monthly'
+  // Annual billing retired — every signup is monthly. The price is set by
+  // account type at checkout (server-side), not by a plan query param.
+  const plan = 'monthly' as const
 
   const [accountType, setAccountType] = useState<AccountType>('county_union')
 
@@ -123,9 +122,11 @@ function SignupForm() {
               className="inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-semibold border mb-4"
               style={{ background: '#edf7f2', borderColor: '#a7d9bc', color: '#155230' }}
             >
-              {plan === 'annual'
-                ? '✓ Annual plan — £1,490/year (save £298)'
-                : '✓ Monthly plan — £149/month'}
+              {accountType === 'golf_club'
+                ? '✓ Golf Club — £99/month'
+                : accountType === 'county_union'
+                ? '✓ County Union — £199/month'
+                : '✓ Monthly plan'}
             </div>
             <h1 className="text-3xl font-black tracking-tight mb-2" style={{ color: '#0a2818' }}>
               Create your account

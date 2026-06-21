@@ -5,7 +5,7 @@ import FAQ from '@/components/FAQ'
 
 export const metadata: Metadata = {
   title: 'Pricing — CountyConsent',
-  description: 'Simple, transparent pricing for CountyConsent. Monthly or annual plans — everything included, no hidden fees.',
+  description: 'Simple, transparent monthly pricing for CountyConsent — everything included, no hidden fees.',
 }
 
 export default function PricingPage() {

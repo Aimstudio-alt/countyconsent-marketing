@@ -9,7 +9,10 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Invalid plan' }, { status: 400 })
     }
 
-    const isTest = process.env.STRIPE_MODE === 'test'
+    // Default to TEST mode — live billing requires an explicit STRIPE_MODE=live
+    // opt-in so a fresh deploy can never take a real payment before env vars are
+    // set and tested.
+    const isTest = process.env.STRIPE_MODE !== 'live'
     const stripeKey = isTest ? process.env.TEST_STRIPE_SECRET_KEY! : process.env.STRIPE_SECRET_KEY!
     const stripe = new Stripe(stripeKey)
 

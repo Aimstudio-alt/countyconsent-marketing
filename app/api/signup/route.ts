@@ -3,16 +3,24 @@ import Stripe from 'stripe'
 import { createServiceClient } from '@/lib/supabase'
 
 function getStripeClient() {
-  const isTest = process.env.STRIPE_MODE === 'test'
+  // Default to TEST mode — live billing requires an explicit STRIPE_MODE=live
+  // opt-in so a fresh deploy can never take a real payment before env vars are
+  // set and tested.
+  const isTest = process.env.STRIPE_MODE !== 'live'
   const key = isTest ? process.env.TEST_STRIPE_SECRET_KEY! : process.env.STRIPE_SECRET_KEY!
   return { stripe: new Stripe(key), isTest }
 }
 
-function getPriceId(plan: string, isTest: boolean) {
-  if (plan === 'monthly') {
-    return isTest ? process.env.TEST_STRIPE_MONTHLY_PRICE_ID! : process.env.STRIPE_MONTHLY_PRICE_ID!
+// Monthly price is forked by account type:
+//   golf_club    → £99/month   (STRIPE_CLUB_PRICE_ID)
+//   county_union → £199/month  (STRIPE_COUNTY_PRICE_ID)
+// Live vs test price IDs are selected by STRIPE_MODE. Annual billing has been
+// retired — there is a single monthly price per account type.
+function getPriceId(accountType: 'county_union' | 'golf_club', isTest: boolean) {
+  if (accountType === 'golf_club') {
+    return isTest ? process.env.TEST_STRIPE_CLUB_PRICE_ID! : process.env.STRIPE_CLUB_PRICE_ID!
   }
-  return isTest ? process.env.TEST_STRIPE_ANNUAL_PRICE_ID! : process.env.STRIPE_ANNUAL_PRICE_ID!
+  return isTest ? process.env.TEST_STRIPE_COUNTY_PRICE_ID! : process.env.STRIPE_COUNTY_PRICE_ID!
 }
 
 export async function POST(request: NextRequest) {
@@ -27,18 +35,18 @@ export async function POST(request: NextRequest) {
       phone,
       parentCountyName,
       password,
-      plan,
     } = body
 
-    if (!countyUnionName || !governingBody || !secretaryName || !email || !phone || !password || !plan) {
+    if (!countyUnionName || !governingBody || !secretaryName || !email || !phone || !password) {
       return NextResponse.json({ error: 'All fields are required.' }, { status: 400 })
-    }
-    if (plan !== 'monthly' && plan !== 'annual') {
-      return NextResponse.json({ error: 'Invalid plan.' }, { status: 400 })
     }
     if (password.length < 8) {
       return NextResponse.json({ error: 'Password must be at least 8 characters.' }, { status: 400 })
     }
+
+    // Annual billing has been retired — every signup is monthly. The price is
+    // determined by account type (see getPriceId), not by plan.
+    const plan = 'monthly' as const
 
     const resolvedAccountType: 'county_union' | 'golf_club' =
       accountType === 'golf_club' ? 'golf_club' : 'county_union'
@@ -111,7 +119,7 @@ export async function POST(request: NextRequest) {
     }
 
     const { stripe, isTest } = getStripeClient()
-    const priceId = getPriceId(plan, isTest)
+    const priceId = getPriceId(resolvedAccountType, isTest)
     const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://countyconsent.co.uk'
 
     const session = await stripe.checkout.sessions.create({

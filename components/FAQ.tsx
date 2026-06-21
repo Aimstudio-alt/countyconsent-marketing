@@ -17,7 +17,7 @@ const faqs = [
   },
   {
     q: 'Can we cancel anytime?',
-    a: 'Yes. Monthly subscribers can cancel at any time and your subscription will run until the end of the current billing period. Annual subscribers receive a pro-rata refund for any unused months.',
+    a: 'Yes. You can cancel at any time and your subscription will run until the end of the current monthly billing period.',
   },
   {
     q: 'Is it really built for golf organisations?',
