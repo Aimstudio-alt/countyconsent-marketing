@@ -19,7 +19,7 @@ export default function WelcomePage() {
           You&apos;re all set.
         </h1>
         <p className="text-lg text-gray-600 mb-10 leading-relaxed">
-          Welcome to CountyConsent. Your 30-day free trial has started — no charge until your trial ends.
+          Welcome to CountyConsent. Your subscription is now active.
         </p>
 
         {/* What happens next */}

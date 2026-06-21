@@ -3,9 +3,20 @@ import Stripe from 'stripe'
 import { createServiceClient } from '@/lib/supabase'
 import { resend, FROM_EMAIL, ADMIN_EMAIL } from '@/lib/resend'
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!)
+// Default to TEST — live requires an explicit STRIPE_MODE=live opt-in, mirroring
+// /api/signup so the webhook always agrees with the mode signup ran in. Resolves
+// both the secret key and the webhook signing secret for the active mode.
+function getStripeContext() {
+  const isTest = process.env.STRIPE_MODE !== 'live'
+  const key = isTest ? process.env.TEST_STRIPE_SECRET_KEY! : process.env.STRIPE_SECRET_KEY!
+  const webhookSecret = isTest
+    ? process.env.TEST_STRIPE_WEBHOOK_SECRET!
+    : process.env.STRIPE_WEBHOOK_SECRET!
+  return { stripe: new Stripe(key), webhookSecret }
+}
 
 export async function POST(request: NextRequest) {
+  const { stripe, webhookSecret } = getStripeContext()
   const body = await request.text()
   const signature = request.headers.get('stripe-signature')
 
@@ -15,7 +26,7 @@ export async function POST(request: NextRequest) {
 
   let event: Stripe.Event
   try {
-    event = stripe.webhooks.constructEvent(body, signature, process.env.STRIPE_WEBHOOK_SECRET!)
+    event = stripe.webhooks.constructEvent(body, signature, webhookSecret)
   } catch (err) {
     console.error('Webhook signature verification failed:', err)
     return NextResponse.json({ error: 'Invalid signature' }, { status: 400 })
@@ -141,7 +152,6 @@ export async function POST(request: NextRequest) {
                 <h2 style="color: #111827; font-size: 22px; margin: 0 0 12px;">Welcome to CountyConsent${name ? `, ${name}` : ''}.</h2>
                 <p style="color: #4b5563; line-height: 1.6; margin: 0 0 16px;">
                   Your <strong>${plan === 'annual' ? 'annual' : 'monthly'}</strong> subscription is now active.
-                  ${subscription.trial_end ? `Your 30-day free trial runs until <strong>${new Date(subscription.trial_end * 1000).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })}</strong>.` : ''}
                 </p>
                 <p style="color: #4b5563; line-height: 1.6; margin: 0 0 24px;">
                   Use the email address and password you chose during signup to log in to your dashboard.
