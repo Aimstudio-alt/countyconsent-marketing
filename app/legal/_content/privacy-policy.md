@@ -4,7 +4,7 @@
 
 This Privacy Policy explains how **SentinelHQ Ltd** ("we", "us", "our") collects, uses and protects personal data when you use the CountyConsent website (countyconsent.co.uk) and application (countyconsent.uk) (together, the "Service").
 
-SentinelHQ Ltd is the operator of CountyConsent. We are registered with the UK Information Commissioner's Office (ICO) under registration number **ZC138385**.
+SentinelHQ Ltd is the operator of CountyConsent. We are registered with the UK Information Commissioner's Office (ICO) under registration number **ZC175485**.
 
 This policy is written to comply with the UK GDPR, the Data Protection Act 2018, and the Privacy and Electronic Communications Regulations (PECR).
 
@@ -20,7 +20,7 @@ This policy describes how we handle personal data **of website visitors, club an
 Director: Kevin Jager
 Registered address: England & Wales
 Company number: 17242389
-ICO registration: ZC138385
+ICO registration: ZC175485
 Contact: hello@sentinelhq.co.uk
 
 ## 3. What personal data we collect
