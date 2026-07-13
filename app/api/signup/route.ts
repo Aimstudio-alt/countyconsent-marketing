@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
 import Stripe from 'stripe'
 import { createServiceClient } from '@/lib/supabase'
+import { resend, FROM_EMAIL, ADMIN_EMAIL } from '@/lib/resend'
+import { MONTHLY_PRICE, ACCOUNT_TYPE_LABEL } from '@/lib/pricing'
 
 function getStripeClient() {
   // Default to TEST mode — live billing requires an explicit STRIPE_MODE=live
@@ -35,7 +37,12 @@ export async function POST(request: NextRequest) {
       phone,
       parentCountyName,
       password,
+      paymentMethod,
     } = body
+
+    // 'card' (default) → Stripe checkout, as before.
+    // 'invoice' → create the same pending account but bill manually; no Stripe.
+    const isInvoice = paymentMethod === 'invoice'
 
     if (!countyUnionName || !governingBody || !secretaryName || !email || !phone || !password) {
       return NextResponse.json({ error: 'All fields are required.' }, { status: 400 })
@@ -118,6 +125,53 @@ export async function POST(request: NextRequest) {
       )
     }
 
+    // ── Invoice path ────────────────────────────────────────────────────────
+    // The account now exists in exactly the same pre-payment state a card signup
+    // has (counties row, subscription_status 'pending_payment', no staff_profiles
+    // and no Stripe objects). We do NOT create a Stripe session or grant access —
+    // the account is activated manually once the invoice is paid. Notify admin so
+    // an invoice can be raised in FreeAgent.
+    if (isInvoice) {
+      const price = MONTHLY_PRICE[resolvedAccountType]
+      const typeLabel = ACCOUNT_TYPE_LABEL[resolvedAccountType]
+      try {
+        await resend.emails.send({
+          from: FROM_EMAIL,
+          to: ADMIN_EMAIL,
+          subject: `New INVOICE signup: ${countyUnionName} (${typeLabel}) — ${price}/month`,
+          html: `
+            <div style="font-family: -apple-system, sans-serif; max-width: 560px; margin: 0 auto; color: #111827;">
+              <h2 style="margin: 0 0 12px;">New invoice signup</h2>
+              <p style="color: #4b5563; margin: 0 0 16px;">
+                A new account has signed up and requested to be invoiced. Raise an invoice in
+                FreeAgent, then activate the account once payment is received.
+              </p>
+              <ul style="color: #111827; line-height: 1.7;">
+                <li><strong>Organisation:</strong> ${countyUnionName}</li>
+                <li><strong>Account type:</strong> ${typeLabel}</li>
+                <li><strong>Price:</strong> ${price}/month</li>
+                <li><strong>Contact email:</strong> ${email}</li>
+                <li><strong>Phone:</strong> ${phone}</li>
+                <li><strong>Governing body:</strong> ${governingBody}</li>
+                ${resolvedAccountType === 'golf_club' && parentCountyName ? `<li><strong>County union:</strong> ${parentCountyName}</li>` : ''}
+              </ul>
+              <p style="color: #6b7280; font-size: 13px; margin-top: 16px;">
+                The account is created with subscription_status = 'pending_payment' and has no
+                dashboard access until you activate it.
+              </p>
+            </div>
+          `,
+        })
+      } catch (emailErr) {
+        // The account is already created; surface the failure so it can be retried
+        // and the admin still finds out (the row exists either way).
+        console.error('[signup] invoice notification email failed:', emailErr instanceof Error ? emailErr.message : String(emailErr))
+      }
+
+      return NextResponse.json({ invoiced: true })
+    }
+
+    // ── Card path (Stripe checkout) ───────────────────────────────────────────
     const { stripe, isTest } = getStripeClient()
     const priceId = getPriceId(resolvedAccountType, isTest)
     const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://countyconsent.co.uk'

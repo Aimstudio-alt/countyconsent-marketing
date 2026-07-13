@@ -2,6 +2,7 @@
 
 import { useState, Suspense } from 'react'
 import Link from 'next/link'
+import { MONTHLY_PRICE } from '@/lib/pricing'
 
 const GOVERNING_BODIES = [
   'England Golf',
@@ -33,16 +34,21 @@ function SignupForm() {
     password: '',
     passwordConfirm: '',
   })
-  const [loading, setLoading] = useState(false)
+  const [loadingMethod, setLoadingMethod] = useState<null | 'card' | 'invoice'>(null)
   const [error, setError] = useState('')
+  const [invoiceRequested, setInvoiceRequested] = useState(false)
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     setForm(prev => ({ ...prev, [e.target.name]: e.target.value }))
   }
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     setError('')
+
+    // Both buttons are type="submit"; the submitter's value tells us which path.
+    const submitter = (e.nativeEvent as SubmitEvent).submitter as HTMLButtonElement | null
+    const method: 'card' | 'invoice' = submitter?.value === 'invoice' ? 'invoice' : 'card'
 
     if (form.password !== form.passwordConfirm) {
       setError('Passwords do not match.')
@@ -57,7 +63,7 @@ function SignupForm() {
       return
     }
 
-    setLoading(true)
+    setLoadingMethod(method)
     try {
       const res = await fetch('/api/signup', {
         method: 'POST',
@@ -72,6 +78,7 @@ function SignupForm() {
           parentCountyName: accountType === 'golf_club' ? form.parentCountyName : undefined,
           password: form.password,
           plan,
+          paymentMethod: method,
         }),
       })
       const data = await res.json()
@@ -81,11 +88,16 @@ function SignupForm() {
       }
       if (data.url) {
         window.location.href = data.url
+        return
+      }
+      if (data.invoiced) {
+        setInvoiceRequested(true)
+        return
       }
     } catch {
       setError('Something went wrong. Please try again.')
     } finally {
-      setLoading(false)
+      setLoadingMethod(null)
     }
   }
 
@@ -116,6 +128,33 @@ function SignupForm() {
       <main className="flex-1 flex items-center justify-center px-6 py-16">
         <div className="w-full max-w-lg">
 
+          {invoiceRequested ? (
+            <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-8 text-center">
+              <div
+                className="w-14 h-14 rounded-2xl mx-auto mb-5 flex items-center justify-center"
+                style={{ background: 'linear-gradient(135deg,#155230,#1a6b3e)' }}
+              >
+                <svg className="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
+                </svg>
+              </div>
+              <h1 className="text-2xl font-black tracking-tight mb-3" style={{ color: '#0a2818' }}>
+                Invoice request received
+              </h1>
+              <p className="text-gray-600 text-sm leading-relaxed mb-3">
+                Thanks — we&apos;ve received your request and will email an invoice to{' '}
+                <strong>{form.email}</strong>.
+              </p>
+              <p className="text-gray-600 text-sm leading-relaxed">
+                Your account has been created but isn&apos;t active yet. Access to your dashboard
+                begins once we&apos;ve received payment.
+              </p>
+              <Link href="/" className="inline-block mt-6 text-sm font-semibold" style={{ color: '#155230' }}>
+                ← Back to home
+              </Link>
+            </div>
+          ) : (
+          <>
           {/* Plan badge */}
           <div className="text-center mb-8">
             <div
@@ -123,9 +162,9 @@ function SignupForm() {
               style={{ background: '#edf7f2', borderColor: '#a7d9bc', color: '#155230' }}
             >
               {accountType === 'golf_club'
-                ? '✓ Golf Club — £99/month'
+                ? `✓ Golf Club — ${MONTHLY_PRICE.golf_club}/month`
                 : accountType === 'county_union'
-                ? '✓ County Union — £199/month'
+                ? `✓ County Union — ${MONTHLY_PRICE.county_union}/month`
                 : '✓ Monthly plan'}
             </div>
             <h1 className="text-3xl font-black tracking-tight mb-2" style={{ color: '#0a2818' }}>
@@ -353,12 +392,37 @@ function SignupForm() {
 
             <button
               type="submit"
-              disabled={loading}
+              value="card"
+              disabled={loadingMethod !== null}
               className="w-full py-4 rounded-xl font-black text-base text-white transition-all hover:opacity-90 disabled:opacity-60"
               style={{ background: 'linear-gradient(135deg,#155230,#1a6b3e)' }}
             >
-              {loading ? 'Creating account…' : 'Continue to payment →'}
+              {loadingMethod === 'card' ? 'Creating account…' : 'Continue to payment →'}
             </button>
+
+            {/* Invoice alternative */}
+            <div className="relative">
+              <div className="absolute inset-0 flex items-center" aria-hidden="true">
+                <div className="w-full border-t border-gray-200" />
+              </div>
+              <div className="relative flex justify-center">
+                <span className="bg-white px-3 text-xs text-gray-400">or</span>
+              </div>
+            </div>
+
+            <button
+              type="submit"
+              value="invoice"
+              disabled={loadingMethod !== null}
+              className="w-full py-3 rounded-xl font-semibold text-sm border-2 transition-all hover:bg-gray-50 disabled:opacity-60"
+              style={{ borderColor: '#155230', color: '#155230' }}
+            >
+              {loadingMethod === 'invoice' ? 'Submitting request…' : 'Request an invoice instead'}
+            </button>
+            <p className="text-center text-xs text-gray-400 leading-relaxed">
+              Pay by invoice (BACS). Your account is created now but stays inactive — access
+              begins once payment is received.
+            </p>
 
             <p className="text-center text-xs text-gray-400 leading-relaxed">
               By creating an account you agree to our terms of service and privacy policy.
@@ -395,6 +459,8 @@ function SignupForm() {
               </div>
             ))}
           </div>
+          </>
+          )}
         </div>
       </main>
     </div>

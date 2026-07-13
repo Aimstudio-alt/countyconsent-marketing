@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import { MONTHLY_PRICE } from '@/lib/pricing'
 
 const clubFeatures = [
   'Secure digital consent forms',
@@ -49,7 +50,7 @@ export default function Pricing() {
           <div className="rounded-2xl border-2 border-gray-200 bg-white p-8 md:p-10 shadow-sm hover:border-gray-300 hover:shadow-md transition-all">
             <div className="text-gray-400 text-sm font-bold tracking-widest uppercase mb-4">Golf Club</div>
             <div className="flex items-end gap-2 mb-2">
-              <span className="text-6xl font-black text-gray-900 tracking-tight">£99</span>
+              <span className="text-6xl font-black text-gray-900 tracking-tight">{MONTHLY_PRICE.golf_club}</span>
               <span className="text-gray-400 text-lg mb-3">/month</span>
             </div>
             <p className="text-gray-500 text-sm mb-8">For a single club managing its own junior members.</p>
@@ -82,7 +83,7 @@ export default function Pricing() {
             <div className="relative p-8 md:p-10">
               <div className="text-green-300 text-sm font-bold tracking-widest uppercase mb-4">County Union</div>
               <div className="flex items-end gap-2 mb-2">
-                <span className="text-6xl font-black text-white tracking-tight">£199</span>
+                <span className="text-6xl font-black text-white tracking-tight">{MONTHLY_PRICE.county_union}</span>
                 <span className="text-green-300 text-lg mb-3">/month</span>
               </div>
               <p className="text-green-200 text-sm mb-8">For county unions managing multiple member clubs and county events.</p>
