@@ -52,10 +52,6 @@ export async function POST(request: NextRequest) {
           })
           .eq('supabase_user_id', supabaseUserId)
 
-        // Provision the county admin: create a staff_profiles row so the new
-        // customer can access the dashboard immediately after payment.
-        // Idempotent — ignoreDuplicates maps to ON CONFLICT (id) DO NOTHING,
-        // so safe on Stripe webhook retries.
         const { data: county } = await supabase
           .from('counties')
           .select('id, secretary_name')
@@ -92,7 +88,6 @@ export async function POST(request: NextRequest) {
         }
       }
 
-      // Also update Stripe customer name from metadata
       if (customerId && session.metadata?.secretary_name) {
         await stripe.customers.update(customerId, {
           name: session.metadata.secretary_name,
@@ -107,26 +102,30 @@ export async function POST(request: NextRequest) {
 
     case 'customer.subscription.created': {
       const subscription = event.data.object as Stripe.Subscription
+
+      // Shared Stripe account: this endpoint receives EVERY product's subscription
+      // events. Genuine CountyConsent signups carry supabase_user_id in the
+      // subscription metadata (set in /api/signup). If it's absent, the sub belongs
+      // to another product on the account (e.g. SportConsent) — ignore it so we
+      // never email their customers or write foreign rows.
+      const supabaseUserId = subscription.metadata?.supabase_user_id
+      if (!supabaseUserId) break
+
       const customer = await stripe.customers.retrieve(subscription.customer as string) as Stripe.Customer
 
       const email = customer.email
       const name = customer.name || subscription.metadata?.secretary_name || ''
       const plan = subscription.items.data[0]?.price?.recurring?.interval === 'year' ? 'annual' : 'monthly'
-      const supabaseUserId = subscription.metadata?.supabase_user_id
 
-      // Update counties table subscription status
-      if (supabaseUserId) {
-        await supabase
-          .from('counties')
-          .update({
-            stripe_customer_id: customer.id,
-            stripe_subscription_id: subscription.id,
-            subscription_status: subscription.status,
-          })
-          .eq('supabase_user_id', supabaseUserId)
-      }
+      await supabase
+        .from('counties')
+        .update({
+          stripe_customer_id: customer.id,
+          stripe_subscription_id: subscription.id,
+          subscription_status: subscription.status,
+        })
+        .eq('supabase_user_id', supabaseUserId)
 
-      // Also maintain legacy subscribers table for backwards compat
       await supabase.from('subscribers').upsert({
         stripe_customer_id: customer.id,
         stripe_subscription_id: subscription.id,
@@ -158,7 +157,7 @@ export async function POST(request: NextRequest) {
                 </p>
                 <a href="${appLoginUrl}"
                   style="display: inline-block; background: linear-gradient(135deg, #155230, #1a6b3e); color: white; text-decoration: none; font-weight: 600; font-size: 15px; padding: 14px 28px; border-radius: 10px; margin-bottom: 24px;">
-                  Log in to your dashboard →
+                  Log in to your dashboard &rarr;
                 </a>
                 <p style="color: #6b7280; font-size: 13px; line-height: 1.5; margin: 0 0 24px;">
                   If the button above doesn't work, copy and paste this link into your browser:<br />
@@ -192,6 +191,7 @@ export async function POST(request: NextRequest) {
 
     case 'customer.subscription.updated': {
       const subscription = event.data.object as Stripe.Subscription
+      if (!subscription.metadata?.supabase_user_id) break
       await supabase
         .from('counties')
         .update({ subscription_status: subscription.status })
@@ -205,6 +205,7 @@ export async function POST(request: NextRequest) {
 
     case 'customer.subscription.deleted': {
       const subscription = event.data.object as Stripe.Subscription
+      if (!subscription.metadata?.supabase_user_id) break
       await supabase
         .from('counties')
         .update({ subscription_status: 'cancelled' })
@@ -238,6 +239,10 @@ export async function POST(request: NextRequest) {
 
     case 'invoice.payment_failed': {
       const invoice = event.data.object as Stripe.Invoice
+      // Only act on invoices for genuine CountyConsent subscriptions (shared account).
+      // Stripe v22 (basil): subscription metadata lives under parent.subscription_details.
+      const invoiceSubMeta = (invoice as any).parent?.subscription_details?.metadata
+      if (!invoiceSubMeta?.supabase_user_id) break
       const customerId = typeof invoice.customer === 'string' ? invoice.customer : invoice.customer?.id
       if (customerId) {
         const customer = await stripe.customers.retrieve(customerId) as Stripe.Customer
