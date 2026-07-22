@@ -20,7 +20,7 @@ const testimonials = [
     name: 'Simon Coultas',
     role: 'Secretary',
     org: 'Northumberland Union of Golf Clubs',
-    image: null,
+    image: '/simoncoultas.png',
     initials: 'SC',
   },
 ]
