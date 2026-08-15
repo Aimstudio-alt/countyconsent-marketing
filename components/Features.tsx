@@ -106,8 +106,8 @@ const features = [
         <path d="M20 17v3l2 2" stroke="#a21caf" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
       </svg>
     ),
-    title: 'GDPR age-18 alerts',
-    description: 'Automatic alerts when a junior turns 18, with a guided workflow to erase their data in line with UK GDPR data minimisation rules.',
+    title: '18th-birthday review alerts',
+    description: 'Automatic alerts when a junior turns 18, with a guided workflow to review and update their record — supporting your data accuracy and storage-limitation obligations.',
     accent: '#fdf4ff',
   },
   {
