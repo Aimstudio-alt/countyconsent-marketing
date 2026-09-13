@@ -58,23 +58,7 @@ export async function POST(request: NextRequest) {
     const resolvedAccountType: 'county_union' | 'golf_club' =
       accountType === 'golf_club' ? 'golf_club' : 'county_union'
 
-    if (resolvedAccountType === 'golf_club' && !parentCountyName) {
-      return NextResponse.json({ error: 'Golf clubs must select a county union.' }, { status: 400 })
-    }
-
     const supabase = createServiceClient()
-
-    // Look up parent county union by name (best-effort — null if not yet registered)
-    let resolvedParentCountyId: string | null = null
-    if (resolvedAccountType === 'golf_club' && parentCountyName) {
-      const { data: parentCounty } = await supabase
-        .from('counties')
-        .select('id')
-        .eq('account_type', 'county_union')
-        .ilike('county_union_name', parentCountyName)
-        .maybeSingle()
-      resolvedParentCountyId = parentCounty?.id ?? null
-    }
 
     const { data: authData, error: authError } = await supabase.auth.admin.createUser({
       email,
@@ -112,7 +96,10 @@ export async function POST(request: NextRequest) {
       plan,
       subscription_status: 'pending_payment',
       account_type: resolvedAccountType,
-      parent_county_id: resolvedAccountType === 'golf_club' ? resolvedParentCountyId : null,
+      // parent_county_id grants a county union visibility of the club's golfers
+      // via affiliated-club search, so it must be set deliberately by an
+      // administrator with both parties' agreement, never from a signup form.
+      parent_county_id: null,
     })
 
     if (insertError) {
