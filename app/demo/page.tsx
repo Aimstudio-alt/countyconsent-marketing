@@ -5,26 +5,48 @@ import Link from "next/link";
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
+type AccountType = "golf_club" | "county_union";
+
 type Golfer = {
   id: number;
   first_name: string;
   last_name: string;
   dob: string;
   parent_email: string;
-  email_confirmed: boolean;
   flagged_own_email: boolean;
-  consented: boolean;
   medical: string | null;
+  emergency_contact: string;
+  gp: string;
 };
 
 // ── Demo data ─────────────────────────────────────────────────────────────────
 
-const IMPORTED_GOLFERS: Golfer[] = [
-  { id: 1, first_name: "Freya",  last_name: "Ahmed",     dob: "14 Feb 2011", parent_email: "s.ahmed@email.com",         email_confirmed: false, flagged_own_email: false, consented: false, medical: null },
-  { id: 2, first_name: "Oscar",  last_name: "Whitfield",  dob: "03 Sep 2010", parent_email: "oscarwhitfield10@email.com", email_confirmed: false, flagged_own_email: true,  consented: false, medical: "Type 1 diabetes — carries an insulin pen at all times. Check blood glucose before and after play." },
-  { id: 3, first_name: "Ruby",   last_name: "Sinclair",   dob: "21 Jun 2012", parent_email: "m.sinclair@email.com",      email_confirmed: false, flagged_own_email: false, consented: false, medical: null },
-  { id: 4, first_name: "Harvey", last_name: "Nolan",      dob: "09 Nov 2011", parent_email: "d.nolan@email.com",         email_confirmed: false, flagged_own_email: false, consented: false, medical: null },
+const BASE_GOLFERS: Golfer[] = [
+  {
+    id: 1, first_name: "Freya", last_name: "Ahmed", dob: "14 Feb 2011",
+    parent_email: "s.ahmed@email.com", flagged_own_email: false, medical: null,
+    emergency_contact: "Sadia Ahmed · 07700 900112", gp: "Dr R. Nkomo · Ashgrove Surgery · 0121 496 0132",
+  },
+  {
+    id: 2, first_name: "Oscar", last_name: "Whitfield", dob: "03 Sep 2010",
+    parent_email: "oscarwhitfield10@email.com", flagged_own_email: true,
+    medical: "Type 1 diabetes — carries an insulin pen at all times. Check blood glucose before and after play.",
+    emergency_contact: "Denise Whitfield · 07700 900221", gp: "Dr L. Farooqi · Millbrook Health Centre · 0161 496 0187",
+  },
+  {
+    id: 3, first_name: "Ruby", last_name: "Sinclair", dob: "21 Jun 2012",
+    parent_email: "m.sinclair@email.com", flagged_own_email: false, medical: null,
+    emergency_contact: "Priya Sinclair · 07700 900334", gp: "Dr S. Baxter · Riverside Medical Practice · 01423 555 021",
+  },
+  {
+    id: 4, first_name: "Harvey", last_name: "Nolan", dob: "09 Nov 2011",
+    parent_email: "d.nolan@email.com", flagged_own_email: false, medical: null,
+    emergency_contact: "David Nolan · 07700 900447", gp: "Dr E. Whitmore · Northgate Surgery · 01904 555 088",
+  },
 ];
+
+const TRIP_NAME = "Coastview Junior Open";
+const TRIP_VENUE = "Coastview Golf Club";
 
 const SCREENS = [
   { id: 1, label: "Golfers" },
@@ -32,19 +54,28 @@ const SCREENS = [
   { id: 3, label: "Send Consent" },
   { id: 4, label: "Parent Consent" },
   { id: 5, label: "Golfer Record" },
-  { id: 6, label: "Trips (Optional)" },
+  { id: 6, label: "Trips" },
   { id: 7, label: "Medical Summary" },
 ];
 
-const SCREEN_HINTS: Record<number, string> = {
-  1: 'Step 1 of 7 — Click "Import golfers" to bring in a membership list. This is the first thing anyone does — no trip required.',
-  2: 'Step 2 of 7 — Confirm each parent/guardian email. Look closely at Oscar’s — it’s flagged as possibly his own address.',
-  3: 'Step 3 of 7 — Send to one parent at a time, or click "Send consent requests to all" to email everyone confirmed in one action.',
-  4: 'Step 4 of 7 — This is what a parent sees. Click "Simulate parent submitting" to complete the form on their behalf.',
-  5: 'Step 5 of 7 — Consent, medical and emergency details are all visible from the golfer’s own record. No trip needed.',
-  6: 'Step 6 of 7 — Optional. Mostly used by county unions to organise an away day. Click "Create a trip" to see how it works, or skip ahead.',
-  7: 'Step 7 of 7 — The medical summary is ready to print, whether it’s for a trip or just for the club. That’s the walkthrough!',
-};
+function orgNameFor(accountType: AccountType) {
+  return accountType === "golf_club" ? "Ashgrove Golf Club" : "Westshire County Golf Union";
+}
+
+function hintFor(screen: number, accountType: AccountType): string {
+  const hints: Record<number, string> = {
+    1: 'Step 1 of 7 — Click "Import golfers" to bring in a membership list. This is the first thing anyone does — no trip required.',
+    2: 'Step 2 of 7 — Confirm each parent/guardian email. Oscar’s is flagged as possibly his own address — confirm it anyway, or replace it with a different one.',
+    3: 'Step 3 of 7 — Send to one parent at a time, or click "Send consent requests to all" to email everyone confirmed in one action.',
+    4: 'Step 4 of 7 — This is what a parent sees. Click "Simulate parent submitting" to complete the form on their behalf.',
+    5: 'Step 5 of 7 — Consent, medical and emergency details are all visible from the golfer’s own record. No trip needed.',
+    6: accountType === "golf_club"
+      ? 'Step 6 of 7 — Optional, and mainly used by county unions. Click "Create a trip" to see how it works, or skip ahead.'
+      : 'Step 6 of 7 — Create a trip and add golfers from the register. This is a normal part of the flow for a county union.',
+    7: 'Step 7 of 7 — Every golfer is listed, with medical alerts highlighted. Click "Print medical summary" to see what a team manager carries on the day.',
+  };
+  return hints[screen];
+}
 
 // ── Shared sub-components ─────────────────────────────────────────────────────
 
@@ -111,9 +142,22 @@ function Detail({ label, value }: { label: string; value: string }) {
   );
 }
 
+function PermissionRow({ label, agreed }: { label: string; agreed: boolean }) {
+  return (
+    <div className="flex items-center justify-between gap-4">
+      <span className="text-xs font-semibold text-slate-500 uppercase tracking-wide flex-shrink-0">{label}</span>
+      {agreed ? (
+        <span className="text-xs font-bold text-green-700">✓ Agreed</span>
+      ) : (
+        <span className="text-xs font-bold text-red-600 bg-red-50 border border-red-200 px-2 py-0.5 rounded-full">✗ Refused</span>
+      )}
+    </div>
+  );
+}
+
 // ── Screen 1: Golfers — empty register, import or add ────────────────────────
 
-function Screen1({ imported, onImport }: { imported: boolean; onImport: () => void }) {
+function Screen1({ imported, orgName, onImport }: { imported: boolean; orgName: string; onImport: () => void }) {
   if (!imported) {
     return (
       <div className="space-y-8">
@@ -134,7 +178,7 @@ function Screen1({ imported, onImport }: { imported: boolean; onImport: () => vo
           <p className="text-slate-500 mt-1 text-sm">Your register is empty. This is the first thing anyone does — trips come later, if you use them at all.</p>
         </div>
 
-        <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-10 flex flex-col items-center text-center gap-5">
+        <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-10 flex flex-col items-center text-center gap-4">
           <div className="w-16 h-16 rounded-full flex items-center justify-center" style={{ background: "#f0fdf4" }}>
             <svg className="w-8 h-8 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" />
@@ -161,6 +205,9 @@ function Screen1({ imported, onImport }: { imported: boolean; onImport: () => vo
               Add golfer individually
             </button>
           </div>
+          <p className="text-xs text-slate-400 max-w-sm">
+            Both options are available in the real app — this walkthrough follows the import path.
+          </p>
         </div>
       </div>
     );
@@ -170,16 +217,16 @@ function Screen1({ imported, onImport }: { imported: boolean; onImport: () => vo
     <div className="space-y-6">
       <div>
         <h1 className="text-2xl font-bold text-slate-900 tracking-tight">Golfers</h1>
-        <p className="text-slate-500 mt-1 text-sm">{IMPORTED_GOLFERS.length} golfers imported into the Westshire County Golf Union register.</p>
+        <p className="text-slate-500 mt-1 text-sm">{BASE_GOLFERS.length} golfers imported into the {orgName} register.</p>
       </div>
 
       <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
         <div className="px-5 py-3.5 border-b border-slate-100 bg-slate-50 flex items-center justify-between">
           <h2 className="text-sm font-bold text-slate-700">Register</h2>
-          <span className="text-xs text-slate-400">{IMPORTED_GOLFERS.length} golfers</span>
+          <span className="text-xs text-slate-400">{BASE_GOLFERS.length} golfers</span>
         </div>
         <div className="divide-y divide-slate-100">
-          {IMPORTED_GOLFERS.map((g) => (
+          {BASE_GOLFERS.map((g) => (
             <div key={g.id} className="flex items-center gap-3 px-5 py-3.5">
               <div className="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center text-xs font-bold text-green-700 flex-shrink-0">
                 {g.first_name.charAt(0)}
@@ -200,8 +247,18 @@ function Screen1({ imported, onImport }: { imported: boolean; onImport: () => vo
 
 // ── Screen 2: Contact details — confirm parent/guardian emails ──────────────
 
-function Screen2({ confirmedIds, onConfirm }: { confirmedIds: Set<number>; onConfirm: (id: number) => void }) {
-  const allConfirmed = confirmedIds.size === IMPORTED_GOLFERS.length;
+function Screen2({ golfers, confirmedIds, oscarReplaceOpen, replaceValue, onConfirm, onOpenReplace, onCancelReplace, onReplaceChange, onSaveReplace }: {
+  golfers: Golfer[];
+  confirmedIds: Set<number>;
+  oscarReplaceOpen: boolean;
+  replaceValue: string;
+  onConfirm: (id: number) => void;
+  onOpenReplace: () => void;
+  onCancelReplace: () => void;
+  onReplaceChange: (v: string) => void;
+  onSaveReplace: () => void;
+}) {
+  const allConfirmed = confirmedIds.size === golfers.length;
 
   return (
     <div className="space-y-6">
@@ -216,11 +273,12 @@ function Screen2({ confirmedIds, onConfirm }: { confirmedIds: Set<number>; onCon
       <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
         <div className="px-5 py-3.5 border-b border-slate-100 bg-slate-50 flex items-center justify-between">
           <p className="text-sm font-bold text-slate-700">Parent / guardian emails</p>
-          <span className="text-xs text-slate-400">{confirmedIds.size} of {IMPORTED_GOLFERS.length} confirmed</span>
+          <span className="text-xs text-slate-400">{confirmedIds.size} of {golfers.length} confirmed</span>
         </div>
         <div className="divide-y divide-slate-100">
-          {IMPORTED_GOLFERS.map((g) => {
+          {golfers.map((g) => {
             const confirmed = confirmedIds.has(g.id);
+            const isOscar = g.flagged_own_email;
             return (
               <div key={g.id}>
                 <div className="flex items-center gap-3 px-5 py-3.5">
@@ -229,17 +287,31 @@ function Screen2({ confirmedIds, onConfirm }: { confirmedIds: Set<number>; onCon
                   </div>
                   <div className="flex-1 min-w-0">
                     <p className="text-sm font-semibold text-slate-900">{g.first_name} {g.last_name}</p>
-                    <p className="text-xs text-slate-400">{g.parent_email}</p>
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <p className="text-xs text-slate-400">{g.parent_email}</p>
+                      {isOscar && !confirmed && (
+                        <span className="inline-flex items-center gap-1 text-xs font-bold text-amber-800 bg-amber-100 border border-amber-300 px-2 py-0.5 rounded-full">
+                          <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 9v2m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z" /></svg>
+                          Possible own address
+                        </span>
+                      )}
+                    </div>
                   </div>
                   {confirmed ? (
                     <span className="text-xs font-semibold text-green-700 bg-green-50 border border-green-200 px-2.5 py-1 rounded-full">Confirmed</span>
-                  ) : g.flagged_own_email ? (
-                    <ClickHint label="Check, then confirm">
-                      <button onClick={() => onConfirm(g.id)}
-                        className="text-xs font-semibold text-amber-800 bg-amber-100 border border-amber-300 px-3 py-1.5 rounded-lg hover:bg-amber-200 transition-colors">
-                        Confirm anyway
+                  ) : isOscar ? (
+                    <div className="flex items-center gap-2">
+                      <button onClick={onOpenReplace}
+                        className="text-xs font-semibold text-slate-600 border border-slate-200 px-3 py-1.5 rounded-lg hover:bg-slate-50 transition-colors">
+                        Replace address
                       </button>
-                    </ClickHint>
+                      <ClickHint label="Check, then confirm">
+                        <button onClick={() => onConfirm(g.id)}
+                          className="text-xs font-semibold text-amber-800 bg-amber-100 border border-amber-300 px-3 py-1.5 rounded-lg hover:bg-amber-200 transition-colors">
+                          Confirm anyway
+                        </button>
+                      </ClickHint>
+                    </div>
                   ) : (
                     <button onClick={() => onConfirm(g.id)}
                       className="text-xs font-semibold text-slate-600 border border-slate-200 px-3 py-1.5 rounded-lg hover:bg-slate-50 transition-colors">
@@ -247,16 +319,44 @@ function Screen2({ confirmedIds, onConfirm }: { confirmedIds: Set<number>; onCon
                     </button>
                   )}
                 </div>
-                {g.flagged_own_email && !confirmed && (
-                  <div className="px-5 pb-4 -mt-1">
+
+                {isOscar && !confirmed && (
+                  <div className="px-5 pb-4 -mt-1 space-y-3">
                     <div className="bg-amber-50 border border-amber-200 rounded-xl px-4 py-3 flex items-start gap-2.5">
                       <svg className="w-4 h-4 text-amber-600 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z" />
                       </svg>
                       <p className="text-xs text-amber-800 leading-relaxed">
-                        <strong>This looks like it might be Oscar&apos;s own email address</strong>, not a parent or guardian&apos;s — the address contains his name and birth year. Check with the club before confirming.
+                        <strong>This looks like it might be Oscar&apos;s own email address</strong>, not a parent or guardian&apos;s — the address contains his name and birth year. Confirm it anyway if that&apos;s genuinely correct, or replace it with the parent&apos;s address.
                       </p>
                     </div>
+
+                    {oscarReplaceOpen && (
+                      <div className="bg-white border border-slate-200 rounded-xl p-4 space-y-3">
+                        <label className="block text-xs font-semibold text-slate-600">Parent / guardian email</label>
+                        <input
+                          type="email"
+                          value={replaceValue}
+                          onChange={(e) => onReplaceChange(e.target.value)}
+                          placeholder="e.g. d.whitfield@email.com"
+                          className="w-full px-3 py-2 rounded-lg border border-slate-300 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-green-500"
+                        />
+                        <div className="flex items-center gap-3">
+                          <ClickHint label="Save & confirm">
+                            <button
+                              onClick={onSaveReplace}
+                              disabled={!replaceValue.trim()}
+                              className="text-xs font-semibold text-white px-4 py-2 rounded-lg shadow-sm disabled:opacity-40 disabled:cursor-not-allowed"
+                              style={{ background: "linear-gradient(135deg, #166534, #15803d)" }}>
+                              Save & confirm
+                            </button>
+                          </ClickHint>
+                          <button onClick={onCancelReplace} className="text-xs font-semibold text-slate-500 hover:text-slate-700">
+                            Cancel
+                          </button>
+                        </div>
+                      </div>
+                    )}
                   </div>
                 )}
               </div>
@@ -279,13 +379,14 @@ function Screen2({ confirmedIds, onConfirm }: { confirmedIds: Set<number>; onCon
 
 // ── Screen 3: Send consent requests ──────────────────────────────────────────
 
-function Screen3({ confirmedCount, sentIds, onSendOne, onSendAll }: {
+function Screen3({ golfers, confirmedCount, sentIds, onSendOne, onSendAll }: {
+  golfers: Golfer[];
   confirmedCount: number;
   sentIds: Set<number>;
   onSendOne: (id: number) => void;
   onSendAll: () => void;
 }) {
-  const allSent = sentIds.size === IMPORTED_GOLFERS.length;
+  const allSent = sentIds.size === golfers.length;
 
   return (
     <div className="max-w-xl space-y-6">
@@ -303,7 +404,7 @@ function Screen3({ confirmedCount, sentIds, onSendOne, onSendAll }: {
           <span className="text-xs text-slate-400">{sentIds.size} of {confirmedCount} sent</span>
         </div>
         <div className="divide-y divide-slate-100">
-          {IMPORTED_GOLFERS.map((g) => {
+          {golfers.map((g) => {
             const isSent = sentIds.has(g.id);
             return (
               <div key={g.id} className="flex items-center gap-3 px-5 py-3.5">
@@ -360,40 +461,107 @@ function Screen3({ confirmedCount, sentIds, onSendOne, onSendAll }: {
 
 // ── Screen 4: Parent completes the form ──────────────────────────────────────
 
-function Screen4({ submitted, onSubmit }: { submitted: boolean; onSubmit: () => void }) {
+function Screen4({ submitted, orgName, onSubmit }: { submitted: boolean; orgName: string; onSubmit: () => void }) {
   return (
     <div className="max-w-lg mx-auto space-y-6">
       <Breadcrumb items={["Golfers", "Send Consent", "Parent Consent"]} />
       <div className="text-center">
         <h1 className="text-2xl font-bold text-slate-900">What the parent sees</h1>
-        <p className="text-slate-500 mt-1 text-sm">Freya&apos;s mum opens the link on her phone — no account, no app, no password.</p>
+        <p className="text-slate-500 mt-1 text-sm">Oscar&apos;s mum opens the link on her phone — no account, no app, no password. The real form is longer than a phone screen, so it scrolls.</p>
       </div>
 
       <div className="relative mx-auto w-72 bg-gray-900 rounded-3xl shadow-2xl p-2">
-        <div className="bg-white rounded-2xl overflow-hidden">
-          <div className="bg-gray-50 border-b border-gray-200 px-4 py-2.5">
-            <p className="text-xs font-bold text-gray-900">Consent form — Freya Ahmed</p>
-            <p className="text-xs text-gray-400">Westshire County Golf Union</p>
+        <div className="bg-white rounded-2xl overflow-hidden max-h-[520px] overflow-y-auto">
+          <div className="bg-gray-50 border-b border-gray-200 px-4 py-2.5 sticky top-0">
+            <p className="text-xs font-bold text-gray-900">Consent form — Oscar Whitfield</p>
+            <p className="text-xs text-gray-400">{orgName}</p>
           </div>
-          <div className="p-4 space-y-3">
+          <div className="p-4 space-y-4">
+
             <div>
-              <p className="text-xs text-gray-500 mb-1">Emergency contact</p>
-              <div className="h-6 bg-gray-100 rounded-md flex items-center px-2 text-xs text-gray-500">Sadia Ahmed · 07700 900112</div>
+              <p className="text-xs font-semibold text-gray-700 mb-1.5">Parent / guardian details</p>
+              <div className="space-y-1.5">
+                <div className="h-6 bg-gray-100 rounded-md flex items-center px-2 text-xs text-gray-500">Denise Whitfield</div>
+                <div className="h-6 bg-gray-100 rounded-md flex items-center px-2 text-xs text-gray-500">Relationship: Mother</div>
+                <div className="h-6 bg-gray-100 rounded-md flex items-center px-2 text-xs text-gray-500">07700 900221</div>
+              </div>
             </div>
+
             <div>
-              <p className="text-xs text-gray-500 mb-1">GP name & phone</p>
-              <div className="h-6 bg-gray-100 rounded-md flex items-center px-2 text-xs text-gray-500">Dr R. Nkomo · 0121 496 0132</div>
+              <p className="text-xs font-semibold text-gray-700 mb-1.5">Emergency contact 1</p>
+              <div className="space-y-1.5">
+                <div className="h-6 bg-gray-100 rounded-md flex items-center px-2 text-xs text-gray-500">Denise Whitfield — Mother</div>
+                <div className="h-6 bg-gray-100 rounded-md flex items-center px-2 text-xs text-gray-500">07700 900221</div>
+              </div>
             </div>
-            <div className="bg-gray-50 border border-gray-100 rounded-xl p-2.5">
-              <p className="text-xs font-semibold text-gray-700 mb-1">Medical information</p>
-              <p className="text-xs text-gray-500">No known conditions</p>
+
+            <div>
+              <p className="text-xs font-semibold text-gray-700 mb-1.5">Emergency contact 2</p>
+              <div className="space-y-1.5">
+                <div className="h-6 bg-gray-100 rounded-md flex items-center px-2 text-xs text-gray-500">Marcus Whitfield — Father</div>
+                <div className="h-6 bg-gray-100 rounded-md flex items-center px-2 text-xs text-gray-500">07700 900238</div>
+              </div>
             </div>
+
+            <div>
+              <p className="text-xs font-semibold text-gray-700 mb-1.5">GP & surgery</p>
+              <div className="space-y-1.5">
+                <div className="h-6 bg-gray-100 rounded-md flex items-center px-2 text-xs text-gray-500">Dr L. Farooqi</div>
+                <div className="h-6 bg-gray-100 rounded-md flex items-center px-2 text-xs text-gray-500">Millbrook Health Centre · 0161 496 0187</div>
+              </div>
+            </div>
+
+            <div className="bg-red-50 border border-red-100 rounded-xl p-2.5 space-y-1">
+              <p className="text-xs font-semibold text-red-800">Medical conditions</p>
+              <p className="text-xs text-red-700">Type 1 diabetes — carries an insulin pen at all times. Check blood glucose before and after play.</p>
+            </div>
+            <div className="bg-gray-50 border border-gray-100 rounded-xl p-2.5 space-y-1">
+              <p className="text-xs font-semibold text-gray-700">Allergies</p>
+              <p className="text-xs text-gray-500">None</p>
+            </div>
+            <div className="bg-gray-50 border border-gray-100 rounded-xl p-2.5 space-y-1">
+              <p className="text-xs font-semibold text-gray-700">Dietary requirements</p>
+              <p className="text-xs text-gray-500">None</p>
+            </div>
+            <div className="bg-gray-50 border border-gray-100 rounded-xl p-2.5 space-y-1">
+              <p className="text-xs font-semibold text-gray-700">Disability & additional needs</p>
+              <p className="text-xs text-gray-500">None</p>
+            </div>
+            <div className="bg-gray-50 border border-gray-100 rounded-xl p-2.5 space-y-1">
+              <p className="text-xs font-semibold text-gray-700">Communication needs</p>
+              <p className="text-xs text-gray-500">None</p>
+            </div>
+
+            <div className="border-t border-gray-100 pt-3 space-y-2">
+              <p className="text-xs font-semibold text-gray-700 mb-1">Permissions</p>
+              {["Participation", "Emergency medical treatment", "Transport", "Data use"].map((label) => (
+                <div key={label} className="flex items-center justify-between">
+                  <span className="text-xs text-gray-600">{label}</span>
+                  <span className="text-xs font-bold text-green-700">✓ Agree</span>
+                </div>
+              ))}
+              <div className="flex items-center justify-between">
+                <span className="text-xs text-gray-600">Photography</span>
+                <span className="text-xs font-bold text-red-600">✗ Decline</span>
+              </div>
+              <p className="text-xs text-amber-800 bg-amber-50 border border-amber-100 rounded-lg px-2.5 py-2">
+                Denise has chosen not to give photography consent for Oscar. Staff will see this on his record — he shouldn&apos;t appear in club photos or social media.
+              </p>
+            </div>
+
+            <div className="bg-amber-50 border border-amber-100 rounded-xl p-2.5">
+              <p className="text-xs text-amber-800 leading-relaxed">
+                I confirm I have parental responsibility for Oscar Whitfield and that the information above is accurate.
+              </p>
+            </div>
+
             <div>
               <p className="text-xs text-gray-500 mb-1">Parent / guardian signature</p>
               <div className="h-8 bg-gray-50 border border-dashed border-gray-200 rounded-md flex items-center justify-center">
-                <span className="text-xs text-gray-400 italic">Sadia Ahmed</span>
+                <span className="text-xs text-gray-400 italic">Denise Whitfield</span>
               </div>
             </div>
+
             {!submitted ? (
               <ClickHint label="Simulate parent submitting">
                 <button onClick={onSubmit} className="w-full py-2 bg-green-700 text-white text-xs font-bold rounded-xl">
@@ -414,70 +582,102 @@ function Screen4({ submitted, onSubmit }: { submitted: boolean; onSubmit: () => 
 
 // ── Screen 5: Golfer record — full consent visible, no trip needed ──────────
 
-function Screen5() {
+function Screen5({ orgName }: { orgName: string }) {
   return (
     <div className="space-y-6">
-      <Breadcrumb items={["Golfers", "Freya Ahmed"]} />
+      <Breadcrumb items={["Golfers", "Oscar Whitfield"]} />
 
       <div>
-        <h1 className="text-2xl font-bold text-slate-900">Freya Ahmed</h1>
-        <p className="text-slate-500 text-sm mt-0.5">DOB: 14 Feb 2011 · Westshire County Golf Union register</p>
-        <p className="text-green-700 text-xs font-semibold mt-2">Everything below is visible from Freya&apos;s own record — no trip needed.</p>
+        <h1 className="text-2xl font-bold text-slate-900">Oscar Whitfield</h1>
+        <p className="text-slate-500 text-sm mt-0.5">DOB: 03 Sep 2010 · {orgName} register</p>
+        <p className="text-green-700 text-xs font-semibold mt-2">Everything below is visible from Oscar&apos;s own record — no trip needed.</p>
       </div>
 
       <div className="grid md:grid-cols-2 gap-5">
         <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-5 space-y-4">
           <h3 className="font-bold text-slate-800 text-sm border-b border-slate-100 pb-3">Parent / Guardian</h3>
-          <Detail label="Name" value="Sadia Ahmed" />
+          <Detail label="Name" value="Denise Whitfield" />
           <Detail label="Relationship" value="Mother" />
-          <Detail label="Mobile" value="07700 900112" />
-          <Detail label="Email" value="s.ahmed@email.com — confirmed" />
+          <Detail label="Mobile" value="07700 900221" />
+          <Detail label="Email" value="d.whitfield@email.com — confirmed" />
+        </div>
+        <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-5 space-y-4">
+          <h3 className="font-bold text-slate-800 text-sm border-b border-slate-100 pb-3">Emergency Contact 1</h3>
+          <Detail label="Name" value="Denise Whitfield" />
+          <Detail label="Relationship" value="Mother" />
+          <Detail label="Mobile" value="07700 900221" />
+        </div>
+        <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-5 space-y-4">
+          <h3 className="font-bold text-slate-800 text-sm border-b border-slate-100 pb-3">Emergency Contact 2</h3>
+          <Detail label="Name" value="Marcus Whitfield" />
+          <Detail label="Relationship" value="Father" />
+          <Detail label="Mobile" value="07700 900238" />
         </div>
         <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-5 space-y-4">
           <h3 className="font-bold text-slate-800 text-sm border-b border-slate-100 pb-3">GP Details</h3>
-          <Detail label="GP name" value="Dr R. Nkomo" />
-          <Detail label="Phone" value="0121 496 0132" />
+          <Detail label="GP name" value="Dr L. Farooqi" />
+          <Detail label="Surgery" value="Millbrook Health Centre" />
+          <Detail label="Phone" value="0161 496 0187" />
         </div>
-        <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-5 space-y-4">
-          <h3 className="font-bold text-slate-800 text-sm border-b border-slate-100 pb-3">Medical</h3>
-          <Detail label="Conditions" value="None recorded" />
+
+        <div className="md:col-span-2 bg-red-50 border-2 border-red-300 rounded-2xl p-5">
+          <div className="flex items-center gap-2 mb-2">
+            <svg className="w-4 h-4 text-red-600 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z" /></svg>
+            <h3 className="font-bold text-red-900 text-sm uppercase tracking-wide">Medical Alert</h3>
+          </div>
+          <p className="text-sm text-red-800 leading-relaxed">
+            Type 1 diabetes — carries an insulin pen at all times. Check blood glucose before and after play.
+          </p>
         </div>
-        <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-5 space-y-4">
-          <h3 className="font-bold text-slate-800 text-sm border-b border-slate-100 pb-3">Consents Given</h3>
-          <Detail label="Supervision" value="✓ Agreed" />
-          <Detail label="Emergency medical" value="✓ Agreed" />
-          <Detail label="Photography" value="✓ Agreed" />
-          <Detail label="Data use" value="✓ Agreed" />
+
+        <div className="md:col-span-2 bg-white rounded-2xl border border-slate-200 shadow-sm p-5 space-y-3">
+          <h3 className="font-bold text-slate-800 text-sm border-b border-slate-100 pb-3">Permissions</h3>
+          <PermissionRow label="Participation" agreed={true} />
+          <PermissionRow label="Emergency medical treatment" agreed={true} />
+          <PermissionRow label="Transport" agreed={true} />
+          <PermissionRow label="Photography" agreed={false} />
+          <PermissionRow label="Data use" agreed={true} />
+          <p className="text-xs text-red-700 bg-red-50 border border-red-200 rounded-lg px-3 py-2 mt-2">
+            Photography has been refused for Oscar — staff need to know not to include him in any club photos or social media.
+          </p>
         </div>
       </div>
 
       <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-5">
         <h3 className="font-bold text-slate-800 text-sm mb-3">Signature</h3>
-        <p className="text-sm text-slate-700">Signed by <strong>Sadia Ahmed</strong> on <strong>{new Date().toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" })}</strong></p>
+        <p className="text-sm text-slate-700">Signed by <strong>Denise Whitfield</strong> on <strong>{new Date().toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" })}</strong></p>
       </div>
     </div>
   );
 }
 
-// ── Screen 6: Trips — optional, mainly for county unions ────────────────────
+// ── Screen 6: Trips ───────────────────────────────────────────────────────────
 
-function Screen6({ tripCreated, golferAdded, onCreateTrip, onAddGolfer }: {
+function Screen6({ accountType, tripCreated, addedIds, golfers, onCreateTrip, onAddGolfer }: {
+  accountType: AccountType;
   tripCreated: boolean;
-  golferAdded: boolean;
+  addedIds: Set<number>;
+  golfers: Golfer[];
   onCreateTrip: () => void;
-  onAddGolfer: () => void;
+  onAddGolfer: (id: number) => void;
 }) {
+  const isClub = accountType === "golf_club";
+
   return (
     <div className="max-w-2xl space-y-6">
-      <Breadcrumb items={["Golfers", "Trips (Optional)"]} />
+      <Breadcrumb items={["Golfers", "Trips"]} />
       <div>
-        <div className="inline-flex items-center gap-1.5 text-xs font-bold px-2.5 py-1 rounded-full mb-3"
-          style={{ background: "#eff6ff", color: "#1d4ed8", border: "1px solid #bfdbfe" }}>
-          Optional
-        </div>
+        {isClub && (
+          <div className="inline-flex items-center gap-1.5 text-xs font-bold px-2.5 py-1 rounded-full mb-3"
+            style={{ background: "#eff6ff", color: "#1d4ed8", border: "1px solid #bfdbfe" }}>
+            Optional
+          </div>
+        )}
         <h1 className="text-2xl font-bold text-slate-900">Trips</h1>
         <p className="text-slate-500 mt-1 text-sm max-w-lg">
-          Most golf clubs never create a trip — golfers stay in the register and get consent requests directly. County unions more often use trips to organise an away day and pull golfers in from the register.
+          {isClub
+            ? "Most golf clubs never create a trip — golfers stay in the register and get consent requests directly. This step is optional, and mainly used by county unions to organise an away day."
+            : "County unions typically use trips to organise an away day, pulling golfers straight from the register — nothing is re-entered."}
         </p>
       </div>
 
@@ -485,12 +685,12 @@ function Screen6({ tripCreated, golferAdded, onCreateTrip, onAddGolfer }: {
         <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 space-y-5">
           <div>
             <label className="block text-sm font-semibold text-slate-700 mb-1.5">Trip name</label>
-            <input defaultValue="Westshire Junior Open" readOnly
+            <input defaultValue={TRIP_NAME} readOnly
               className="w-full px-4 py-2.5 rounded-xl border border-slate-300 text-slate-900 text-sm bg-slate-50 focus:outline-none" />
           </div>
           <div>
             <label className="block text-sm font-semibold text-slate-700 mb-1.5">Venue</label>
-            <input defaultValue="Ashgrove Golf Club" readOnly
+            <input defaultValue={TRIP_VENUE} readOnly
               className="w-full px-4 py-2.5 rounded-xl border border-slate-300 text-slate-900 text-sm bg-slate-50 focus:outline-none" />
           </div>
           <div className="flex items-center gap-3 pt-2">
@@ -507,30 +707,35 @@ function Screen6({ tripCreated, golferAdded, onCreateTrip, onAddGolfer }: {
       ) : (
         <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
           <div className="px-5 py-3.5 border-b border-slate-100 bg-slate-50">
-            <p className="text-sm font-bold text-slate-700">Westshire Junior Open</p>
-            <p className="text-xs text-slate-400">Ashgrove Golf Club</p>
+            <p className="text-sm font-bold text-slate-700">{TRIP_NAME}</p>
+            <p className="text-xs text-slate-400">{TRIP_VENUE}</p>
           </div>
-          <div className="p-5 space-y-4">
+          <div className="px-5 py-3 border-b border-slate-100">
             <p className="text-sm text-slate-600">Golfers on this trip are added from the register — nothing is re-entered.</p>
-            {!golferAdded ? (
-              <ClickHint label="Add from the register">
-                <button onClick={onAddGolfer}
-                  className="inline-flex items-center gap-2 text-white text-sm font-semibold px-4 py-2.5 rounded-xl shadow-sm transition-all"
-                  style={{ background: "linear-gradient(135deg, #166534, #15803d)" }}>
-                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 4v16m8-8H4" /></svg>
-                  Add golfers from register
-                </button>
-              </ClickHint>
-            ) : (
-              <div className="bg-slate-50 rounded-xl px-4 py-3 flex items-center gap-3">
-                <div className="w-7 h-7 rounded-full bg-green-100 flex items-center justify-center text-xs font-bold text-green-700 flex-shrink-0">F</div>
-                <div className="flex-1">
-                  <p className="text-sm font-semibold text-slate-900">Freya Ahmed</p>
-                  <p className="text-xs text-slate-400">Added from register — consent already on file</p>
+          </div>
+          <div className="divide-y divide-slate-100">
+            {golfers.map((g) => {
+              const added = addedIds.has(g.id);
+              return (
+                <div key={g.id} className="flex items-center gap-3 px-5 py-3.5">
+                  <div className="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center text-xs font-bold text-green-700 flex-shrink-0">
+                    {g.first_name.charAt(0)}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-semibold text-slate-900">{g.first_name} {g.last_name}</p>
+                    <p className="text-xs text-slate-400">{added ? "Added from register — consent already on file" : "In register, not yet added"}</p>
+                  </div>
+                  {added ? (
+                    <ConsentBadge consented={true} />
+                  ) : (
+                    <button onClick={() => onAddGolfer(g.id)}
+                      className="text-xs font-semibold text-slate-600 border border-slate-200 px-3 py-1.5 rounded-lg hover:bg-slate-50 transition-colors">
+                      Add to trip
+                    </button>
+                  )}
                 </div>
-                <ConsentBadge consented={true} />
-              </div>
-            )}
+              );
+            })}
           </div>
         </div>
       )}
@@ -540,8 +745,8 @@ function Screen6({ tripCreated, golferAdded, onCreateTrip, onAddGolfer }: {
 
 // ── Screen 7: Medical summary — for a trip, or for the club ──────────────────
 
-function Screen7({ scope }: { scope: "club" | "trip" }) {
-  const withMedical = IMPORTED_GOLFERS.filter(g => g.medical);
+function Screen7({ golfers, scope, orgName, onPrint }: { golfers: Golfer[]; scope: "club" | "trip"; orgName: string; onPrint: () => void }) {
+  const withMedical = golfers.filter(g => g.medical);
 
   return (
     <div className="space-y-6">
@@ -552,7 +757,7 @@ function Screen7({ scope }: { scope: "club" | "trip" }) {
           <div>
             <h1 className="text-xl font-bold text-slate-900">Medical summary</h1>
             <p className="text-slate-500 text-sm mt-0.5">
-              {scope === "trip" ? "Westshire Junior Open · Ashgrove Golf Club" : "Whole club register — Westshire County Golf Union"}
+              {scope === "trip" ? `${TRIP_NAME} · ${TRIP_VENUE}` : `Whole club register — ${orgName}`}
             </p>
           </div>
           <div className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0" style={{ background: "#f0fdf4" }}>
@@ -561,9 +766,9 @@ function Screen7({ scope }: { scope: "club" | "trip" }) {
             </svg>
           </div>
         </div>
-        <div className="grid grid-cols-2 gap-4 text-center">
+        <div className="grid grid-cols-2 gap-4 text-center mb-5">
           <div>
-            <p className="text-2xl font-black text-slate-900">{IMPORTED_GOLFERS.length}</p>
+            <p className="text-2xl font-black text-slate-900">{golfers.length}</p>
             <p className="text-xs font-semibold text-slate-500 uppercase tracking-wide mt-0.5">Golfers</p>
           </div>
           <div>
@@ -571,32 +776,51 @@ function Screen7({ scope }: { scope: "club" | "trip" }) {
             <p className="text-xs font-semibold text-slate-500 uppercase tracking-wide mt-0.5">Medical alerts</p>
           </div>
         </div>
+        <ClickHint label="See it as it prints">
+          <button onClick={onPrint}
+            className="w-full inline-flex items-center justify-center gap-2 text-white text-sm font-semibold px-5 py-2.5 rounded-xl shadow-sm transition-all"
+            style={{ background: "linear-gradient(135deg, #166534, #15803d)" }}>
+            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" /></svg>
+            Print medical summary
+          </button>
+        </ClickHint>
+        <p className="text-xs text-slate-400 text-center mt-2">This is what a team manager carries on the day.</p>
       </div>
 
       <p className="text-xs text-slate-400 bg-slate-50 border border-slate-200 rounded-xl px-4 py-3">
-        This summary works the same way whether it&apos;s printed for a specific trip or for the whole club — the golfers and their medical details come from the register either way.
+        This summary works the same way whether it&apos;s printed for a specific trip or for the whole club — every golfer is listed, with medical alerts highlighted among them.
       </p>
 
-      {withMedical.length > 0 && (
-        <div className="space-y-3">
-          <h2 className="text-sm font-bold text-slate-700 uppercase tracking-wide">Medical Alerts</h2>
-          {withMedical.map(g => (
-            <div key={g.id} className="bg-red-50 border-2 border-red-300 rounded-2xl p-5 space-y-3">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl bg-red-100 flex items-center justify-center flex-shrink-0">
+      <div className="space-y-3">
+        <h2 className="text-sm font-bold text-slate-700 uppercase tracking-wide">All golfers</h2>
+        {golfers.map(g => (
+          <div key={g.id} className={`rounded-2xl p-5 space-y-2 border-2 ${g.medical ? "bg-red-50 border-red-300" : "bg-white border-slate-200"}`}>
+            <div className="flex items-center gap-3">
+              <div className={`w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 ${g.medical ? "bg-red-100" : "bg-slate-100"}`}>
+                {g.medical ? (
                   <svg className="w-5 h-5 text-red-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z" /></svg>
-                </div>
-                <div>
-                  <p className="font-bold text-red-900">{g.first_name} {g.last_name}</p>
-                  <p className="text-red-700 text-xs">DOB: {g.dob}</p>
-                </div>
-                <span className="ml-auto text-xs font-bold text-red-700 bg-red-100 border border-red-200 px-2.5 py-1 rounded-full">MEDICAL</span>
+                ) : (
+                  <svg className="w-5 h-5 text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5.121 17.804A13.937 13.937 0 0112 16c2.5 0 4.847.655 6.879 1.804M15 10a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
+                )}
               </div>
-              <p className="text-sm text-red-800 leading-relaxed">{g.medical}</p>
+              <div className="flex-1">
+                <p className={`font-bold ${g.medical ? "text-red-900" : "text-slate-900"}`}>{g.first_name} {g.last_name}</p>
+                <p className={`text-xs ${g.medical ? "text-red-700" : "text-slate-400"}`}>DOB: {g.dob}</p>
+              </div>
+              {g.medical ? (
+                <span className="text-xs font-bold text-red-700 bg-red-100 border border-red-200 px-2.5 py-1 rounded-full">MEDICAL</span>
+              ) : (
+                <span className="text-xs font-semibold text-slate-500 bg-slate-100 border border-slate-200 px-2.5 py-1 rounded-full">No alerts</span>
+              )}
             </div>
-          ))}
-        </div>
-      )}
+            {g.medical && <p className="text-sm text-red-800 leading-relaxed">{g.medical}</p>}
+            <div className={`flex flex-wrap gap-x-6 gap-y-1 text-xs ${g.medical ? "text-red-700" : "text-slate-500"} pt-1`}>
+              <span>Emergency contact: {g.emergency_contact}</span>
+              <span>GP: {g.gp}</span>
+            </div>
+          </div>
+        ))}
+      </div>
 
       <div className="rounded-2xl border-2 border-green-300 p-5 text-center space-y-3" style={{ background: "#f0fdf4" }}>
         <div className="flex items-center justify-center gap-3">
@@ -622,17 +846,100 @@ function Screen7({ scope }: { scope: "club" | "trip" }) {
   );
 }
 
+// ── Print preview modal ───────────────────────────────────────────────────────
+
+function PrintPreviewModal({ golfers, orgName, scope, onClose }: {
+  golfers: Golfer[];
+  orgName: string;
+  scope: "club" | "trip";
+  onClose: () => void;
+}) {
+  const withMedical = golfers.filter(g => g.medical);
+  const today = new Date().toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" });
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto py-10 px-4" style={{ background: "rgba(15,23,42,0.6)" }}>
+      <div className="bg-white w-full max-w-2xl rounded-lg shadow-2xl print:shadow-none print:rounded-none">
+        <div className="flex items-center justify-between gap-3 px-6 py-3 border-b border-slate-200 print:hidden">
+          <p className="text-sm font-semibold text-slate-700">Print preview</p>
+          <div className="flex items-center gap-2">
+            <button onClick={() => window.print()}
+              className="text-xs font-semibold text-white px-4 py-2 rounded-lg shadow-sm"
+              style={{ background: "linear-gradient(135deg, #166534, #15803d)" }}>
+              Print
+            </button>
+            <button onClick={onClose} className="text-xs font-semibold text-slate-500 hover:text-slate-700 px-3 py-2">
+              Close
+            </button>
+          </div>
+        </div>
+
+        <div className="p-8 text-black">
+          <div className="flex items-start justify-between border-b-2 border-black pb-4 mb-4">
+            <div>
+              <p className="text-xl font-bold">{orgName}</p>
+              <p className="text-sm">Medical & Emergency Contact Summary</p>
+            </div>
+            <div className="text-right text-sm">
+              <p>{scope === "trip" ? `${TRIP_NAME}` : "Whole club register"}</p>
+              {scope === "trip" && <p>{TRIP_VENUE}</p>}
+              <p>Printed {today}</p>
+            </div>
+          </div>
+
+          <p className="text-xs mb-4">
+            Carried by the team manager on the day. Not for wider distribution — contains special category medical data.
+          </p>
+
+          <div className="space-y-4">
+            {golfers.map((g) => (
+              <div key={g.id} className={`border rounded-md p-3 ${g.medical ? "border-black" : "border-gray-400"}`}>
+                <div className="flex items-center justify-between">
+                  <p className="font-bold">{g.first_name} {g.last_name} <span className="font-normal text-sm">— DOB {g.dob}</span></p>
+                  {g.medical
+                    ? <span className="text-xs font-bold border border-black px-2 py-0.5 rounded">MEDICAL ALERT</span>
+                    : <span className="text-xs text-gray-500">No medical alerts</span>}
+                </div>
+                {g.medical && <p className="text-sm mt-1">{g.medical}</p>}
+                <div className="flex flex-wrap gap-x-6 text-sm mt-1">
+                  <span>Emergency contact: {g.emergency_contact}</span>
+                  <span>GP: {g.gp}</span>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          <p className="text-xs text-gray-500 mt-6">
+            {withMedical.length} of {golfers.length} golfers listed have a recorded medical alert.
+          </p>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 // ── Main demo page ────────────────────────────────────────────────────────────
 
 export default function DemoPage() {
+  const [accountType, setAccountType] = useState<AccountType>("golf_club");
   const [screen, setScreen] = useState(1);
   const [fading, setFading] = useState(false);
   const [imported, setImported] = useState(false);
   const [confirmedIds, setConfirmedIds] = useState<Set<number>>(new Set());
+  const [oscarReplaceOpen, setOscarReplaceOpen] = useState(false);
+  const [oscarEmailOverride, setOscarEmailOverride] = useState<string | null>(null);
+  const [replaceValue, setReplaceValue] = useState("d.whitfield@email.com");
   const [sentIds, setSentIds] = useState<Set<number>>(new Set());
   const [parentSubmitted, setParentSubmitted] = useState(false);
   const [tripCreated, setTripCreated] = useState(false);
-  const [golferAdded, setGolferAdded] = useState(false);
+  const [addedToTripIds, setAddedToTripIds] = useState<Set<number>>(new Set());
+  const [printOpen, setPrintOpen] = useState(false);
+
+  const golfers = BASE_GOLFERS.map((g) =>
+    g.id === 2 && oscarEmailOverride ? { ...g, parent_email: oscarEmailOverride } : g
+  );
+
+  const orgName = orgNameFor(accountType);
 
   const navigate = (to: number) => {
     setFading(true);
@@ -643,163 +950,247 @@ export default function DemoPage() {
     }, 180);
   };
 
-  const restart = () => {
+  const resetProgress = () => {
     setImported(false);
     setConfirmedIds(new Set());
+    setOscarReplaceOpen(false);
+    setOscarEmailOverride(null);
+    setReplaceValue("d.whitfield@email.com");
     setSentIds(new Set());
     setParentSubmitted(false);
     setTripCreated(false);
-    setGolferAdded(false);
+    setAddedToTripIds(new Set());
+    setPrintOpen(false);
+  };
+
+  const restart = () => {
+    resetProgress();
     navigate(1);
+  };
+
+  // Switching account type mid-walkthrough restarts cleanly rather than
+  // preserving progress — the organisation name and step 6 framing are
+  // baked into screens already visited (e.g. "imported into the Ashgrove
+  // Golf Club register"), so carrying old progress across the switch would
+  // leave stale, mismatched copy on screen rather than a clean re-run.
+  const handleAccountTypeChange = (next: AccountType) => {
+    if (next === accountType) return;
+    setAccountType(next);
+    resetProgress();
+    setScreen(1);
   };
 
   const confirmedCount = confirmedIds.size;
 
+  const nextGateReason = (): string | null => {
+    if (screen === 1 && !imported) return "Import golfers to continue";
+    if (screen === 2 && confirmedCount < golfers.length) return `Confirm all ${golfers.length} to continue`;
+    if (screen === 3 && sentIds.size < golfers.length) return `Send to all ${golfers.length} to continue`;
+    if (screen === 4 && !parentSubmitted) return "Simulate the parent submitting to continue";
+    if (screen === 6 && accountType === "county_union" && (!tripCreated || addedToTripIds.size === 0)) {
+      return "Create a trip and add a golfer to continue";
+    }
+    return null;
+  };
+  const gateReason = nextGateReason();
+  const nextDisabled = gateReason !== null;
+
   return (
     <div className="min-h-screen" style={{ fontFamily: "var(--font-geist-sans, system-ui, sans-serif)", background: "#f8fafc" }}>
+      <div className="print:hidden">
 
-      {/* Demo banner */}
-      <div className="text-center py-2 px-4 text-xs font-semibold leading-relaxed" style={{ background: "#155230", color: "#bbf7d0" }}>
-        <span className="hidden sm:inline">This is a demo — no real data is stored · Fictional data only · Screen layouts are for illustration purposes only</span>
-        <span className="sm:hidden">Demo only — no real data stored</span>
-      </div>
+        {/* Demo banner */}
+        <div className="text-center py-2 px-4 text-xs font-semibold leading-relaxed" style={{ background: "#155230", color: "#bbf7d0" }}>
+          <span className="hidden sm:inline">This is a demo — no real data is stored · Fictional data only · Screen layouts are for illustration purposes only</span>
+          <span className="sm:hidden">Demo only — no real data stored</span>
+        </div>
 
-      {/* Demo controls */}
-      <div className="sticky top-0 z-40 bg-white border-b border-slate-200 shadow-sm px-4 py-3">
-        <div className="max-w-6xl mx-auto flex items-center justify-between gap-4">
-          <div className="flex items-center gap-3 flex-1 min-w-0">
-            <span className="text-xs font-semibold text-slate-500 whitespace-nowrap hidden sm:block">
-              Step {screen}/{SCREENS.length}
-            </span>
-            <div className="flex-1 bg-slate-100 rounded-full h-2 min-w-0">
-              <div className="h-2 rounded-full transition-all duration-500"
-                style={{ width: `${(screen / SCREENS.length) * 100}%`, background: "linear-gradient(90deg, #155230, #22c55e)" }} />
+        {/* Account type toggle */}
+        <div className="bg-white border-b border-slate-200 px-4 py-2.5">
+          <div className="max-w-6xl mx-auto flex items-center gap-3">
+            <span className="text-xs font-semibold text-slate-500">Viewing as:</span>
+            <div className="inline-flex rounded-lg border border-slate-200 p-0.5 bg-slate-50">
+              {(["golf_club", "county_union"] as AccountType[]).map((t) => (
+                <button
+                  key={t}
+                  onClick={() => handleAccountTypeChange(t)}
+                  className={`text-xs font-semibold px-3 py-1.5 rounded-md transition-colors ${
+                    accountType === t ? "bg-white text-slate-900 shadow-sm border border-slate-200" : "text-slate-500"
+                  }`}>
+                  {t === "golf_club" ? "Golf club" : "County union"}
+                </button>
+              ))}
             </div>
-            <span className="text-xs font-bold text-slate-700 whitespace-nowrap hidden sm:block">
-              {SCREENS.find(s => s.id === screen)?.label}
-            </span>
-          </div>
-          <div className="flex items-center gap-2 flex-shrink-0">
-            <button onClick={restart}
-              className="text-xs font-semibold px-3 py-1.5 rounded-lg border border-slate-200 text-slate-600 hover:bg-slate-50 transition-colors">
-              ↺ Restart
-            </button>
-            <Link href="/pricing"
-              className="text-xs font-bold px-3 py-1.5 rounded-lg text-white transition-opacity hover:opacity-90"
-              style={{ background: "linear-gradient(135deg, #155230, #1a6b3e)" }}>
-              Sign up now →
-            </Link>
+            <span className="text-xs text-slate-400 hidden sm:inline">Switching restarts the walkthrough</span>
           </div>
         </div>
-      </div>
 
-      {/* Per-screen guidance strip */}
-      {SCREEN_HINTS[screen] && (
+        {/* Demo controls */}
+        <div className="sticky top-0 z-40 bg-white border-b border-slate-200 shadow-sm px-4 py-3">
+          <div className="max-w-6xl mx-auto flex items-center justify-between gap-4">
+            <div className="flex items-center gap-3 flex-1 min-w-0">
+              <span className="text-xs font-semibold text-slate-500 whitespace-nowrap hidden sm:block">
+                Step {screen}/{SCREENS.length}
+              </span>
+              <div className="flex-1 bg-slate-100 rounded-full h-2 min-w-0">
+                <div className="h-2 rounded-full transition-all duration-500"
+                  style={{ width: `${(screen / SCREENS.length) * 100}%`, background: "linear-gradient(90deg, #155230, #22c55e)" }} />
+              </div>
+              <span className="text-xs font-bold text-slate-700 whitespace-nowrap hidden sm:block">
+                {SCREENS.find(s => s.id === screen)?.label}
+              </span>
+            </div>
+            <div className="flex items-center gap-2 flex-shrink-0">
+              <button onClick={restart}
+                className="text-xs font-semibold px-3 py-1.5 rounded-lg border border-slate-200 text-slate-600 hover:bg-slate-50 transition-colors">
+                ↺ Restart
+              </button>
+              <Link href="/pricing"
+                className="text-xs font-bold px-3 py-1.5 rounded-lg text-white transition-opacity hover:opacity-90"
+                style={{ background: "linear-gradient(135deg, #155230, #1a6b3e)" }}>
+                Sign up now →
+              </Link>
+            </div>
+          </div>
+        </div>
+
+        {/* Per-screen guidance strip */}
         <div style={{ background: "#b45309", borderBottom: "2px solid #92400e" }} className="px-4 py-3">
           <div className="max-w-6xl mx-auto flex items-center gap-3">
             <svg className="w-5 h-5 flex-shrink-0 text-amber-200" fill="currentColor" viewBox="0 0 20 20">
               <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
             </svg>
             <p className="text-sm font-semibold text-white leading-snug">
-              {SCREEN_HINTS[screen]}
+              {hintFor(screen, accountType)}
             </p>
           </div>
         </div>
-      )}
 
-      {/* Fake app nav */}
-      <nav style={{ background: "#052e16" }} className="border-b border-white/10">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 h-14 flex items-center justify-between">
-          <div className="flex items-center gap-6">
-            <div className="flex items-center gap-2.5">
-              <div className="w-8 h-8 rounded-xl flex items-center justify-center flex-shrink-0" style={{ background: "#155230" }}>
-                <svg className="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
-                  <path fillRule="evenodd" d="M10 1.944A11.954 11.954 0 012.166 5C2.056 5.649 2 6.319 2 7c0 5.225 3.34 9.67 8 11.317C14.66 16.67 18 12.225 18 7c0-.682-.057-1.35-.166-2.001A11.954 11.954 0 0110 1.944z" clipRule="evenodd" />
-                </svg>
+        {/* Fake app nav */}
+        <nav style={{ background: "#052e16" }} className="border-b border-white/10">
+          <div className="max-w-6xl mx-auto px-4 sm:px-6 h-14 flex items-center justify-between">
+            <div className="flex items-center gap-6">
+              <div className="flex items-center gap-2.5">
+                <div className="w-8 h-8 rounded-xl flex items-center justify-center flex-shrink-0" style={{ background: "#155230" }}>
+                  <svg className="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M10 1.944A11.954 11.954 0 012.166 5C2.056 5.649 2 6.319 2 7c0 5.225 3.34 9.67 8 11.317C14.66 16.67 18 12.225 18 7c0-.682-.057-1.35-.166-2.001A11.954 11.954 0 0110 1.944z" clipRule="evenodd" />
+                  </svg>
+                </div>
+                <span className="font-bold text-white text-sm">CountyConsent</span>
               </div>
-              <span className="font-bold text-white text-sm">CountyConsent</span>
+              <div className="hidden sm:flex items-center gap-1">
+                {["Golfers", "Trips", "Archived"].map((label) => (
+                  <span key={label}
+                    className={`text-xs font-semibold px-3 py-1.5 rounded-lg ${label === "Golfers" ? "text-white bg-white/10" : "text-green-300/70"}`}>
+                    {label}
+                  </span>
+                ))}
+              </div>
             </div>
-            <div className="hidden sm:flex items-center gap-1">
-              {["Golfers", "Trips", "Archived"].map((label) => (
-                <span key={label}
-                  className={`text-xs font-semibold px-3 py-1.5 rounded-lg ${label === "Golfers" ? "text-white bg-white/10" : "text-green-300/70"}`}>
-                  {label}
-                </span>
-              ))}
+            <div className="flex items-center gap-3">
+              <span className="text-green-300 text-xs hidden md:block">{orgName}</span>
+              <div className="flex items-center gap-2">
+                <div className="w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold text-white flex-shrink-0" style={{ background: "#155230" }}>
+                  SM
+                </div>
+                <span className="text-white text-xs font-semibold hidden sm:block">Sarah Mitchell</span>
+              </div>
             </div>
           </div>
-          <div className="flex items-center gap-3">
-            <span className="text-green-300 text-xs hidden md:block">Westshire County Golf Union</span>
-            <div className="flex items-center gap-2">
-              <div className="w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold text-white flex-shrink-0" style={{ background: "#155230" }}>
-                SM
-              </div>
-              <span className="text-white text-xs font-semibold hidden sm:block">Sarah Mitchell</span>
-            </div>
-          </div>
-        </div>
-      </nav>
+        </nav>
 
-      {/* Screen content */}
-      <main
-        className="max-w-6xl mx-auto px-4 sm:px-6 py-8"
-        style={{ opacity: fading ? 0 : 1, transition: "opacity 0.18s ease" }}>
+        {/* Screen content */}
+        <main
+          className="max-w-6xl mx-auto px-4 sm:px-6 py-8"
+          style={{ opacity: fading ? 0 : 1, transition: "opacity 0.18s ease" }}>
 
-        {screen === 1 && (
-          <Screen1 imported={imported} onImport={() => { setImported(true); }} />
-        )}
-        {screen === 2 && (
-          <Screen2 confirmedIds={confirmedIds} onConfirm={(id) => setConfirmedIds(prev => new Set([...prev, id]))} />
-        )}
-        {screen === 3 && (
-          <Screen3
-            confirmedCount={confirmedCount}
-            sentIds={sentIds}
-            onSendOne={(id) => setSentIds(prev => new Set([...prev, id]))}
-            onSendAll={() => setSentIds(new Set(IMPORTED_GOLFERS.map(g => g.id)))}
-          />
-        )}
-        {screen === 4 && (
-          <Screen4 submitted={parentSubmitted} onSubmit={() => setParentSubmitted(true)} />
-        )}
-        {screen === 5 && <Screen5 />}
-        {screen === 6 && (
-          <Screen6
-            tripCreated={tripCreated}
-            golferAdded={golferAdded}
-            onCreateTrip={() => setTripCreated(true)}
-            onAddGolfer={() => setGolferAdded(true)}
-          />
-        )}
-        {screen === 7 && <Screen7 scope={tripCreated ? "trip" : "club"} />}
-
-        {/* Step navigation */}
-        <div className="flex items-center justify-between gap-3 pt-8 mt-8 border-t border-slate-200">
-          <button onClick={() => navigate(Math.max(1, screen - 1))} disabled={screen === 1}
-            className="text-sm font-semibold text-slate-500 hover:text-slate-700 disabled:opacity-30 disabled:cursor-not-allowed transition-colors">
-            ← Back
-          </button>
-          {screen < SCREENS.length ? (
-            <ClickHint label={`Next: ${SCREENS.find(s => s.id === screen + 1)?.label}`}>
-              <button
-                onClick={() => navigate(screen + 1)}
-                disabled={
-                  (screen === 1 && !imported) ||
-                  (screen === 2 && confirmedCount < IMPORTED_GOLFERS.length) ||
-                  (screen === 3 && sentIds.size < IMPORTED_GOLFERS.length) ||
-                  (screen === 4 && !parentSubmitted)
-                }
-                className="inline-flex items-center gap-2 text-white text-sm font-semibold px-5 py-2.5 rounded-xl shadow-sm transition-all disabled:opacity-40 disabled:cursor-not-allowed"
-                style={{ background: "linear-gradient(135deg, #166534, #15803d)" }}>
-                Next: {SCREENS.find(s => s.id === screen + 1)?.label}
-                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" /></svg>
-              </button>
-            </ClickHint>
-          ) : (
-            <span />
+          {screen === 1 && (
+            <Screen1 imported={imported} orgName={orgName} onImport={() => setImported(true)} />
           )}
-        </div>
-      </main>
+          {screen === 2 && (
+            <Screen2
+              golfers={golfers}
+              confirmedIds={confirmedIds}
+              oscarReplaceOpen={oscarReplaceOpen}
+              replaceValue={replaceValue}
+              onConfirm={(id) => { setConfirmedIds(prev => new Set([...prev, id])); setOscarReplaceOpen(false); }}
+              onOpenReplace={() => setOscarReplaceOpen(true)}
+              onCancelReplace={() => setOscarReplaceOpen(false)}
+              onReplaceChange={setReplaceValue}
+              onSaveReplace={() => {
+                setOscarEmailOverride(replaceValue.trim());
+                setConfirmedIds(prev => new Set([...prev, 2]));
+                setOscarReplaceOpen(false);
+              }}
+            />
+          )}
+          {screen === 3 && (
+            <Screen3
+              golfers={golfers}
+              confirmedCount={confirmedCount}
+              sentIds={sentIds}
+              onSendOne={(id) => setSentIds(prev => new Set([...prev, id]))}
+              onSendAll={() => setSentIds(new Set(golfers.map(g => g.id)))}
+            />
+          )}
+          {screen === 4 && (
+            <Screen4 submitted={parentSubmitted} orgName={orgName} onSubmit={() => setParentSubmitted(true)} />
+          )}
+          {screen === 5 && <Screen5 orgName={orgName} />}
+          {screen === 6 && (
+            <Screen6
+              accountType={accountType}
+              tripCreated={tripCreated}
+              addedIds={addedToTripIds}
+              golfers={golfers}
+              onCreateTrip={() => setTripCreated(true)}
+              onAddGolfer={(id) => setAddedToTripIds(prev => new Set([...prev, id]))}
+            />
+          )}
+          {screen === 7 && (
+            <Screen7
+              golfers={golfers}
+              scope={tripCreated ? "trip" : "club"}
+              orgName={orgName}
+              onPrint={() => setPrintOpen(true)}
+            />
+          )}
+
+          {/* Step navigation */}
+          <div className="flex items-center justify-between gap-3 pt-8 mt-8 border-t border-slate-200">
+            <button onClick={() => navigate(Math.max(1, screen - 1))} disabled={screen === 1}
+              className="text-sm font-semibold text-slate-500 hover:text-slate-700 disabled:opacity-30 disabled:cursor-not-allowed transition-colors">
+              ← Back
+            </button>
+            {screen < SCREENS.length ? (
+              <div className="flex flex-col items-end gap-1.5">
+                {gateReason && (
+                  <span className="text-xs font-semibold text-amber-700">{gateReason}</span>
+                )}
+                <button
+                  onClick={() => navigate(screen + 1)}
+                  disabled={nextDisabled}
+                  className="inline-flex items-center gap-2 text-white text-sm font-semibold px-5 py-2.5 rounded-xl shadow-sm transition-all disabled:opacity-40 disabled:cursor-not-allowed"
+                  style={{ background: "linear-gradient(135deg, #166534, #15803d)" }}>
+                  Next: {SCREENS.find(s => s.id === screen + 1)?.label}
+                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" /></svg>
+                </button>
+              </div>
+            ) : (
+              <span />
+            )}
+          </div>
+        </main>
+      </div>
+
+      {printOpen && (
+        <PrintPreviewModal
+          golfers={golfers}
+          orgName={orgName}
+          scope={tripCreated ? "trip" : "club"}
+          onClose={() => setPrintOpen(false)}
+        />
+      )}
     </div>
   );
 }
