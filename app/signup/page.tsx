@@ -11,10 +11,6 @@ const GOVERNING_BODIES = [
   'Golf Ireland',
 ]
 
-const ENGLAND_GOLF_COUNTIES = [
-  'Durham County Golf Union',
-]
-
 type AccountType = 'county_union' | 'golf_club'
 
 function SignupForm() {
@@ -30,7 +26,6 @@ function SignupForm() {
     contactName: '',
     email: '',
     phone: '',
-    parentCountyName: '',
     password: '',
     passwordConfirm: '',
   })
@@ -58,11 +53,6 @@ function SignupForm() {
       setError('Password must be at least 8 characters.')
       return
     }
-    if (accountType === 'golf_club' && !form.parentCountyName) {
-      setError('Please select which county union your club belongs to.')
-      return
-    }
-
     setLoadingMethod(method)
     try {
       const res = await fetch('/api/signup', {
@@ -75,7 +65,6 @@ function SignupForm() {
           secretaryName: form.contactName,
           email: form.email,
           phone: form.phone,
-          parentCountyName: accountType === 'golf_club' ? form.parentCountyName : undefined,
           password: form.password,
           plan,
           paymentMethod: method,
@@ -229,29 +218,6 @@ function SignupForm() {
                 ))}
               </div>
             </div>
-
-            {/* County union selector (golf clubs only) */}
-            {accountType === 'golf_club' && (
-              <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-1.5" htmlFor="parentCountyName">
-                  County union
-                </label>
-                <select
-                  id="parentCountyName"
-                  name="parentCountyName"
-                  required
-                  value={form.parentCountyName}
-                  onChange={handleChange}
-                  className={`${inputClass} bg-white`}
-                  style={ringStyle}
-                >
-                  <option value="">Select your county union</option>
-                  {ENGLAND_GOLF_COUNTIES.map(name => (
-                    <option key={name} value={name}>{name}</option>
-                  ))}
-                </select>
-              </div>
-            )}
 
             {/* Organisation name */}
             <div>
