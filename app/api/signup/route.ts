@@ -14,7 +14,7 @@ function getStripeClient() {
 }
 
 // Monthly price is forked by account type:
-//   golf_club    → £99/month   (STRIPE_CLUB_PRICE_ID)
+//   golf_club    → £65/month   (STRIPE_CLUB_PRICE_ID)
 //   county_union → £199/month  (STRIPE_COUNTY_PRICE_ID)
 // Live vs test price IDs are selected by STRIPE_MODE. Annual billing has been
 // retired — there is a single monthly price per account type.

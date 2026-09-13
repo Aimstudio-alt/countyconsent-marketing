@@ -11,7 +11,7 @@ export type AccountType = 'county_union' | 'golf_club'
 // Bare price strings (no "/month" suffix — callers append it to suit context).
 export const MONTHLY_PRICE: Record<AccountType, string> = {
   county_union: '£199',
-  golf_club: '£99',
+  golf_club: '£65',
 }
 
 export const ACCOUNT_TYPE_LABEL: Record<AccountType, string> = {
