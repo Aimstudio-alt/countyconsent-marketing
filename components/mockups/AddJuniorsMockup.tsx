@@ -13,7 +13,7 @@ export default function AddJuniorsMockup() {
         <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100">
           <div>
             <p className="text-sm font-bold text-gray-900">Junior Members</p>
-            <p className="text-xs text-gray-400">Durham County Golf Union · 4 members</p>
+            <p className="text-xs text-gray-400">Ashgrove Golf Club · 4 members</p>
           </div>
           <button className="flex items-center gap-1.5 text-xs bg-green-700 text-white px-3 py-1.5 rounded-lg font-semibold">
             <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">

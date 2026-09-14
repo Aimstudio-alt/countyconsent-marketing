@@ -26,7 +26,7 @@ export default function HeroDashboard() {
             <svg className="w-3 h-3 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
               <path fillRule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clipRule="evenodd" />
             </svg>
-            <span className="text-xs text-gray-400 font-mono">countyconsent.uk/trips/durham-junior-open</span>
+            <span className="text-xs text-gray-400 font-mono">countyconsent.uk/golfers</span>
           </div>
         </div>
 
@@ -57,15 +57,15 @@ export default function HeroDashboard() {
             {/* Top bar */}
             <div className="flex items-center justify-between px-5 py-3 border-b border-gray-100">
               <div>
-                <h2 className="text-sm font-bold text-gray-900">Durham Junior Open 2025</h2>
-                <p className="text-xs text-gray-400">14–15 June · Rockcliffe Hall · 12 juniors</p>
+                <h2 className="text-sm font-bold text-gray-900">Ashgrove Golf Club — Junior Register</h2>
+                <p className="text-xs text-gray-400">42 golfers · updated 2 minutes ago</p>
               </div>
               <div className="flex items-center gap-2">
                 <span className="text-xs bg-green-50 text-green-700 border border-green-100 px-2 py-1 rounded-full font-medium">
-                  8 consented
+                  34 consented
                 </span>
                 <span className="text-xs bg-amber-50 text-amber-700 border border-amber-100 px-2 py-1 rounded-full font-medium">
-                  4 pending
+                  8 pending
                 </span>
               </div>
             </div>
@@ -73,9 +73,9 @@ export default function HeroDashboard() {
             {/* Stats row */}
             <div className="grid grid-cols-3 gap-3 px-5 py-3 border-b border-gray-50">
               {[
-                { label: 'Consent rate', value: '67%', color: 'text-green-700', bg: 'bg-green-50' },
+                { label: 'Consent rate', value: '81%', color: 'text-green-700', bg: 'bg-green-50' },
                 { label: 'Medical alerts', value: '3', color: 'text-amber-700', bg: 'bg-amber-50' },
-                { label: 'Days to trip', value: '12', color: 'text-blue-700', bg: 'bg-blue-50' },
+                { label: 'Contacts confirmed', value: '38', color: 'text-blue-700', bg: 'bg-blue-50' },
               ].map((s) => (
                 <div key={s.label} className={`${s.bg} rounded-xl px-3 py-2`}>
                   <div className={`text-lg font-extrabold ${s.color}`}>{s.value}</div>

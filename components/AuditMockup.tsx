@@ -16,7 +16,7 @@ export default function AuditMockup() {
         <div className="px-5 py-4 border-b border-gray-100 flex items-center justify-between">
           <div>
             <h3 className="text-sm font-bold text-gray-900">Audit trail</h3>
-            <p className="text-xs text-gray-400">Durham Junior Open · Today</p>
+            <p className="text-xs text-gray-400">Ashgrove Golf Club · Today</p>
           </div>
           <button className="text-xs text-green-700 font-medium bg-green-50 border border-green-100 px-2.5 py-1 rounded-lg">
             Export CSV

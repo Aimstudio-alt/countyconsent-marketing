@@ -1,4 +1,3 @@
-import InviteStaffMockup from './mockups/InviteStaffMockup'
 import AddJuniorsMockup from './mockups/AddJuniorsMockup'
 import TripSetupMockup from './mockups/TripSetupMockup'
 import EmailMockup from './mockups/EmailMockup'
@@ -8,50 +7,50 @@ import StaffViewMockup from './mockups/StaffViewMockup'
 const steps = [
   {
     number: '01',
-    label: 'Team',
-    title: 'Invite your team managers',
-    description: 'Add the staff who will run your trips. Each manager receives an invite link by email and sets up their own password — no shared logins.',
-    mockup: <InviteStaffMockup />,
+    label: 'Register',
+    title: 'Build your register',
+    description: 'Import a membership list or add junior golfers individually — the first thing anyone does, whether you\'re a golf club or a county union.',
+    mockup: <AddJuniorsMockup />,
     bg: 'white',
   },
   {
     number: '02',
-    label: 'Register',
-    title: 'Build your junior golfer register',
-    description: 'Add junior golfers to your county register once. Import in bulk via CSV or add individually — they\'re then available for any trip.',
-    mockup: <AddJuniorsMockup />,
+    label: 'Confirm',
+    title: 'Check the contact details',
+    description: 'Imported emails are held unconfirmed until someone confirms each one genuinely belongs to a parent or guardian. Nothing is ever sent until they are.',
+    mockup: null,
     bg: '#f7f5ee',
   },
   {
     number: '03',
-    label: 'Plan',
-    title: 'Create a trip and assign managers',
-    description: 'Set up your away trip or tournament in seconds — add the venue, dates and assign the team managers who will be travelling.',
-    mockup: <TripSetupMockup />,
+    label: 'Send',
+    title: 'Send consent requests',
+    description: 'Send to everyone confirmed at once, or chase a single parent individually — whichever the moment calls for.',
+    mockup: <EmailMockup />,
     bg: 'white',
   },
   {
     number: '04',
-    label: 'Notify',
-    title: 'Add golfers and send consent requests',
-    description: 'Select golfers from your register and add them to the trip. Each parent automatically receives a unique secure link to complete their child\'s consent form.',
-    mockup: <EmailMockup />,
+    label: 'Consent',
+    title: 'Parents complete the form',
+    description: 'Consent, emergency contacts, medical information, GP details and permissions — completed from any device, no printing or chasing paperwork.',
+    mockup: <ConsentFormMockup />,
     bg: '#f7f5ee',
   },
   {
     number: '05',
-    label: 'Consent',
-    title: 'Parents complete the form digitally',
-    description: 'Parents fill in medical information, emergency contacts and give consent from any device — no printing, no chasing, no missing paperwork.',
-    mockup: <ConsentFormMockup />,
+    label: 'Record',
+    title: 'Everything on the golfer\'s record',
+    description: 'Consent, medical alerts and emergency contacts live on the golfer\'s own record — searchable at any time, with no trip required.',
+    mockup: <StaffViewMockup />,
     bg: 'white',
   },
   {
     number: '06',
-    label: 'Go',
-    title: 'Staff have everything on the day',
-    description: 'On the day, staff have instant access to medical summaries, emergency contacts and full consent records — online or offline.',
-    mockup: <StaffViewMockup />,
+    label: 'Trips',
+    title: 'Trips, optional',
+    description: 'County unions can group golfers from the register for an event. Entirely optional, and mainly used by county unions rather than individual clubs.',
+    mockup: <TripSetupMockup />,
     bg: '#f7f5ee',
   },
 ]
@@ -68,10 +67,10 @@ export default function HowItWorks() {
             How it works
           </div>
           <h2 className="text-3xl md:text-4xl font-black tracking-tight mb-4" style={{color:'#0a2818'}}>
-            From register to roadtrip<br className="hidden md:block" /> in six steps
+            From register to record<br className="hidden md:block" /> in six steps
           </h2>
           <p className="text-lg max-w-2xl mx-auto" style={{color:'#6b7280'}}>
-            A complete walkthrough of how CountyConsent works — from setting up your organisation to the moment you board the coach.
+            A complete walkthrough of how CountyConsent works — from building your register to keeping every golfer&apos;s record ready, whenever a trip comes up.
           </p>
         </div>
       </div>
@@ -82,17 +81,17 @@ export default function HowItWorks() {
         return (
           <div key={step.number} style={{background: step.bg}}>
             <div className="max-w-6xl mx-auto px-6 py-16 md:py-20">
-              <div className={`grid md:grid-cols-2 gap-12 md:gap-20 items-center ${isEven ? '' : ''}`}>
+              <div className={step.mockup ? 'grid md:grid-cols-2 gap-12 md:gap-20 items-center' : ''}>
 
                 {/* Text */}
-                <div className={isEven ? 'md:order-2' : ''}>
+                <div className={step.mockup ? (isEven ? 'md:order-2' : '') : 'max-w-2xl mx-auto text-center'}>
                   {/* Giant step number */}
                   <div className="font-black leading-none mb-4 select-none"
                     style={{fontSize:'clamp(80px,14vw,120px)',color:'transparent',WebkitTextStroke:'2px #15523020',lineHeight:1}}>
                     {step.number}
                   </div>
 
-                  <div className="flex items-center gap-3 mb-4 -mt-4">
+                  <div className={`flex items-center gap-3 mb-4 -mt-4 ${step.mockup ? '' : 'justify-center'}`}>
                     <span className="inline-block text-xs font-bold tracking-widest uppercase px-3 py-1 rounded-full border"
                       style={{background:'#edf7f2',borderColor:'#a7d9bc',color:'#155230'}}>
                       {step.label}
@@ -107,7 +106,7 @@ export default function HowItWorks() {
                   </p>
 
                   {i < steps.length - 1 && (
-                    <div className="mt-8 flex items-center gap-3">
+                    <div className={`mt-8 flex items-center gap-3 ${step.mockup ? '' : 'justify-center'}`}>
                       <div className="h-px w-8 bg-gray-300" />
                       <span className="text-sm font-medium" style={{color:'#9ca3af'}}>then</span>
                       <svg className="w-4 h-4" style={{color:'#155230'}} fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -118,9 +117,11 @@ export default function HowItWorks() {
                 </div>
 
                 {/* Mockup */}
-                <div className={isEven ? 'md:order-1' : ''}>
-                  {step.mockup}
-                </div>
+                {step.mockup && (
+                  <div className={isEven ? 'md:order-1' : ''}>
+                    {step.mockup}
+                  </div>
+                )}
               </div>
             </div>
           </div>
