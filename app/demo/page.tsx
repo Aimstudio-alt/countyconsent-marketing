@@ -115,9 +115,9 @@ function Breadcrumb({ items }: { items: string[] }) {
 function ClickHint({ children, label }: { children: React.ReactNode; label: string }) {
   return (
     <span className="inline-flex flex-col items-center" style={{ gap: 0 }}>
-      <span className="inline-flex items-start gap-1.5 text-xs font-bold px-3 py-2 rounded-lg shadow-md pointer-events-none text-center leading-snug animate-bounce"
-        style={{ background: "#c9921c", color: "white", marginBottom: 4, maxWidth: "min(85vw, 280px)" }}>
-        <svg className="w-3 h-3 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+      <span className="inline-flex items-start gap-2 text-sm font-bold px-4 py-3 rounded-lg shadow-md pointer-events-none text-center leading-snug"
+        style={{ background: "#c9921c", color: "white", marginBottom: 4, maxWidth: "min(90vw, 320px)" }}>
+        <svg className="w-3.5 h-3.5 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
           <path d="M10 12a2 2 0 100-4 2 2 0 000 4z" />
           <path fillRule="evenodd" d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clipRule="evenodd" />
         </svg>
