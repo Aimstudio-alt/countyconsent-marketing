@@ -5,8 +5,6 @@ import Link from "next/link";
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
-type AccountType = "golf_club" | "county_union";
-
 type Golfer = {
   id: number;
   first_name: string;
@@ -45,6 +43,7 @@ const BASE_GOLFERS: Golfer[] = [
   },
 ];
 
+const ORG_NAME = "Ashgrove Golf Club";
 const TRIP_NAME = "Coastview Junior Open";
 const TRIP_VENUE = "Coastview Golf Club";
 
@@ -58,20 +57,16 @@ const SCREENS = [
   { id: 7, label: "Medical Summary" },
 ];
 
-function orgNameFor(accountType: AccountType) {
-  return accountType === "golf_club" ? "Ashgrove Golf Club" : "Westshire County Golf Union";
-}
-
-function hintFor(screen: number, accountType: AccountType): string {
+function hintFor(screen: number, imported: boolean): string {
   const hints: Record<number, string> = {
-    1: 'Step 1 of 7 — Click "Import membership list" to add golfers to the register.',
+    1: imported
+      ? 'Step 1 of 7 — Register built. Click "Next: Contact Details" to continue.'
+      : 'Step 1 of 7 — Click "Import membership list" to add golfers to the register.',
     2: 'Step 2 of 7 — Confirm each parent/guardian email.',
     3: 'Step 3 of 7 — Send to one parent, or to everyone confirmed at once.',
     4: 'Step 4 of 7 — Click "Simulate parent submitting" to complete the form.',
     5: 'Step 5 of 7 — This is the golfer record.',
-    6: accountType === "golf_club"
-      ? 'Step 6 of 7 — Click "Create trip" to see this optional step, or skip ahead.'
-      : 'Step 6 of 7 — Click "Create trip" and add golfers from the register.',
+    6: 'Step 6 of 7 — Click "Create trip" to see this optional step, or skip ahead.',
     7: 'Step 7 of 7 — Click "Print medical summary" to see the printable version.',
   };
   return hints[screen];
@@ -167,15 +162,14 @@ function Screen1({ imported, orgName, onImport }: { imported: boolean; orgName: 
           <div>
             <p className="font-bold text-green-900 text-sm">Welcome to the interactive demo</p>
             <p className="text-green-800 text-xs mt-0.5 leading-relaxed">
-              Click the <span className="font-bold" style={{ color: "#c9921c" }}>amber highlighted buttons</span> to step through the golfer-first workflow.
-              No sign-up needed — all data is fictional.
+              Follow the amber-highlighted buttons through the workflow. All data is fictional.
             </p>
           </div>
         </div>
 
         <div>
           <h1 className="text-2xl font-bold text-slate-900 tracking-tight">Golfers</h1>
-          <p className="text-slate-500 mt-1 text-sm">Your register is empty. This is the first thing anyone does — trips come later, if you use them at all.</p>
+          <p className="text-slate-500 mt-1 text-sm">Your register is empty. This is the first thing anyone does.</p>
         </div>
 
         <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-10 flex flex-col items-center text-center gap-4">
@@ -184,12 +178,7 @@ function Screen1({ imported, orgName, onImport }: { imported: boolean; orgName: 
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" />
             </svg>
           </div>
-          <div>
-            <h2 className="text-lg font-bold text-slate-900 mb-1">Build your golfer register</h2>
-            <p className="text-slate-500 text-sm max-w-sm">
-              Import a membership list, or add golfers one at a time. Once they&apos;re in the register, they&apos;re available for consent requests — with or without a trip.
-            </p>
-          </div>
+          <h2 className="text-lg font-bold text-slate-900">Build your golfer register</h2>
           <div className="flex items-center gap-3">
             <ClickHint label="Everything starts with the register — trips come later, if at all. Import your golfers.">
               <button onClick={onImport}
@@ -205,7 +194,7 @@ function Screen1({ imported, orgName, onImport }: { imported: boolean; orgName: 
               Add golfer individually
             </button>
           </div>
-          <p className="text-xs text-slate-400 max-w-sm">
+          <p className="text-sm text-slate-600 max-w-sm">
             Both options are available in the real app — this walkthrough follows the import path.
           </p>
         </div>
@@ -217,7 +206,9 @@ function Screen1({ imported, orgName, onImport }: { imported: boolean; orgName: 
     <div className="space-y-6">
       <div>
         <h1 className="text-2xl font-bold text-slate-900 tracking-tight">Golfers</h1>
-        <p className="text-slate-500 mt-1 text-sm">{BASE_GOLFERS.length} golfers imported into the {orgName} register.</p>
+        <p className="text-slate-500 mt-1 text-sm">
+          {BASE_GOLFERS.length} golfers imported into the {orgName} register, each with an unconfirmed parent email — you&apos;ll confirm those next.
+        </p>
       </div>
 
       <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
@@ -235,7 +226,7 @@ function Screen1({ imported, orgName, onImport }: { imported: boolean; orgName: 
                 <p className="text-sm font-semibold text-slate-900">{g.first_name} {g.last_name}</p>
                 <p className="text-xs text-slate-400">DOB: {g.dob}</p>
               </div>
-              {g.medical && <span className="text-xs font-bold text-red-700 bg-red-50 border border-red-200 px-2 py-0.5 rounded-full">MED</span>}
+              {g.medical && <span className="text-xs font-bold text-red-700 bg-red-50 border border-red-200 px-2 py-0.5 rounded-full">Medical alert</span>}
               <span className="text-xs font-semibold text-amber-700 bg-amber-50 border border-amber-200 px-2.5 py-1 rounded-full">Email unconfirmed</span>
             </div>
           ))}
@@ -273,7 +264,9 @@ function Screen2({ golfers, confirmedIds, oscarReplaceOpen, replaceValue, onConf
       <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
         <div className="px-5 py-3.5 border-b border-slate-100 bg-slate-50 flex items-center justify-between">
           <p className="text-sm font-bold text-slate-700">Parent / guardian emails</p>
-          <span className="text-xs text-slate-400">{confirmedIds.size} of {golfers.length} confirmed</span>
+          <span className={`text-sm font-bold px-3 py-1.5 rounded-lg border ${allConfirmed ? "text-green-700 bg-green-50 border-green-200" : "text-amber-800 bg-amber-100 border-amber-300"}`}>
+            {confirmedIds.size} of {golfers.length} confirmed
+          </span>
         </div>
         <div className="divide-y divide-slate-100">
           {golfers.map((g) => {
@@ -300,7 +293,7 @@ function Screen2({ golfers, confirmedIds, oscarReplaceOpen, replaceValue, onConf
                   {confirmed ? (
                     <span className="text-xs font-semibold text-green-700 bg-green-50 border border-green-200 px-2.5 py-1 rounded-full">Confirmed</span>
                   ) : isOscar ? (
-                    <div className="flex items-center gap-2">
+                    <div className="flex flex-col items-end gap-2">
                       <ClickHint label="This looks like Oscar's own address, not a parent's. Replace it.">
                         <button onClick={onOpenReplace}
                           className="text-xs font-semibold text-slate-600 border border-slate-200 px-3 py-1.5 rounded-lg hover:bg-slate-50 transition-colors">
@@ -320,43 +313,32 @@ function Screen2({ golfers, confirmedIds, oscarReplaceOpen, replaceValue, onConf
                   )}
                 </div>
 
-                {isOscar && !confirmed && (
-                  <div className="px-5 pb-4 -mt-1 space-y-3">
-                    <div className="bg-amber-50 border border-amber-200 rounded-xl px-4 py-3 flex items-start gap-2.5">
-                      <svg className="w-4 h-4 text-amber-600 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z" />
-                      </svg>
-                      <p className="text-xs text-amber-800 leading-relaxed">
-                        <strong>This looks like it might be Oscar&apos;s own email address</strong>, not a parent or guardian&apos;s — the address contains his name and birth year. Confirm it anyway if that&apos;s genuinely correct, or replace it with the parent&apos;s address.
-                      </p>
-                    </div>
-
-                    {oscarReplaceOpen && (
-                      <div className="bg-white border border-slate-200 rounded-xl p-4 space-y-3">
-                        <label className="block text-xs font-semibold text-slate-600">Parent / guardian email</label>
-                        <input
-                          type="email"
-                          value={replaceValue}
-                          onChange={(e) => onReplaceChange(e.target.value)}
-                          placeholder="e.g. d.whitfield@email.com"
-                          className="w-full px-3 py-2 rounded-lg border border-slate-300 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-green-500"
-                        />
-                        <div className="flex items-center gap-3">
-                          <ClickHint label="Save & confirm">
-                            <button
-                              onClick={onSaveReplace}
-                              disabled={!replaceValue.trim()}
-                              className="text-xs font-semibold text-white px-4 py-2 rounded-lg shadow-sm disabled:opacity-40 disabled:cursor-not-allowed"
-                              style={{ background: "linear-gradient(135deg, #166534, #15803d)" }}>
-                              Save & confirm
-                            </button>
-                          </ClickHint>
-                          <button onClick={onCancelReplace} className="text-xs font-semibold text-slate-500 hover:text-slate-700">
-                            Cancel
+                {isOscar && !confirmed && oscarReplaceOpen && (
+                  <div className="px-5 pb-4 -mt-1">
+                    <div className="bg-white border border-slate-200 rounded-xl p-4 space-y-3">
+                      <label className="block text-xs font-semibold text-slate-600">Parent / guardian email</label>
+                      <input
+                        type="email"
+                        value={replaceValue}
+                        onChange={(e) => onReplaceChange(e.target.value)}
+                        placeholder="e.g. d.whitfield@email.com"
+                        className="w-full px-3 py-2 rounded-lg border border-slate-300 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-green-500"
+                      />
+                      <div className="flex items-center gap-3">
+                        <ClickHint label="Enter the parent's real address, then save and confirm.">
+                          <button
+                            onClick={onSaveReplace}
+                            disabled={!replaceValue.trim()}
+                            className="text-xs font-semibold text-white px-4 py-2 rounded-lg shadow-sm disabled:opacity-40 disabled:cursor-not-allowed"
+                            style={{ background: "linear-gradient(135deg, #166534, #15803d)" }}>
+                            Save & confirm
                           </button>
-                        </div>
+                        </ClickHint>
+                        <button onClick={onCancelReplace} className="text-xs font-semibold text-slate-500 hover:text-slate-700">
+                          Cancel
+                        </button>
                       </div>
-                    )}
+                    </div>
                   </div>
                 )}
               </div>
@@ -389,7 +371,7 @@ function Screen3({ golfers, confirmedCount, sentIds, onSendOne, onSendAll }: {
   const allSent = sentIds.size === golfers.length;
 
   return (
-    <div className="max-w-xl space-y-6">
+    <div className="space-y-6">
       <Breadcrumb items={["Golfers", "Send Consent"]} />
       <div>
         <h1 className="text-2xl font-bold text-slate-900">Send consent requests</h1>
@@ -574,6 +556,9 @@ function Screen4({ submitted, orgName, onSubmit }: { submitted: boolean; orgName
               </div>
             )}
           </div>
+          <div className="sticky bottom-0 -mt-2 px-4 py-2 text-center text-xs font-semibold text-slate-500 bg-gradient-to-t from-white via-white/95 to-transparent pointer-events-none">
+            Scroll for more ↓
+          </div>
         </div>
       </div>
     </div>
@@ -590,7 +575,7 @@ function Screen5({ orgName }: { orgName: string }) {
       <div>
         <h1 className="text-2xl font-bold text-slate-900">Oscar Whitfield</h1>
         <p className="text-slate-500 text-sm mt-0.5">DOB: 03 Sep 2010 · {orgName} register</p>
-        <p className="text-green-700 text-xs font-semibold mt-2">Everything below is visible from Oscar&apos;s own record — no trip needed.</p>
+        <p className="text-green-700 text-xs font-semibold mt-2">Everything below is visible from Oscar&apos;s own record — no trip needed. Scroll down, then click Next to continue.</p>
       </div>
 
       <div className="grid md:grid-cols-2 gap-5">
@@ -653,31 +638,24 @@ function Screen5({ orgName }: { orgName: string }) {
 
 // ── Screen 6: Trips ───────────────────────────────────────────────────────────
 
-function Screen6({ accountType, tripCreated, addedIds, golfers, onCreateTrip, onAddGolfer }: {
-  accountType: AccountType;
+function Screen6({ tripCreated, addedIds, golfers, onCreateTrip, onAddGolfer }: {
   tripCreated: boolean;
   addedIds: Set<number>;
   golfers: Golfer[];
   onCreateTrip: () => void;
   onAddGolfer: (id: number) => void;
 }) {
-  const isClub = accountType === "golf_club";
-
   return (
     <div className="max-w-2xl space-y-6">
       <Breadcrumb items={["Golfers", "Trips"]} />
       <div>
-        {isClub && (
-          <div className="inline-flex items-center gap-1.5 text-xs font-bold px-2.5 py-1 rounded-full mb-3"
-            style={{ background: "#eff6ff", color: "#1d4ed8", border: "1px solid #bfdbfe" }}>
-            Optional
-          </div>
-        )}
+        <div className="inline-flex items-center gap-1.5 text-xs font-bold px-2.5 py-1 rounded-full mb-3"
+          style={{ background: "#eff6ff", color: "#1d4ed8", border: "1px solid #bfdbfe" }}>
+          Optional
+        </div>
         <h1 className="text-2xl font-bold text-slate-900">Trips</h1>
         <p className="text-slate-500 mt-1 text-sm max-w-lg">
-          {isClub
-            ? "Most golf clubs never create a trip — golfers stay in the register and get consent requests directly. This step is optional, and mainly used by county unions to organise an away day."
-            : "County unions typically use trips to organise an away day, pulling golfers straight from the register — nothing is re-entered."}
+          Most golf clubs never create a trip — golfers stay in the register and get consent requests directly. This step is optional, and mainly used by county unions to organise an away day.
         </p>
       </div>
 
@@ -685,18 +663,16 @@ function Screen6({ accountType, tripCreated, addedIds, golfers, onCreateTrip, on
         <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 space-y-5">
           <div>
             <label className="block text-sm font-semibold text-slate-700 mb-1.5">Trip name</label>
-            <input defaultValue={TRIP_NAME} readOnly
-              className="w-full px-4 py-2.5 rounded-xl border border-slate-300 text-slate-900 text-sm bg-slate-50 focus:outline-none" />
+            <input value="" readOnly placeholder={TRIP_NAME}
+              className="w-full px-4 py-2.5 rounded-xl border border-slate-300 text-slate-900 text-sm bg-slate-50 focus:outline-none placeholder:text-slate-400" />
           </div>
           <div>
             <label className="block text-sm font-semibold text-slate-700 mb-1.5">Venue</label>
-            <input defaultValue={TRIP_VENUE} readOnly
-              className="w-full px-4 py-2.5 rounded-xl border border-slate-300 text-slate-900 text-sm bg-slate-50 focus:outline-none" />
+            <input value="" readOnly placeholder={TRIP_VENUE}
+              className="w-full px-4 py-2.5 rounded-xl border border-slate-300 text-slate-900 text-sm bg-slate-50 focus:outline-none placeholder:text-slate-400" />
           </div>
           <div className="flex items-center gap-3 pt-2">
-            <ClickHint label={isClub
-              ? "Golfers come from the register, not re-entered — this step is optional. Create the trip."
-              : "Golfers come from the register, not re-entered — a normal part of the flow. Create the trip."}>
+            <ClickHint label="Golfers come from the register, not re-entered — this step is optional. Create the trip.">
               <button onClick={onCreateTrip}
                 className="inline-flex items-center gap-2 text-white text-sm font-semibold px-5 py-2.5 rounded-xl shadow-sm transition-all"
                 style={{ background: "linear-gradient(135deg, #166534, #15803d)" }}>
@@ -718,6 +694,8 @@ function Screen6({ accountType, tripCreated, addedIds, golfers, onCreateTrip, on
           <div className="divide-y divide-slate-100">
             {golfers.map((g) => {
               const added = addedIds.has(g.id);
+              const isFirstUnadded = !added && addedIds.size === 0
+                && golfers.find(x => !addedIds.has(x.id))?.id === g.id;
               return (
                 <div key={g.id} className="flex items-center gap-3 px-5 py-3.5">
                   <div className="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center text-xs font-bold text-green-700 flex-shrink-0">
@@ -729,6 +707,13 @@ function Screen6({ accountType, tripCreated, addedIds, golfers, onCreateTrip, on
                   </div>
                   {added ? (
                     <ConsentBadge consented={true} />
+                  ) : isFirstUnadded ? (
+                    <ClickHint label="Add at least one golfer to continue.">
+                      <button onClick={() => onAddGolfer(g.id)}
+                        className="text-xs font-semibold text-slate-600 border border-slate-200 px-3 py-1.5 rounded-lg hover:bg-slate-50 transition-colors">
+                        Add to trip
+                      </button>
+                    </ClickHint>
                   ) : (
                     <button onClick={() => onAddGolfer(g.id)}
                       className="text-xs font-semibold text-slate-600 border border-slate-200 px-3 py-1.5 rounded-lg hover:bg-slate-50 transition-colors">
@@ -786,11 +771,10 @@ function Screen7({ golfers, scope, orgName, onPrint }: { golfers: Golfer[]; scop
             Print medical summary
           </button>
         </ClickHint>
-        <p className="text-xs text-slate-400 text-center mt-2">This is what a team manager carries on the day.</p>
       </div>
 
-      <p className="text-xs text-slate-400 bg-slate-50 border border-slate-200 rounded-xl px-4 py-3">
-        This summary works the same way whether it&apos;s printed for a specific trip or for the whole club — every golfer is listed, with medical alerts highlighted among them.
+      <p className="text-sm text-slate-600 bg-slate-50 border border-slate-200 rounded-xl px-4 py-3">
+        This works the same way for a trip or the whole club register — every golfer listed, medical alerts highlighted.
       </p>
 
       <div className="space-y-3">
@@ -923,7 +907,6 @@ function PrintPreviewModal({ golfers, orgName, scope, onClose }: {
 // ── Main demo page ────────────────────────────────────────────────────────────
 
 export default function DemoPage() {
-  const [accountType, setAccountType] = useState<AccountType>("golf_club");
   const [screen, setScreen] = useState(1);
   const [fading, setFading] = useState(false);
   const [imported, setImported] = useState(false);
@@ -941,7 +924,7 @@ export default function DemoPage() {
     g.id === 2 && oscarEmailOverride ? { ...g, parent_email: oscarEmailOverride } : g
   );
 
-  const orgName = orgNameFor(accountType);
+  const orgName = ORG_NAME;
 
   const navigate = (to: number) => {
     setFading(true);
@@ -970,28 +953,18 @@ export default function DemoPage() {
     navigate(1);
   };
 
-  // Switching account type mid-walkthrough restarts cleanly rather than
-  // preserving progress — the organisation name and step 6 framing are
-  // baked into screens already visited (e.g. "imported into the Ashgrove
-  // Golf Club register"), so carrying old progress across the switch would
-  // leave stale, mismatched copy on screen rather than a clean re-run.
-  const handleAccountTypeChange = (next: AccountType) => {
-    if (next === accountType) return;
-    setAccountType(next);
-    resetProgress();
-    setScreen(1);
-  };
-
   const confirmedCount = confirmedIds.size;
 
   const nextGateReason = (): string | null => {
     if (screen === 1 && !imported) return "Import golfers to continue";
     if (screen === 2 && confirmedCount < golfers.length) return `Confirm all ${golfers.length} to continue`;
+    // Satisfied by either route — sending to all four individually, or one
+    // click of "Send to all" — both converge on the same sentIds state, so
+    // neither route is blocked and neither can be skipped in favour of the
+    // other.
     if (screen === 3 && sentIds.size < golfers.length) return `Send to all ${golfers.length} to continue`;
     if (screen === 4 && !parentSubmitted) return "Simulate the parent submitting to continue";
-    if (screen === 6 && accountType === "county_union" && (!tripCreated || addedToTripIds.size === 0)) {
-      return "Create a trip and add a golfer to continue";
-    }
+    if (screen === 6 && tripCreated && addedToTripIds.size === 0) return "Add a golfer to the trip to continue";
     return null;
   };
   const gateReason = nextGateReason();
@@ -1005,26 +978,6 @@ export default function DemoPage() {
         <div className="text-center py-2 px-4 text-xs font-semibold leading-relaxed" style={{ background: "#155230", color: "#bbf7d0" }}>
           <span className="hidden sm:inline">This is a demo — no real data is stored · Fictional data only · Screen layouts are for illustration purposes only</span>
           <span className="sm:hidden">Demo only — no real data stored</span>
-        </div>
-
-        {/* Account type toggle */}
-        <div className="bg-white border-b border-slate-200 px-4 py-2.5">
-          <div className="max-w-6xl mx-auto flex items-center gap-3">
-            <span className="text-xs font-semibold text-slate-500">Viewing as:</span>
-            <div className="inline-flex rounded-lg border border-slate-200 p-0.5 bg-slate-50">
-              {(["golf_club", "county_union"] as AccountType[]).map((t) => (
-                <button
-                  key={t}
-                  onClick={() => handleAccountTypeChange(t)}
-                  className={`text-xs font-semibold px-3 py-1.5 rounded-md transition-colors ${
-                    accountType === t ? "bg-white text-slate-900 shadow-sm border border-slate-200" : "text-slate-500"
-                  }`}>
-                  {t === "golf_club" ? "Golf club" : "County union"}
-                </button>
-              ))}
-            </div>
-            <span className="text-xs text-slate-400 hidden sm:inline">Switching restarts the walkthrough</span>
-          </div>
         </div>
 
         {/* Demo controls */}
@@ -1063,7 +1016,7 @@ export default function DemoPage() {
               <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
             </svg>
             <p className="text-sm font-semibold text-white leading-snug">
-              {hintFor(screen, accountType)}
+              {hintFor(screen, imported)}
             </p>
           </div>
         </div>
@@ -1141,7 +1094,6 @@ export default function DemoPage() {
           {screen === 5 && <Screen5 orgName={orgName} />}
           {screen === 6 && (
             <Screen6
-              accountType={accountType}
               tripCreated={tripCreated}
               addedIds={addedToTripIds}
               golfers={golfers}
@@ -1169,7 +1121,22 @@ export default function DemoPage() {
                 {gateReason && (
                   <span className="text-sm font-bold text-amber-800 bg-amber-100 border border-amber-300 rounded-lg px-3 py-2 shadow-sm">{gateReason}</span>
                 )}
-                {screen === 5 ? (
+                {screen === 1 && imported ? (
+                  // The register view has no other control to carry guidance
+                  // toward — Next is the only remaining action once import
+                  // is done, so the callout moves here rather than leaving
+                  // the user to find an unmarked enabled button.
+                  <ClickHint label="The register is built — click Next to confirm parent contact details.">
+                    <button
+                      onClick={() => navigate(screen + 1)}
+                      disabled={nextDisabled}
+                      className="inline-flex items-center gap-2 text-white text-sm font-semibold px-5 py-2.5 rounded-xl shadow-sm transition-all disabled:opacity-40 disabled:cursor-not-allowed"
+                      style={{ background: "linear-gradient(135deg, #166534, #15803d)" }}>
+                      Next: {SCREENS.find(s => s.id === screen + 1)?.label}
+                      <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" /></svg>
+                    </button>
+                  </ClickHint>
+                ) : screen === 5 ? (
                   // Step 5 has no other control to carry its guidance — the
                   // golfer record is read-only, so the reason moves onto the
                   // Next button instead of being stranded in the hint strip.
