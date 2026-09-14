@@ -1167,7 +1167,7 @@ export default function DemoPage() {
             {screen < SCREENS.length ? (
               <div className="flex flex-col items-end gap-1.5">
                 {gateReason && (
-                  <span className="text-xs font-semibold text-amber-700">{gateReason}</span>
+                  <span className="text-sm font-bold text-amber-800 bg-amber-100 border border-amber-300 rounded-lg px-3 py-2 shadow-sm">{gateReason}</span>
                 )}
                 {screen === 5 ? (
                   // Step 5 has no other control to carry its guidance — the
