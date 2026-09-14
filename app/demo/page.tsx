@@ -64,15 +64,15 @@ function orgNameFor(accountType: AccountType) {
 
 function hintFor(screen: number, accountType: AccountType): string {
   const hints: Record<number, string> = {
-    1: 'Step 1 of 7 — Click "Import golfers" to bring in a membership list. This is the first thing anyone does — no trip required.',
-    2: 'Step 2 of 7 — Confirm each parent/guardian email. Oscar’s is flagged as possibly his own address — confirm it anyway, or replace it with a different one.',
-    3: 'Step 3 of 7 — Send to one parent at a time, or click "Send consent requests to all" to email everyone confirmed in one action.',
-    4: 'Step 4 of 7 — This is what a parent sees. Click "Simulate parent submitting" to complete the form on their behalf.',
-    5: 'Step 5 of 7 — Consent, medical and emergency details are all visible from the golfer’s own record. No trip needed.',
+    1: 'Step 1 of 7 — Click "Import membership list" to add golfers to the register.',
+    2: 'Step 2 of 7 — Confirm each parent/guardian email.',
+    3: 'Step 3 of 7 — Send to one parent, or to everyone confirmed at once.',
+    4: 'Step 4 of 7 — Click "Simulate parent submitting" to complete the form.',
+    5: 'Step 5 of 7 — This is the golfer record.',
     6: accountType === "golf_club"
-      ? 'Step 6 of 7 — Optional, and mainly used by county unions. Click "Create a trip" to see how it works, or skip ahead.'
-      : 'Step 6 of 7 — Create a trip and add golfers from the register. This is a normal part of the flow for a county union.',
-    7: 'Step 7 of 7 — Every golfer is listed, with medical alerts highlighted. Click "Print medical summary" to see what a team manager carries on the day.',
+      ? 'Step 6 of 7 — Click "Create trip" to see this optional step, or skip ahead.'
+      : 'Step 6 of 7 — Click "Create trip" and add golfers from the register.',
+    7: 'Step 7 of 7 — Click "Print medical summary" to see the printable version.',
   };
   return hints[screen];
 }
@@ -115,9 +115,9 @@ function Breadcrumb({ items }: { items: string[] }) {
 function ClickHint({ children, label }: { children: React.ReactNode; label: string }) {
   return (
     <span className="inline-flex flex-col items-center" style={{ gap: 0 }}>
-      <span className="inline-flex items-center gap-1.5 text-xs font-bold px-3 py-1.5 rounded-lg shadow-md pointer-events-none text-center animate-bounce"
-        style={{ background: "#c9921c", color: "white", marginBottom: 4, maxWidth: 180 }}>
-        <svg className="w-3 h-3 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+      <span className="inline-flex items-start gap-1.5 text-xs font-bold px-3 py-2 rounded-lg shadow-md pointer-events-none text-center leading-snug animate-bounce"
+        style={{ background: "#c9921c", color: "white", marginBottom: 4, maxWidth: "min(85vw, 280px)" }}>
+        <svg className="w-3 h-3 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
           <path d="M10 12a2 2 0 100-4 2 2 0 000 4z" />
           <path fillRule="evenodd" d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clipRule="evenodd" />
         </svg>
@@ -191,7 +191,7 @@ function Screen1({ imported, orgName, onImport }: { imported: boolean; orgName: 
             </p>
           </div>
           <div className="flex items-center gap-3">
-            <ClickHint label="Click here to begin">
+            <ClickHint label="Everything starts with the register — trips come later, if at all. Import your golfers.">
               <button onClick={onImport}
                 className="inline-flex items-center gap-2 text-white font-semibold px-6 py-3 rounded-xl shadow-sm transition-all duration-200"
                 style={{ background: "linear-gradient(135deg, #166534, #15803d)" }}>
@@ -301,16 +301,16 @@ function Screen2({ golfers, confirmedIds, oscarReplaceOpen, replaceValue, onConf
                     <span className="text-xs font-semibold text-green-700 bg-green-50 border border-green-200 px-2.5 py-1 rounded-full">Confirmed</span>
                   ) : isOscar ? (
                     <div className="flex items-center gap-2">
-                      <button onClick={onOpenReplace}
-                        className="text-xs font-semibold text-slate-600 border border-slate-200 px-3 py-1.5 rounded-lg hover:bg-slate-50 transition-colors">
-                        Replace address
-                      </button>
-                      <ClickHint label="Check, then confirm">
-                        <button onClick={() => onConfirm(g.id)}
-                          className="text-xs font-semibold text-amber-800 bg-amber-100 border border-amber-300 px-3 py-1.5 rounded-lg hover:bg-amber-200 transition-colors">
-                          Confirm anyway
+                      <ClickHint label="This looks like Oscar's own address, not a parent's. Replace it.">
+                        <button onClick={onOpenReplace}
+                          className="text-xs font-semibold text-slate-600 border border-slate-200 px-3 py-1.5 rounded-lg hover:bg-slate-50 transition-colors">
+                          Replace address
                         </button>
                       </ClickHint>
+                      <button onClick={() => onConfirm(g.id)}
+                        className="text-xs font-semibold text-amber-800 bg-amber-100 border border-amber-300 px-3 py-1.5 rounded-lg hover:bg-amber-200 transition-colors">
+                        Confirm anyway
+                      </button>
                     </div>
                   ) : (
                     <button onClick={() => onConfirm(g.id)}
@@ -436,7 +436,7 @@ function Screen3({ golfers, confirmedCount, sentIds, onSendOne, onSendAll }: {
         </div>
 
         {!allSent ? (
-          <ClickHint label="Send to everyone confirmed">
+          <ClickHint label="Send to everyone at once, or chase one parent individually. Send to all.">
             <button onClick={onSendAll}
               className="w-full inline-flex items-center justify-center gap-2 text-white text-sm font-semibold px-5 py-3 rounded-xl shadow-sm transition-all"
               style={{ background: "linear-gradient(135deg, #166534, #15803d)" }}>
@@ -563,7 +563,7 @@ function Screen4({ submitted, orgName, onSubmit }: { submitted: boolean; orgName
             </div>
 
             {!submitted ? (
-              <ClickHint label="Simulate parent submitting">
+              <ClickHint label="One form covers consent, contacts, medical and permissions. Submit as the parent.">
                 <button onClick={onSubmit} className="w-full py-2 bg-green-700 text-white text-xs font-bold rounded-xl">
                   Submit consent ✓
                 </button>
@@ -694,7 +694,9 @@ function Screen6({ accountType, tripCreated, addedIds, golfers, onCreateTrip, on
               className="w-full px-4 py-2.5 rounded-xl border border-slate-300 text-slate-900 text-sm bg-slate-50 focus:outline-none" />
           </div>
           <div className="flex items-center gap-3 pt-2">
-            <ClickHint label="Create the trip">
+            <ClickHint label={isClub
+              ? "Golfers come from the register, not re-entered — this step is optional. Create the trip."
+              : "Golfers come from the register, not re-entered — a normal part of the flow. Create the trip."}>
               <button onClick={onCreateTrip}
                 className="inline-flex items-center gap-2 text-white text-sm font-semibold px-5 py-2.5 rounded-xl shadow-sm transition-all"
                 style={{ background: "linear-gradient(135deg, #166534, #15803d)" }}>
@@ -776,7 +778,7 @@ function Screen7({ golfers, scope, orgName, onPrint }: { golfers: Golfer[]; scop
             <p className="text-xs font-semibold text-slate-500 uppercase tracking-wide mt-0.5">Medical alerts</p>
           </div>
         </div>
-        <ClickHint label="See it as it prints">
+        <ClickHint label="One summary for the team manager to carry — trip or whole club. Print it.">
           <button onClick={onPrint}
             className="w-full inline-flex items-center justify-center gap-2 text-white text-sm font-semibold px-5 py-2.5 rounded-xl shadow-sm transition-all"
             style={{ background: "linear-gradient(135deg, #166534, #15803d)" }}>
@@ -1167,14 +1169,30 @@ export default function DemoPage() {
                 {gateReason && (
                   <span className="text-xs font-semibold text-amber-700">{gateReason}</span>
                 )}
-                <button
-                  onClick={() => navigate(screen + 1)}
-                  disabled={nextDisabled}
-                  className="inline-flex items-center gap-2 text-white text-sm font-semibold px-5 py-2.5 rounded-xl shadow-sm transition-all disabled:opacity-40 disabled:cursor-not-allowed"
-                  style={{ background: "linear-gradient(135deg, #166534, #15803d)" }}>
-                  Next: {SCREENS.find(s => s.id === screen + 1)?.label}
-                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" /></svg>
-                </button>
+                {screen === 5 ? (
+                  // Step 5 has no other control to carry its guidance — the
+                  // golfer record is read-only, so the reason moves onto the
+                  // Next button instead of being stranded in the hint strip.
+                  <ClickHint label="Everything is visible from the golfer's own record — no trip needed. Continue.">
+                    <button
+                      onClick={() => navigate(screen + 1)}
+                      disabled={nextDisabled}
+                      className="inline-flex items-center gap-2 text-white text-sm font-semibold px-5 py-2.5 rounded-xl shadow-sm transition-all disabled:opacity-40 disabled:cursor-not-allowed"
+                      style={{ background: "linear-gradient(135deg, #166534, #15803d)" }}>
+                      Next: {SCREENS.find(s => s.id === screen + 1)?.label}
+                      <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" /></svg>
+                    </button>
+                  </ClickHint>
+                ) : (
+                  <button
+                    onClick={() => navigate(screen + 1)}
+                    disabled={nextDisabled}
+                    className="inline-flex items-center gap-2 text-white text-sm font-semibold px-5 py-2.5 rounded-xl shadow-sm transition-all disabled:opacity-40 disabled:cursor-not-allowed"
+                    style={{ background: "linear-gradient(135deg, #166534, #15803d)" }}>
+                    Next: {SCREENS.find(s => s.id === screen + 1)?.label}
+                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" /></svg>
+                  </button>
+                )}
               </div>
             ) : (
               <span />
