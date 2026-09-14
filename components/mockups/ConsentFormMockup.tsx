@@ -21,7 +21,7 @@ export default function ConsentFormMockup() {
             </div>
             <div>
               <p className="text-xs font-bold text-gray-900 leading-none">Consent Form</p>
-              <p className="text-xs text-gray-400">Durham Junior Open 2025</p>
+              <p className="text-xs text-gray-400">Ashgrove Golf Club</p>
             </div>
           </div>
 

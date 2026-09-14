@@ -39,8 +39,8 @@ export default function WelcomePage() {
               },
               {
                 step: '3',
-                title: 'Set up your first trip',
-                desc: 'Create a trip, assign juniors, and send digital consent requests to parents in minutes.',
+                title: 'Send consent requests',
+                desc: 'Once your golfers are added, send consent requests straight from their record — to everyone at once, or to a single parent. No trip required first.',
               },
             ].map(({ step, title, desc }) => (
               <li key={step} className="flex gap-4">

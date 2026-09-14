@@ -38,7 +38,7 @@ export default function EmailMockup() {
               {/* Email body */}
               <div className="px-3 py-3 space-y-2.5">
                 <p className="text-xs text-gray-600 leading-relaxed">
-                  Hi Sarah, Durham CGU need your consent for <strong>Archie Thompson</strong> to attend the <strong>Junior Open 2025</strong> (14–15 Jun).
+                  Hi Sarah, Ashgrove Golf Club needs a consent form completed for <strong>Archie Thompson</strong>.
                 </p>
                 <p className="text-xs text-gray-600 leading-relaxed">
                   Takes about 3 minutes — no account needed.

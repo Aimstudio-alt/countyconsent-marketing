@@ -16,7 +16,7 @@ export default function TripSetupMockup() {
             <svg className="w-4 h-4 text-green-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
             </svg>
-            <p className="text-sm font-bold text-gray-900">Durham Junior Open 2025</p>
+            <p className="text-sm font-bold text-gray-900">Westshire Junior Open 2026</p>
           </div>
           <div className="flex flex-wrap gap-3 text-xs text-gray-500">
             <span className="flex items-center gap-1"><span className="w-1.5 h-1.5 rounded-full bg-green-500 inline-block" />14–15 June</span>
@@ -26,7 +26,7 @@ export default function TripSetupMockup() {
         </div>
         {/* Assign section */}
         <div className="px-5 py-3 border-b border-gray-100">
-          <p className="text-xs font-semibold text-gray-700 mb-2">Assigned juniors — consent status</p>
+          <p className="text-xs font-semibold text-gray-700 mb-2">Golfers from the register — consent status</p>
           <div className="space-y-2">
             {juniors.map((j) => (
               <div key={j.name} className="flex items-center justify-between">
@@ -34,7 +34,7 @@ export default function TripSetupMockup() {
                 {j.consent === 'confirmed' ? (
                   <span className="text-xs bg-green-50 text-green-700 border border-green-100 px-2 py-0.5 rounded-full font-semibold">✓ Consented</span>
                 ) : (
-                  <span className="text-xs bg-gray-100 text-gray-500 border border-gray-200 px-2 py-0.5 rounded-full font-medium">Not sent</span>
+                  <span className="text-xs bg-gray-100 text-gray-500 border border-gray-200 px-2 py-0.5 rounded-full font-medium">Not yet</span>
                 )}
               </div>
             ))}
@@ -43,9 +43,9 @@ export default function TripSetupMockup() {
         {/* CTA */}
         <div className="px-5 py-3 flex items-center gap-2">
           <button className="flex-1 text-xs bg-green-700 text-white py-2 rounded-lg font-semibold">
-            Send consent requests →
+            Add golfers from register →
           </button>
-          <span className="text-xs text-gray-400">2 pending</span>
+          <span className="text-xs text-gray-400">5 added</span>
         </div>
       </div>
     </div>

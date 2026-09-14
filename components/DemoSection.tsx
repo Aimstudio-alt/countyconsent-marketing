@@ -56,8 +56,8 @@ export default function DemoSection() {
                 <span className="font-bold text-white text-sm">CountyConsent</span>
               </div>
               <div className="flex items-center gap-2">
-                <span className="text-green-300 text-xs hidden sm:block">Northumberland County Golf Union</span>
-                <div className="w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold text-white" style={{ background: "#155230" }}>SM</div>
+                <span className="text-green-300 text-xs hidden sm:block">Westshire County Golf Union</span>
+                <div className="w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold text-white" style={{ background: "#155230" }}>WC</div>
               </div>
             </div>
 
@@ -66,8 +66,8 @@ export default function DemoSection() {
               {/* Stats row */}
               <div className="grid grid-cols-4 gap-3 mb-4">
                 {[
-                  { label: "Upcoming Trips", value: "1", color: "text-green-700" },
-                  { label: "Total Golfers", value: "6", color: "text-blue-700" },
+                  { label: "Contacts Confirmed", value: "5", color: "text-blue-700" },
+                  { label: "Total Golfers", value: "6", color: "text-green-700" },
                   { label: "Consents Received", value: "4", color: "text-emerald-700" },
                   { label: "Medical Alerts", value: "1", color: "text-red-700" },
                 ].map(({ label, value, color }) => (
@@ -77,15 +77,15 @@ export default function DemoSection() {
                   </div>
                 ))}
               </div>
-              {/* Trip card preview */}
-              <div className="bg-white rounded-xl border border-slate-200 border-l-4 border-l-amber-400 shadow-sm p-4 flex items-center gap-3">
-                <div className="w-10 h-10 rounded-full border-2 border-amber-400 flex items-center justify-center text-[10px] font-black text-slate-700 flex-shrink-0">67%</div>
+              {/* Register summary preview */}
+              <div className="bg-white rounded-xl border border-slate-200 border-l-4 border-l-green-400 shadow-sm p-4 flex items-center gap-3">
+                <div className="w-10 h-10 rounded-full border-2 border-green-400 flex items-center justify-center text-[10px] font-black text-slate-700 flex-shrink-0">67%</div>
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2">
-                    <span className="font-bold text-slate-900 text-sm">Northumberland Junior Open</span>
+                    <span className="font-bold text-slate-900 text-sm">Junior Register</span>
                     <span className="text-[10px] font-bold text-red-700 bg-red-50 border border-red-200 px-1.5 py-0.5 rounded-full">1 MED</span>
                   </div>
-                  <span className="text-slate-500 text-xs">Slaley Hall Golf Club · 15 Jul 2026</span>
+                  <span className="text-slate-500 text-xs">6 golfers · 5 contacts confirmed</span>
                 </div>
                 <div className="hidden sm:flex items-center gap-1.5 text-xs">
                   <span className="bg-green-50 text-green-700 border border-green-200 font-bold px-2 py-1 rounded-lg">4 received</span>
@@ -93,7 +93,7 @@ export default function DemoSection() {
                 </div>
               </div>
               <div className="mt-3 text-center">
-                <span className="text-xs text-slate-400 italic">Click through 9 screens of the real workflow →</span>
+                <span className="text-xs text-slate-400 italic">Click through 7 screens of the real workflow →</span>
               </div>
             </div>
           </div>
@@ -103,7 +103,7 @@ export default function DemoSection() {
             style={{ background: "linear-gradient(to bottom, transparent 40%, rgba(5,46,22,0.85) 100%)" }}>
             <div className="absolute bottom-8 left-0 right-0 flex flex-col items-center gap-4">
               <p className="text-white font-semibold text-sm opacity-90">
-                Interactive · 9 screens · No sign-up required
+                Interactive · 7 screens · No sign-up required
               </p>
               <a href="/demo"
                 className="inline-flex items-center gap-2.5 px-8 py-4 rounded-xl font-bold text-base shadow-xl hover:opacity-95 transition-all hover:-translate-y-0.5"
@@ -121,11 +121,12 @@ export default function DemoSection() {
         {/* Feature bullets below */}
         <div className="flex flex-wrap justify-center gap-6 mt-12">
           {[
-            "Invite team managers",
-            "Golfer register & trip setup",
-            "Add from register flow",
-            "Consent email & medical alerts",
-            "Medical summary print view",
+            "Build your golfer register",
+            "Confirm contact details",
+            "Send consent requests",
+            "Parents complete the form",
+            "Everything on the golfer's record",
+            "Print medical summary",
           ].map((f) => (
             <div key={f} className="flex items-center gap-2 text-sm font-medium" style={{ color: "#374151" }}>
               <span className="w-5 h-5 rounded-full flex items-center justify-center text-xs font-bold text-white flex-shrink-0"

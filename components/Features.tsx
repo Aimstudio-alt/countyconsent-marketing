@@ -94,7 +94,7 @@ const features = [
       </svg>
     ),
     title: 'Junior golfer register',
-    description: 'Every junior in one place — name, club, age, consent status, and medical flags visible at a glance across all trips.',
+    description: 'Every junior in one place — name, club, age, consent status, and medical flags visible at a glance. No trip needed to see it.',
     accent: '#f0fdf4',
   },
   {
