@@ -33,7 +33,7 @@ We will:
 
 ## 4. Children's data
 
-We acknowledge that the Service processes the personal data of children. We will handle such data with particular care, consistent with the UK GDPR and the ICO's Age Appropriate Design Code. You remain responsible for obtaining valid parental consent and for the lawful basis of processing children's data.
+We acknowledge that the Service processes the personal data of children. We will handle such data with particular care, consistent with the UK GDPR and the ICO's Age Appropriate Design Code. You remain responsible for obtaining valid parental consent and for the lawful basis of processing children's data. Retention periods for golfer records are determined by you as controller. The Service flags records when a golfer reaches 18 so you can review them; it does not delete or alter records on its own.
 
 ## 5. Subprocessors
 
