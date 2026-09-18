@@ -45,6 +45,7 @@ You authorise us to engage the following subprocessors:
 | Vercel | Application hosting | London (lhr1), with global edge delivery |
 | Resend | Transactional email | United States |
 | Stripe | Payment processing | United States / global |
+| Golf Genius | Roster import for counties that connect it — data flows from Golf Genius to us only, not the reverse | Not disclosed by Golf Genius |
 
 We will inform you of any intended changes to subprocessors and give you the opportunity to object. We remain responsible for our subprocessors' compliance.
 
