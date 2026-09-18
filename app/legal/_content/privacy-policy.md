@@ -53,6 +53,8 @@ We share data only with:
 - **Subprocessors** who help us run the Service, under contract: Supabase (database/hosting), Vercel (application hosting), Resend (email delivery), Stripe (payments).
 - **Authorities or third parties** where required by law or to protect safeguarding interests.
 
+Where a county connects its own **Golf Genius** account, we retrieve that county's event roster — junior golfer name, date of birth, email address (usually a parent/guardian's), and home club — to help populate golfer and consent records for a trip. We do not send golfer data to Golf Genius; the connection is used to import roster data only, using the county's own Golf Genius API credentials.
+
 We do **not** sell your personal data. Some subprocessors may process data outside the UK; where they do, we ensure appropriate safeguards (such as UK International Data Transfer Agreements or adequacy decisions) are in place.
 
 ## 6. How long we keep data
