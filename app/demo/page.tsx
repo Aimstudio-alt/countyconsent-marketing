@@ -28,7 +28,7 @@ const BASE_GOLFERS: Golfer[] = [
   {
     id: 2, first_name: "Oscar", last_name: "Whitfield", dob: "03 Sep 2010",
     parent_email: "oscarwhitfield10@email.com", flagged_own_email: true,
-    medical: "Type 1 diabetes — carries an insulin pen at all times. Check blood glucose before and after play.",
+    medical: "Type 1 diabetes. Carries an insulin pen at all times. Check blood glucose before and after play.",
     emergency_contact: "Denise Whitfield · 07700 900221", gp: "Dr L. Farooqi · Millbrook Health Centre · 0161 496 0187",
   },
   {
@@ -60,14 +60,14 @@ const SCREENS = [
 function hintFor(screen: number, imported: boolean): string {
   const hints: Record<number, string> = {
     1: imported
-      ? 'Step 1 of 7 — Register built. Click "Next: Contact Details" to continue.'
-      : 'Step 1 of 7 — Click "Import membership list" to add golfers to the register.',
-    2: 'Step 2 of 7 — Confirm each parent/guardian email.',
-    3: 'Step 3 of 7 — Send to one parent, or to everyone confirmed at once.',
-    4: 'Step 4 of 7 — Click "Simulate parent submitting" to complete the form.',
-    5: 'Step 5 of 7 — This is the golfer record.',
-    6: 'Step 6 of 7 — Click "Create trip" to see this optional step, or skip ahead.',
-    7: 'Step 7 of 7 — Click "Print medical summary" to see the printable version.',
+      ? 'Step 1 of 7: Register built. Click "Next: Contact Details" to continue.'
+      : 'Step 1 of 7: Click "Import membership list" to add golfers to the register.',
+    2: 'Step 2 of 7: Confirm each parent/guardian email.',
+    3: 'Step 3 of 7: Send to one parent, or to everyone confirmed at once.',
+    4: 'Step 4 of 7: Click "Simulate parent submitting" to complete the form.',
+    5: 'Step 5 of 7: This is the golfer record.',
+    6: 'Step 6 of 7: Click "Create trip" to see this optional step, or skip ahead.',
+    7: 'Step 7 of 7: Click "Print medical summary" to see the printable version.',
   };
   return hints[screen];
 }
@@ -180,7 +180,7 @@ function Screen1({ imported, orgName, onImport }: { imported: boolean; orgName: 
           </div>
           <h2 className="text-lg font-bold text-slate-900">Build your golfer register</h2>
           <div className="flex items-center gap-3">
-            <ClickHint label="Everything starts with the register — trips come later, if at all. Import your golfers.">
+            <ClickHint label="Everything starts with the register. Trips come later, if at all. Import your golfers.">
               <button onClick={onImport}
                 className="inline-flex items-center gap-2 text-white font-semibold px-6 py-3 rounded-xl shadow-sm transition-all duration-200"
                 style={{ background: "linear-gradient(135deg, #166534, #15803d)" }}>
@@ -195,7 +195,7 @@ function Screen1({ imported, orgName, onImport }: { imported: boolean; orgName: 
             </button>
           </div>
           <p className="text-sm text-slate-600 max-w-sm">
-            Both options are available in the real app — this walkthrough follows the import path.
+            Both options are available in the real app. This walkthrough follows the import path.
           </p>
         </div>
       </div>
@@ -207,7 +207,7 @@ function Screen1({ imported, orgName, onImport }: { imported: boolean; orgName: 
       <div>
         <h1 className="text-2xl font-bold text-slate-900 tracking-tight">Golfers</h1>
         <p className="text-slate-500 mt-1 text-sm">
-          {BASE_GOLFERS.length} golfers imported into the {orgName} register, each with an unconfirmed parent email — you&apos;ll confirm those next.
+          {BASE_GOLFERS.length} golfers imported into the {`${orgName} register`}, each with an unconfirmed parent email. You&apos;ll confirm those next.
         </p>
       </div>
 
@@ -376,7 +376,7 @@ function Screen3({ golfers, confirmedCount, sentIds, onSendOne, onSendAll }: {
       <div>
         <h1 className="text-2xl font-bold text-slate-900">Send consent requests</h1>
         <p className="text-slate-500 mt-1 text-sm">
-          Send to everyone confirmed in one action, or send to a single parent individually — for example if you&apos;re chasing just one after the rest already have theirs.
+          Send to everyone confirmed in one action, or send to a single parent individually, for example if you&apos;re chasing just one after the rest already have theirs.
         </p>
       </div>
 
@@ -449,13 +449,13 @@ function Screen4({ submitted, orgName, onSubmit }: { submitted: boolean; orgName
       <Breadcrumb items={["Golfers", "Send Consent", "Parent Consent"]} />
       <div className="text-center">
         <h1 className="text-2xl font-bold text-slate-900">What the parent sees</h1>
-        <p className="text-slate-500 mt-1 text-sm">Oscar&apos;s mum opens the link on her phone — no account, no app, no password. The real form is longer than a phone screen, so it scrolls.</p>
+        <p className="text-slate-500 mt-1 text-sm">Oscar&apos;s mum opens the link on her phone: no account, no app, no password. The real form is longer than a phone screen, so it scrolls.</p>
       </div>
 
       <div className="relative mx-auto w-72 bg-gray-900 rounded-3xl shadow-2xl p-2">
         <div className="bg-white rounded-2xl overflow-hidden max-h-[520px] overflow-y-auto">
           <div className="bg-gray-50 border-b border-gray-200 px-4 py-2.5 sticky top-0">
-            <p className="text-xs font-bold text-gray-900">Consent form — Oscar Whitfield</p>
+            <p className="text-xs font-bold text-gray-900">Consent form: Oscar Whitfield</p>
             <p className="text-xs text-gray-400">{orgName}</p>
           </div>
           <div className="p-4 space-y-4">
@@ -472,7 +472,7 @@ function Screen4({ submitted, orgName, onSubmit }: { submitted: boolean; orgName
             <div>
               <p className="text-xs font-semibold text-gray-700 mb-1.5">Emergency contact 1</p>
               <div className="space-y-1.5">
-                <div className="h-6 bg-gray-100 rounded-md flex items-center px-2 text-xs text-gray-500">Denise Whitfield — Mother</div>
+                <div className="h-6 bg-gray-100 rounded-md flex items-center px-2 text-xs text-gray-500">Denise Whitfield, Mother</div>
                 <div className="h-6 bg-gray-100 rounded-md flex items-center px-2 text-xs text-gray-500">07700 900221</div>
               </div>
             </div>
@@ -480,7 +480,7 @@ function Screen4({ submitted, orgName, onSubmit }: { submitted: boolean; orgName
             <div>
               <p className="text-xs font-semibold text-gray-700 mb-1.5">Emergency contact 2</p>
               <div className="space-y-1.5">
-                <div className="h-6 bg-gray-100 rounded-md flex items-center px-2 text-xs text-gray-500">Marcus Whitfield — Father</div>
+                <div className="h-6 bg-gray-100 rounded-md flex items-center px-2 text-xs text-gray-500">Marcus Whitfield, Father</div>
                 <div className="h-6 bg-gray-100 rounded-md flex items-center px-2 text-xs text-gray-500">07700 900238</div>
               </div>
             </div>
@@ -495,7 +495,7 @@ function Screen4({ submitted, orgName, onSubmit }: { submitted: boolean; orgName
 
             <div className="bg-red-50 border border-red-100 rounded-xl p-2.5 space-y-1">
               <p className="text-xs font-semibold text-red-800">Medical conditions</p>
-              <p className="text-xs text-red-700">Type 1 diabetes — carries an insulin pen at all times. Check blood glucose before and after play.</p>
+              <p className="text-xs text-red-700">Type 1 diabetes. Carries an insulin pen at all times. Check blood glucose before and after play.</p>
             </div>
             <div className="bg-gray-50 border border-gray-100 rounded-xl p-2.5 space-y-1">
               <p className="text-xs font-semibold text-gray-700">Allergies</p>
@@ -527,7 +527,7 @@ function Screen4({ submitted, orgName, onSubmit }: { submitted: boolean; orgName
                 <span className="text-xs font-bold text-red-600">✗ Decline</span>
               </div>
               <p className="text-xs text-amber-800 bg-amber-50 border border-amber-100 rounded-lg px-2.5 py-2">
-                Denise has chosen not to give photography consent for Oscar. Staff will see this on his record — he shouldn&apos;t appear in club photos or social media.
+                Denise has chosen not to give photography consent for Oscar. Staff will see this on his record. He shouldn&apos;t appear in club photos or social media.
               </p>
             </div>
 
@@ -575,7 +575,7 @@ function Screen5({ orgName }: { orgName: string }) {
       <div>
         <h1 className="text-2xl font-bold text-slate-900">Oscar Whitfield</h1>
         <p className="text-slate-500 text-sm mt-0.5">DOB: 03 Sep 2010 · {orgName} register</p>
-        <p className="text-green-700 text-xs font-semibold mt-2">Everything below is visible from Oscar&apos;s own record — no trip needed. Scroll down, then click Next to continue.</p>
+        <p className="text-green-700 text-xs font-semibold mt-2">Everything below is visible from Oscar&apos;s own record, no trip needed. Scroll down, then click Next to continue.</p>
       </div>
 
       <div className="grid md:grid-cols-2 gap-5">
@@ -584,7 +584,7 @@ function Screen5({ orgName }: { orgName: string }) {
           <Detail label="Name" value="Denise Whitfield" />
           <Detail label="Relationship" value="Mother" />
           <Detail label="Mobile" value="07700 900221" />
-          <Detail label="Email" value="d.whitfield@email.com — confirmed" />
+          <Detail label="Email" value="d.whitfield@email.com, confirmed" />
         </div>
         <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-5 space-y-4">
           <h3 className="font-bold text-slate-800 text-sm border-b border-slate-100 pb-3">Emergency Contact 1</h3>
@@ -611,7 +611,7 @@ function Screen5({ orgName }: { orgName: string }) {
             <h3 className="font-bold text-red-900 text-sm uppercase tracking-wide">Medical Alert</h3>
           </div>
           <p className="text-sm text-red-800 leading-relaxed">
-            Type 1 diabetes — carries an insulin pen at all times. Check blood glucose before and after play.
+            Type 1 diabetes. Carries an insulin pen at all times. Check blood glucose before and after play.
           </p>
         </div>
 
@@ -623,7 +623,7 @@ function Screen5({ orgName }: { orgName: string }) {
           <PermissionRow label="Photography" agreed={false} />
           <PermissionRow label="Data use" agreed={true} />
           <p className="text-xs text-red-700 bg-red-50 border border-red-200 rounded-lg px-3 py-2 mt-2">
-            Photography has been refused for Oscar — staff need to know not to include him in any club photos or social media.
+            Photography has been refused for Oscar. Staff need to know not to include him in any club photos or social media.
           </p>
         </div>
       </div>
@@ -655,7 +655,7 @@ function Screen6({ tripCreated, addedIds, golfers, onCreateTrip, onAddGolfer }: 
         </div>
         <h1 className="text-2xl font-bold text-slate-900">Trips</h1>
         <p className="text-slate-500 mt-1 text-sm max-w-lg">
-          Most golf clubs never create a trip — golfers stay in the register and get consent requests directly. This step is optional, and mainly used by county unions to organise an away day.
+          Most golf clubs never create a trip. Golfers stay in the register and get consent requests directly. This step is optional, and mainly used by county unions to organise an away day.
         </p>
       </div>
 
@@ -672,7 +672,7 @@ function Screen6({ tripCreated, addedIds, golfers, onCreateTrip, onAddGolfer }: 
               className="w-full px-4 py-2.5 rounded-xl border border-slate-300 text-slate-900 text-sm bg-slate-50 focus:outline-none placeholder:text-slate-400" />
           </div>
           <div className="flex items-center gap-3 pt-2">
-            <ClickHint label="Golfers come from the register, not re-entered — this step is optional. Create the trip.">
+            <ClickHint label="Golfers come from the register, not re-entered. This step is optional. Create the trip.">
               <button onClick={onCreateTrip}
                 className="inline-flex items-center gap-2 text-white text-sm font-semibold px-5 py-2.5 rounded-xl shadow-sm transition-all"
                 style={{ background: "linear-gradient(135deg, #166534, #15803d)" }}>
@@ -689,7 +689,7 @@ function Screen6({ tripCreated, addedIds, golfers, onCreateTrip, onAddGolfer }: 
             <p className="text-xs text-slate-400">{TRIP_VENUE}</p>
           </div>
           <div className="px-5 py-3 border-b border-slate-100">
-            <p className="text-sm text-slate-600">Golfers on this trip are added from the register — nothing is re-entered.</p>
+            <p className="text-sm text-slate-600">Golfers on this trip are added from the register, so nothing is re-entered.</p>
           </div>
           <div className="divide-y divide-slate-100">
             {golfers.map((g) => {
@@ -703,7 +703,7 @@ function Screen6({ tripCreated, addedIds, golfers, onCreateTrip, onAddGolfer }: 
                   </div>
                   <div className="flex-1 min-w-0">
                     <p className="text-sm font-semibold text-slate-900">{g.first_name} {g.last_name}</p>
-                    <p className="text-xs text-slate-400">{added ? "Added from register — consent already on file" : "In register, not yet added"}</p>
+                    <p className="text-xs text-slate-400">{added ? "Added from register, consent already on file" : "In register, not yet added"}</p>
                   </div>
                   {added ? (
                     <ConsentBadge consented={true} />
@@ -744,7 +744,7 @@ function Screen7({ golfers, scope, orgName, onPrint }: { golfers: Golfer[]; scop
           <div>
             <h1 className="text-xl font-bold text-slate-900">Medical summary</h1>
             <p className="text-slate-500 text-sm mt-0.5">
-              {scope === "trip" ? `${TRIP_NAME} · ${TRIP_VENUE}` : `Whole club register — ${orgName}`}
+              {scope === "trip" ? `${TRIP_NAME} · ${TRIP_VENUE}` : `Whole club register: ${orgName}`}
             </p>
           </div>
           <div className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0" style={{ background: "#f0fdf4" }}>
@@ -763,7 +763,7 @@ function Screen7({ golfers, scope, orgName, onPrint }: { golfers: Golfer[]; scop
             <p className="text-xs font-semibold text-slate-500 uppercase tracking-wide mt-0.5">Medical alerts</p>
           </div>
         </div>
-        <ClickHint label="One summary for the team manager to carry — trip or whole club. Print it.">
+        <ClickHint label="One summary for the team manager to carry, for a trip or the whole club. Print it.">
           <button onClick={onPrint}
             className="w-full inline-flex items-center justify-center gap-2 text-white text-sm font-semibold px-5 py-2.5 rounded-xl shadow-sm transition-all"
             style={{ background: "linear-gradient(135deg, #166534, #15803d)" }}>
@@ -774,7 +774,7 @@ function Screen7({ golfers, scope, orgName, onPrint }: { golfers: Golfer[]; scop
       </div>
 
       <p className="text-sm text-slate-600 bg-slate-50 border border-slate-200 rounded-xl px-4 py-3">
-        This works the same way for a trip or the whole club register — every golfer listed, medical alerts highlighted.
+        This works the same way for a trip or the whole club register: every golfer listed, medical alerts highlighted.
       </p>
 
       <div className="space-y-3">
@@ -817,7 +817,7 @@ function Screen7({ golfers, scope, orgName, onPrint }: { golfers: Golfer[]; scop
           </div>
           <div className="text-left">
             <p className="font-bold text-green-900">That&apos;s the walkthrough.</p>
-            <p className="text-green-800 text-sm">Everything starts and ends with the register — trips are just an optional way to group golfers for a specific event.</p>
+            <p className="text-green-800 text-sm">Everything starts and ends with the register. Trips are just an optional way to group golfers for a specific event.</p>
           </div>
         </div>
         <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-1">
@@ -874,14 +874,14 @@ function PrintPreviewModal({ golfers, orgName, scope, onClose }: {
           </div>
 
           <p className="text-xs mb-4">
-            Carried by the team manager on the day. Not for wider distribution — contains special category medical data.
+            Carried by the team manager on the day. Not for wider distribution: contains special category medical data.
           </p>
 
           <div className="space-y-4">
             {golfers.map((g) => (
               <div key={g.id} className={`border rounded-md p-3 ${g.medical ? "border-black" : "border-gray-400"}`}>
                 <div className="flex items-center justify-between">
-                  <p className="font-bold">{g.first_name} {g.last_name} <span className="font-normal text-sm">— DOB {g.dob}</span></p>
+                  <p className="font-bold">{g.first_name} {g.last_name} <span className="font-normal text-sm">· DOB {g.dob}</span></p>
                   {g.medical
                     ? <span className="text-xs font-bold border border-black px-2 py-0.5 rounded">MEDICAL ALERT</span>
                     : <span className="text-xs text-gray-500">No medical alerts</span>}
@@ -976,8 +976,8 @@ export default function DemoPage() {
 
         {/* Demo banner */}
         <div className="text-center py-2 px-4 text-xs font-semibold leading-relaxed" style={{ background: "#155230", color: "#bbf7d0" }}>
-          <span className="hidden sm:inline">This is a demo — no real data is stored · Fictional data only · Screen layouts are for illustration purposes only</span>
-          <span className="sm:hidden">Demo only — no real data stored</span>
+          <span className="hidden sm:inline">This is a demo. No real data is stored · Fictional data only · Screen layouts are for illustration purposes only</span>
+          <span className="sm:hidden">Demo only. No real data stored</span>
         </div>
 
         {/* Demo controls */}
@@ -1126,7 +1126,7 @@ export default function DemoPage() {
                   // toward — Next is the only remaining action once import
                   // is done, so the callout moves here rather than leaving
                   // the user to find an unmarked enabled button.
-                  <ClickHint label="The register is built — click Next to confirm parent contact details.">
+                  <ClickHint label="The register is built. Click Next to confirm parent contact details.">
                     <button
                       onClick={() => navigate(screen + 1)}
                       disabled={nextDisabled}
@@ -1140,7 +1140,7 @@ export default function DemoPage() {
                   // Step 5 has no other control to carry its guidance — the
                   // golfer record is read-only, so the reason moves onto the
                   // Next button instead of being stranded in the hint strip.
-                  <ClickHint label="Everything is visible from the golfer's own record — no trip needed. Continue.">
+                  <ClickHint label="Everything is visible from the golfer's own record, no trip needed. Continue.">
                     <button
                       onClick={() => navigate(screen + 1)}
                       disabled={nextDisabled}
