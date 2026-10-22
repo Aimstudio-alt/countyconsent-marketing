@@ -15,14 +15,18 @@ function formatInviteDate(date: string) {
   return `${weekday}, ${Number(d)} ${m}`
 }
 
-// "2:00pm" → "14:00 – 15:00" (one-hour slot; falls back to the raw string)
+const DEMO_MINUTES = 30
+
+// "2:00pm" → "14:00 – 14:30" (falls back to the raw string)
 function formatInviteTime(time: string) {
   const match = /^(\d{1,2}):(\d{2})(am|pm)$/i.exec(time)
   if (!match) return time
   let hour = Number(match[1]) % 12
   if (match[3].toLowerCase() === 'pm') hour += 12
-  const pad = (n: number) => String(n).padStart(2, '0')
-  return `${pad(hour)}:${match[2]} – ${pad((hour + 1) % 24)}:${match[2]}`
+  const start = hour * 60 + Number(match[2])
+  const end = (start + DEMO_MINUTES) % (24 * 60)
+  const hhmm = (mins: number) => `${String(Math.floor(mins / 60)).padStart(2, '0')}:${String(mins % 60).padStart(2, '0')}`
+  return `${hhmm(start)} – ${hhmm(end)}`
 }
 
 export async function POST(request: NextRequest) {
