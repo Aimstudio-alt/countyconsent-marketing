@@ -3,6 +3,27 @@ import { createServiceClient } from '@/lib/supabase'
 import { resend, FROM_EMAIL, ADMIN_EMAIL } from '@/lib/resend'
 
 const MEET_LINK = 'https://meet.google.com/ddc-vvna-ksc'
+const WEEKDAYS = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']
+const MONTHS = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']
+
+// "22 October 2026" → "Thursday, 22 October" (falls back to the raw string)
+function formatInviteDate(date: string) {
+  const [d, m, y] = date.split(' ')
+  const month = MONTHS.indexOf(m)
+  if (month === -1) return date
+  const weekday = WEEKDAYS[new Date(Number(y), month, Number(d)).getDay()]
+  return `${weekday}, ${Number(d)} ${m}`
+}
+
+// "2:00pm" → "14:00 – 15:00" (one-hour slot; falls back to the raw string)
+function formatInviteTime(time: string) {
+  const match = /^(\d{1,2}):(\d{2})(am|pm)$/i.exec(time)
+  if (!match) return time
+  let hour = Number(match[1]) % 12
+  if (match[3].toLowerCase() === 'pm') hour += 12
+  const pad = (n: number) => String(n).padStart(2, '0')
+  return `${pad(hour)}:${match[2]} – ${pad((hour + 1) % 24)}:${match[2]}`
+}
 
 export async function POST(request: NextRequest) {
   try {
@@ -46,9 +67,11 @@ export async function POST(request: NextRequest) {
                 We've confirmed your booking for <strong>${organisation}</strong>. Here are the details:
               </p>
               <div style="background: white; border: 1px solid #e5e7eb; border-radius: 8px; padding: 16px 20px; margin: 0 0 20px;">
-                <p style="margin: 0 0 8px; color: #374151;"><strong>Date:</strong> ${date}</p>
-                <p style="margin: 0 0 8px; color: #374151;"><strong>Time:</strong> ${time} (UK time)</p>
-                <p style="margin: 0; color: #374151;"><strong>Video call:</strong> <a href="${MEET_LINK}" style="color: #166534;">${MEET_LINK}</a></p>
+                <p style="margin: 0 0 4px; color: #111827; font-weight: 600;">CountyConsent demo — ${organisation}</p>
+                <p style="margin: 0 0 4px; color: #374151;">${formatInviteDate(date)} · ${formatInviteTime(time)}</p>
+                <p style="margin: 0 0 16px; color: #6b7280; font-size: 14px;">Time zone: Europe/London</p>
+                <p style="margin: 0 0 4px; color: #374151; font-weight: 600;">Google Meet joining info</p>
+                <p style="margin: 0; color: #374151;">Video call link: <a href="${MEET_LINK}" style="color: #166534;">${MEET_LINK}</a></p>
               </div>
               <p style="margin: 0 0 24px;">
                 <a href="${MEET_LINK}" style="display: inline-block; background: #166534; color: white; text-decoration: none; font-weight: 600; padding: 12px 24px; border-radius: 8px;">Join Google Meet</a>
